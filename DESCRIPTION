@@ -1,13 +1,20 @@
 Package: appReporteAvance
 Title: Reporte de avances de oficina
 Version: 0.0.0.9000
-Authors@R: person('Samuel', 'Calderon', email = 'samuel.calderon@uarm.pe', role = c('cre', 'aut'))
-Description: Las personas de la oficina usan esta app para reportar el estado de avance de sus actividades específicas.
+Authors@R: 
+    person("Samuel", "Calderon", , "samuel.calderon@uarm.pe", role = c("cre", "aut"))
+Description: Las personas de la oficina usan esta app para reportar el
+    estado de avance de sus actividades específicas.
 License: MIT + file LICENSE
 Imports: 
     config (>= 0.3.1),
     golem (>= 0.3.2),
     shiny (>= 1.7.1)
+Suggests: 
+    spelling,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
 Encoding: UTF-8
+Language: en-US
 LazyData: true
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.0
