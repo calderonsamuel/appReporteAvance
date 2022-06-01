@@ -6,10 +6,13 @@ Authors@R:
 Description: Las personas de la oficina usan esta app para reportar el
     estado de avance de sus actividades específicas.
 License: MIT + file LICENSE
+URL: https://github.com/calderonsamuel/appReporteAvance
+BugReports: https://github.com/calderonsamuel/appReporteAvance/issues
 Imports: 
     config (>= 0.3.1),
     golem (>= 0.3.2),
-    shiny (>= 1.7.1)
+    shiny (>= 1.7.1),
+    shinyWidgets
 Suggests: 
     spelling,
     testthat (>= 3.0.0)
@@ -18,5 +21,3 @@ Encoding: UTF-8
 Language: en-US
 LazyData: true
 RoxygenNote: 7.2.0
-URL: https://github.com/calderonsamuel/appReporteAvance
-BugReports: https://github.com/calderonsamuel/appReporteAvance/issues
