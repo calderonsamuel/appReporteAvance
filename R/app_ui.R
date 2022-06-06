@@ -10,6 +10,7 @@ app_ui <- function(request) {
     golem_add_external_resources(),
     # Your application UI logic
     fluidPage(
+      theme = app_my_theme(),
       h1("Reporte de avance"),
       mod_form_page_ui("form_page_1")
     )
