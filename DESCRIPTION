@@ -9,8 +9,11 @@ License: MIT + file LICENSE
 URL: https://github.com/calderonsamuel/appReporteAvance
 BugReports: https://github.com/calderonsamuel/appReporteAvance/issues
 Imports: 
+    bslib,
     config (>= 0.3.1),
     golem (>= 0.3.2),
+    lubridate,
+    RSQLite,
     shiny (>= 1.7.1),
     shinyWidgets
 Suggests: 
