@@ -14,7 +14,7 @@ app_ui <- function(request) {
       bs4Dash::dashboardSidebar(
         bs4Dash::sidebarMenu(id = "test",
           bs4Dash::menuItem("Asignar tareas", tabName = "tasks", icon = icon("calendar-plus")),
-          bs4Dash::menuItem("Reporte de avance", tabName = "progress", icon = icon("tasks"))
+          bs4Dash::menuItem("Reporte de avance", tabName = "reporte", icon = icon("tasks"))
         )
       ),
       bs4Dash::dashboardBody(
@@ -22,6 +22,10 @@ app_ui <- function(request) {
           bs4Dash::tabItem(
             tabName = "tasks",
             mod_tasks_ui("tasks_1")
+          ),
+          bs4Dash::tabItem(
+            tabName = "reporte",
+            mod_reporte_ui("reporte_1")
           )
         )
       )
