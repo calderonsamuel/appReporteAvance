@@ -9,8 +9,10 @@ License: MIT + file LICENSE
 URL: https://github.com/calderonsamuel/appReporteAvance
 BugReports: https://github.com/calderonsamuel/appReporteAvance/issues
 Imports: 
+    bs4Dash,
     bslib,
     config (>= 0.3.1),
+    DT,
     golem (>= 0.3.2),
     lubridate,
     RSQLite,

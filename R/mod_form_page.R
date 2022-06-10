@@ -26,6 +26,19 @@ mod_form_page_server <- function(id){
   })
 }
 
+mod_form_page_testapp <- function() {
+
+  ui <- fluidPage(
+    mod_form_page_ui("form_page_1")
+  )
+
+  server <- function(input, output, session) {
+    mod_form_page_server("form_page_1")
+  }
+
+  shinyApp(ui, server)
+}
+
 ## To be copied in the UI
 # mod_form_page_ui("form_page_1")
 

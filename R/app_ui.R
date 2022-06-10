@@ -9,11 +9,23 @@ app_ui <- function(request) {
     # Leave this function for adding external resources
     golem_add_external_resources(),
     # Your application UI logic
-    fluidPage(
-      theme = app_my_theme(),
-      h1("Reporte de avance"),
-      mod_form_page_ui("form_page_1")
+    bs4Dash::dashboardPage(
+      bs4Dash::dashboardHeader(title = "Reporte"),
+      bs4Dash::dashboardSidebar(
+        bs4Dash::sidebarMenu(id = "test",
+          bs4Dash::menuItem("hola")
+        )
+      ),
+      bs4Dash::dashboardBody(
+
+      )
     )
+
+    # fluidPage(
+    #   theme = app_my_theme(),
+    #   h1("Reporte de avance"),
+    #   mod_form_page_ui("form_page_1")
+    # )
   )
 }
 
