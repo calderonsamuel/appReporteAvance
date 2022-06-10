@@ -18,7 +18,10 @@ mod_tasks_ui <- function(id){
             icon = icon("plus"), status = "success", inline = TRUE, circle = TRUE,
             tooltip = shinyWidgets::tooltipOptions(title = "Nueva tarea"),
 
-            selectInput(ns("user"), "Seleccione encargado", choices = get_users()$user_id),
+            selectInput(
+              ns("user"), "Seleccione encargado",
+              choices = with(get_users(), setNames(user_id, paste(name, last_name)))
+            ),
             textAreaInput(ns("description"), "Descripción de tarea"),
             btn_add(ns("add_task"))
           ),
