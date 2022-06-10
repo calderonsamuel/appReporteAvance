@@ -72,9 +72,8 @@ mod_tasks_server <- function(id){
 
         vals$data_tasks <- get_tasks()
 
-        updateSelectInput(session, "user", choices = get_users()$user_id)
+        # updateSelectInput(session, "user", choices = get_users()$user_id)
         updateTextAreaInput(session, "description", value = "")
-        updateSelectInput(session, "select_task", choices = vals$data_tasks$task_id)
 
         alert_success(session = session, text = "La tarea se añadió correctamente")
       }
