@@ -10,19 +10,23 @@
 mod_tasks_ui <- function(id){
   ns <- NS(id)
   tagList(
-    sidebarLayout(
-      sidebarPanel(
-        h3("Nueva tarea"),
-        selectInput(ns("user"), "Seleccione encargado", choices = get_users()$user_id),
-        textInput(ns("description"), "Descripción de tarea"),
-        btn_add(ns("add_task")),
-        h3("Eliminar tarea"),
-        btn_trash(ns("delete_task"))
+    bs4Dash::box(
+      collapsible = FALSE, width = 12,
+      fluidRow(
+        tags$span(
+          shinyWidgets::dropdownButton(
+            icon = icon("plus"), status = "success", inline = TRUE, circle = TRUE,
+            tooltip = shinyWidgets::tooltipOptions(title = "Nueva tarea"),
+
+            selectInput(ns("user"), "Seleccione encargado", choices = get_users()$user_id),
+            textAreaInput(ns("description"), "Descripción de tarea"),
+            btn_add(ns("add_task"))
+          ),
+          btn_trash(ns("delete_task"))
+        )
       ),
-      mainPanel(
-        # verbatimTextOutput(ns("ids_selected")),
-        DT::DTOutput(ns("tabla"))
-      )
+      fluidRow(DT::DTOutput(ns("tabla")))
+
     )
   )
 }
@@ -61,40 +65,33 @@ mod_tasks_server <- function(id){
 
     observeEvent(input$add_task, {
 
-      insert_task(new_task_data())
+      if (input$description == "") {
+        alert_error(session, "Debe añadir una descripción")
+      } else {
+        insert_task(new_task_data())
 
-      vals$data_tasks <- get_tasks()
+        vals$data_tasks <- get_tasks()
 
-      updateSelectInput(session, "user", choices = get_users()$user_id)
-      updateTextInput(session, "description", value = "")
-      updateSelectInput(session, "select_task", choices = vals$data_tasks$task_id)
+        updateSelectInput(session, "user", choices = get_users()$user_id)
+        updateTextAreaInput(session, "description", value = "")
+        updateSelectInput(session, "select_task", choices = vals$data_tasks$task_id)
 
-      showModal(modalDialog(
-        title = "Nueva tarea añadida",
-        footer = modalButton("Ok")
-      ))
+        alert_success(session = session, text = "La tarea se añadió correctamente")
+      }
     })
 
     observeEvent(input$delete_task,{
 
       if (length(task_for_deleting()) == 0) {
 
-        showModal(modalDialog(
-          title = "Debe seleccionar una tarea a eliminar",
-          footer = modalButton("Ok")
-        ))
+        alert_error(session, "Debe seleccionar una tarea a eliminar")
 
       } else {
         delete_task(task_for_deleting())
 
         vals$data_tasks <- get_tasks()
 
-        # updateSelectInput(session, "select_task", choices = vals$data_tasks$task_id)
-
-        showModal(modalDialog(
-          title = "Tarea eliminada",
-          footer = modalButton("Ok")
-        ))
+        alert_info(session, "Tarea eliminada")
       }
 
     })
@@ -105,6 +102,9 @@ mod_tasks_server <- function(id){
 
 mod_tasks_testapp <- function() {
   ui <- fluidPage(
+    tags$head(
+      shinyWidgets::useSweetAlert()
+    ),
     mod_tasks_ui("tasks_1")
   )
 
