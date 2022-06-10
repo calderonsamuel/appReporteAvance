@@ -20,7 +20,9 @@ mod_tasks_ui <- function(id){
 
             selectInput(
               ns("user"), "Seleccione encargado",
-              choices = with(get_users(), setNames(user_id, paste(name, last_name)))
+              choices = with(data = get_users(),
+                             expr = setNames(object = user_id,
+                                             nm = paste(name, last_name)))
             ),
             textAreaInput(ns("description"), "Descripción de tarea"),
             btn_add(ns("add_task"))
