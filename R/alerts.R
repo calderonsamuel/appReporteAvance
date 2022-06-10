@@ -1,5 +1,10 @@
-
-alert_x <- function(title = "Title", type = NULL) {
+#' Sweet alerts factory
+#'
+#' @inheritParams shinyWidgets::sendSweetAlert
+#'
+#' @return A function to generate a sweet alert with a particular title and type.
+#'
+mk_alert <- function(title = "Title", type = NULL) {
   function(session = getDefaultReactiveDomain(),
            text = NULL, btn_labels = "Ok", btn_colors = "#3085d6",
            html = FALSE, closeOnClickOutside = TRUE, showCloseButton = FALSE,
@@ -20,11 +25,27 @@ alert_x <- function(title = "Title", type = NULL) {
   }
 }
 
-alert_success <- alert_x(title = "¡Hecho!", type = "success")
+#' Pre styled sweet alerts
+#'
+#' These functions are convenient wrappers for [shinyWidgets::sendSweetAlert()].
+#'
+#' @inheritParams shinyWidgets::sendSweetAlert
+#' @name alerts
+#' @return HTML code for sweet alerts
+#' @seealso [shinyWidgets::sendSweetAlert()]
+#'
+NULL
+#> NULL
 
-alert_error <- alert_x(title = "Error...", type = "error")
+#' @rdname alerts
+alert_success <- mk_alert(title = "¡Hecho!", type = "success")
 
-alert_info <- alert_x(title = "Atención", type = "info")
+#' @rdname alerts
+alert_error <- mk_alert(title = "Error...", type = "error")
 
-alert_warning <- alert_x(title = "¡Cuidado!", type = "warning")
+#' @rdname alerts
+alert_info <- mk_alert(title = "Atención", type = "info")
+
+#' @rdname alerts
+alert_warning <- mk_alert(title = "¡Cuidado!", type = "warning")
 
