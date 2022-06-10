@@ -22,7 +22,7 @@ mod_form_page_server <- function(id){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     mod_metadata_server("metadata_1")
-    mod_reporte_server("reporte_1")
+    mod_progress_server("reporte_1")
   })
 }
 

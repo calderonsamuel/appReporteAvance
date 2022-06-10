@@ -1,4 +1,4 @@
-#' reporte UI Function
+#' progress UI Function
 #'
 #' @description A shiny Module.
 #'
@@ -7,7 +7,7 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList radioButtons textAreaInput wellPanel
-mod_reporte_ui <- function(id){
+mod_progress_ui <- function(id){
   ns <- NS(id)
   tagList(
     fluidRow(
@@ -61,28 +61,28 @@ mod_reporte_ui <- function(id){
   )
 }
 
-#' reporte Server Functions
+#' progress Server Functions
 #'
 #' @noRd
-mod_reporte_server <- function(id){
+mod_progress_server <- function(id){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
   })
 }
 
-mod_reporte_testapp <- function() {
-  ui <- fluidPage(mod_reporte_ui("reporte_1"))
+mod_progress_testapp <- function() {
+  ui <- fluidPage(mod_progress_ui("progress_1"))
 
   server <- function(input, output, session) {
-    mod_reporte_server("reporte_1")
+    mod_progress_server("progress_1")
   }
 
   shinyApp(ui, server)
 }
 
 ## To be copied in the UI
-# mod_reporte_ui("reporte_1")
+# mod_progress_ui("progress_1")
 
 ## To be copied in the server
-# mod_reporte_server("reporte_1")
+# mod_progress_server("progress_1")
