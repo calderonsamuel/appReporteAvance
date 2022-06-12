@@ -10,19 +10,34 @@
 mod_admin_ui <- function(id){
   ns <- NS(id)
   tagList(
-    sidebarLayout(
-      sidebarPanel(
-        tabsetPanel(
-          tabPanel(
-            title = "Usuarios",
-            mod_admin_users_input(ns("admin_users_1"))
-          )
+    fluidRow(
+      col_4(
+        bs4Dash::box(
+          width = 12,
+          mod_admin_users_input(ns("admin_users_1"))
         )
       ),
-      mainPanel(
-        mod_admin_users_output(ns("admin_users_1"))
+      col_8(
+        bs4Dash::box(
+          width = 12,
+          mod_admin_users_output(ns("admin_users_1"))
+        )
       )
     )
+
+    # sidebarLayout(
+    #   sidebarPanel(
+    #     tabsetPanel(
+    #       tabPanel(
+    #         title = "Usuarios",
+    #         mod_admin_users_input(ns("admin_users_1"))
+    #       )
+    #     )
+    #   ),
+    #   mainPanel(
+    #     mod_admin_users_output(ns("admin_users_1"))
+    #   )
+    # )
   )
 }
 
