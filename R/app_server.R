@@ -9,4 +9,5 @@ app_server <- function(input, output, session) {
   mod_form_page_server("form_page_1")
   mod_tasks_server("tasks_1")
   mod_progress_server("progress_1")
+  mod_admin_server("admin_1")
 }

@@ -15,7 +15,8 @@ app_ui <- function(request) {
         expandOnHover = FALSE,
         bs4Dash::sidebarMenu(id = "test",
           bs4Dash::menuItem("Asignar tareas", tabName = "tasks", icon = icon("calendar-plus")),
-          bs4Dash::menuItem("Reporte de avance", tabName = "progress", icon = icon("tasks"))
+          bs4Dash::menuItem("Reporte de avance", tabName = "progress", icon = icon("tasks")),
+          bs4Dash::menuItem("Admin", tabName = "admin", icon = icon("user-shield"))
         )
       ),
       bs4Dash::dashboardBody(
@@ -27,6 +28,10 @@ app_ui <- function(request) {
           bs4Dash::tabItem(
             tabName = "progress",
             mod_progress_ui("progress_1")
+          ),
+          bs4Dash::tabItem(
+            tabName = "admin",
+            mod_admin_ui("admin_1")
           )
         )
       )
