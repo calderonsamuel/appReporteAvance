@@ -15,7 +15,8 @@ mod_progress_ui <- function(id){
         title = "Pendiente",
         solidHeader = TRUE,
         collapsible = FALSE,
-        width = 3
+        width = 3,
+        uiOutput(ns("pendientes"))
       ),
       bs4Dash::box(
         title = "En proceso",
@@ -67,6 +68,25 @@ mod_progress_ui <- function(id){
 mod_progress_server <- function(id){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
+
+    vals <- reactiveValues(
+      user_tasks = get_task_from_user(user = "dgco93")
+    )
+
+    tasks_by_status <- reactiveValues(
+      pendientes = reactive(subset(vals$user_tasks, status == "Pendiente")),
+      en_proceso = reactive(subset(vals$user_tasks, status == "En proceso"))
+    )
+
+    output$pendientes <- renderUI({
+      # data <- tasks_by_status$pendientes
+      # for (row in seq_len(nrow(data))) {
+      #   row_data <- data[row,]
+      # }
+      # tableOutput(ns("tabla_pendientes"))
+    })
+
+    output$tabla_pendientes <- renderTable(vals$user_tasks)
 
   })
 }
