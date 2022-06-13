@@ -1,39 +1,43 @@
 create_reporte_progress <- function() {
-  con <- RSQLite::dbConnect(RSQLite::SQLite(), "reporte_avance.db")
+  con <- db_connect()
 
-  if (!RSQLite::dbExistsTable(con, "progress")) {
+  if (!DBI::dbExistsTable(con, "progress")) {
     fields_list <- data.frame(
-      task_id = character(),
-      status_id = character(),
-      status = character(),
-      time = character(),
-      explain = character()
+      task_id = strrep(" ", 64),
+      status_id = strrep(" ", 64),
+      status = strrep(" ", 64),
+      time = strrep(" ", 64),
+      explain = strrep(" ", 64)
     )
 
-    RSQLite::dbWriteTable(con, "progress", fields_list)
+    DBI::dbWriteTable(con, "progress", fields_list)
+    delete_status(status_id = strrep(" ", 64), with_print = FALSE)
     print("created table 'progress'")
   }
 
-  RSQLite::dbDisconnect(con)
+  DBI::dbDisconnect(con)
 }
 
 get_progress <- function() {
-  con <- RSQLite::dbConnect(RSQLite::SQLite(), "reporte_avance.db")
-  data <- RSQLite::dbReadTable(con, "progress")
-  RSQLite::dbDisconnect(con)
+  con <- db_connect()
+  data <- DBI::dbReadTable(con, "progress")
+  DBI::dbDisconnect(con)
   return(data)
 }
 
-insert_status <- function(field_list) {
-  con <- RSQLite::dbConnect(RSQLite::SQLite(), "reporte_avance.db")
-  RSQLite::dbWriteTable(con, "progress", field_list, append = TRUE)
-  RSQLite::dbDisconnect(con)
-  print(sprintf("inserted status with id %s", field_list$status_id))
+insert_status <- function(field_list, with_print = TRUE) {
+  con <- db_connect()
+  DBI::dbWriteTable(con, "progress", field_list, append = TRUE)
+  DBI::dbDisconnect(con)
+  if (with_print) print(sprintf("inserted status with id %s", field_list$status_id))
 }
 
-delete_status <- function(status_id) {
-  con <- RSQLite::dbConnect(RSQLite::SQLite(), "reporte_avance.db")
-  RSQLite::dbExecute(con, sprintf("DELETE FROM progress WHERE (status_id = '%s')", status_id))
-  RSQLite::dbDisconnect(con)
-  print(sprintf("deleted status with id %s", task_id))
+delete_status <- function(status_id, with_print = TRUE) {
+  con <- db_connect()
+  DBI::dbExecute(con, sprintf("DELETE FROM progress WHERE (status_id = '%s')", status_id))
+  DBI::dbDisconnect(con)
+  if (with_print) print(sprintf("deleted status with id %s", task_id))
 }
+
+# create_reporte_progress()
+# remove_table_from_reporte("progress")
