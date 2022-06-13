@@ -16,10 +16,10 @@ mod_admin_users_input <- function(id){
     textInput(ns("last_name"), "Apellidos"),
     selectInput(ns("privileges"), "Privilegios", choices = c("user", "admin")),
     dateInput(ns("date_added"), "Fecha", language = "es", value = lubridate::today("America/Lima")),
-    actionButton(ns("insert_user"), "Agregar"),
+    btn_agregar(ns("insert_user")),
     h3("Eliminar usuario"),
     uiOutput(ns("select_user")),
-    actionButton(ns("delete_user"), "Eliminar")
+    btn_eliminar(ns("delete_user"))
   )
 }
 
