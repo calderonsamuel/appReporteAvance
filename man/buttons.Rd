@@ -4,11 +4,29 @@
 \alias{buttons}
 \alias{btn_add}
 \alias{btn_trash}
+\alias{btn_agregar}
+\alias{btn_eliminar}
 \title{Pre styled pretty action buttons}
 \usage{
 btn_add(inputId, icon = NULL, size = "md", block = FALSE, no_outline = TRUE)
 
 btn_trash(inputId, icon = NULL, size = "md", block = FALSE, no_outline = TRUE)
+
+btn_agregar(
+  inputId,
+  icon = NULL,
+  size = "md",
+  block = FALSE,
+  no_outline = TRUE
+)
+
+btn_eliminar(
+  inputId,
+  icon = NULL,
+  size = "md",
+  block = FALSE,
+  no_outline = TRUE
+)
 }
 \arguments{
 \item{inputId}{The \code{input} slot that will be used to access the value.}
