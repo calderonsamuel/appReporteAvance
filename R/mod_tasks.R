@@ -51,7 +51,7 @@ mod_tasks_server <- function(id){
     new_task_data <- reactive({
       data.frame(
         reviewer = "dgco93",
-        user = input$user,
+        user_id = input$user,
         task_id = paste0("T", lubridate::now("America/Lima")),
         task_description = input$description,
         status = "Pendiente"
