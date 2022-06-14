@@ -4,7 +4,7 @@ create_reporte_tasks <- function() {
   if (!DBI::dbExistsTable(con, "tasks")) {
     task_list <- data.frame(
       reviewer = strrep(" ", 64),
-      user = strrep(" ", 64),
+      user_id = strrep(" ", 64),
       task_id = strrep(" ", 64),
       task_description = strrep(" ", 64),
       status = strrep(" ", 64)
@@ -58,10 +58,30 @@ mdf_task_status <- function(task_id, new_status, with_print = TRUE) {
 
 get_task_from_user <- function(user) {
   con <- db_connect()
-  data <- DBI::dbGetQuery(con, sprintf("SELECT * FROM tasks WHERE (user = '%s')", user))
+  data <- DBI::dbGetQuery(con, sprintf("SELECT * FROM tasks WHERE (user_id = '%s')", user))
   DBI::dbDisconnect(con)
   return(data)
 }
+
+mk_task_getter <- function(status) {
+  function(user_id) {
+    con <- db_connect()
+    data <- try(
+      expr = DBI::dbGetQuery(
+        conn = con,
+        statement = sprintf("select * from tasks where (user_id = '%s' and status = '%s')",
+                            user_id, status)),
+      silent = TRUE)
+    DBI::dbDisconnect(con)
+    return(data)
+  }
+}
+
+get_tasks_pendientes <- mk_task_getter("Pendiente")
+get_tasks_en_proceso <- mk_task_getter("En proceso")
+get_tasks_pausado <- mk_task_getter("Pausado")
+get_tasks_en_revision <- mk_task_getter("En revisión")
+get_tasks_terminado <- mk_task_getter("Terminado")
 
 # create_reporte_tasks()
 # remove_table_from_reporte("tasks")
@@ -69,7 +89,7 @@ get_task_from_user <- function(user) {
 #
 # data.frame(
 #   reviewer = "dgco93",
-#   user = "dgco90",
+#   user_id = "dgco90",
 #   task_id = "123",
 #   task_description = "Una tarea importate",
 #   status = "Pendiente"
@@ -78,3 +98,4 @@ get_task_from_user <- function(user) {
 # get_tasks()
 # delete_task("AOI001")
 # get_tasks()
+
