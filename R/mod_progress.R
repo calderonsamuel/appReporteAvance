@@ -18,15 +18,9 @@ mod_progress_ui <- function(id){
         width = 3,
         uiOutput(ns("pendientes"))
       ),
-      bs4Dash::box(
-        title = "En proceso",
-        solidHeader = TRUE,
-        collapsible = FALSE,
-        width = 3
-      ),
       col_3(
         bs4Dash::box(
-          title = "En revisión",
+          title = "En proceso",
           solidHeader = TRUE,
           collapsible = FALSE,
           width = 12
@@ -37,6 +31,12 @@ mod_progress_ui <- function(id){
           collapsible = FALSE,
           width = 12
         ),
+      ),
+      bs4Dash::box(
+        title = "En revisión",
+        solidHeader = TRUE,
+        collapsible = FALSE,
+        width = 3
       ),
       bs4Dash::box(
         title = "Terminado",
@@ -74,11 +74,14 @@ mod_progress_server <- function(id){
     )
 
     tasks_by_status <- reactiveValues(
-      pendientes = reactive(subset(vals$user_tasks, status == "Pendiente")),
-      en_proceso = reactive(subset(vals$user_tasks, status == "En proceso"))
+      pendientes = get_tasks_pendientes(user = "dgco93"),
+      en_proceso = get_tasks_en_proceso(user = "dgco93")
     )
 
     output$pendientes <- renderUI({
+      tasks_by_status$pendientes$task_description |>
+        lapply(box_pendientes)
+      # box_pendientes("Pendiente 1")
       # data <- tasks_by_status$pendientes
       # for (row in seq_len(nrow(data))) {
       #   row_data <- data[row,]
@@ -106,3 +109,13 @@ mod_progress_testapp <- function() {
 
 ## To be copied in the server
 # mod_progress_server("progress_1")
+
+## Functions
+convert_task_to_box <- function(task) {
+
+}
+bs4Dash::box(
+  title = ""
+)
+
+
