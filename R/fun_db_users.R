@@ -7,6 +7,7 @@ create_reporte_users <- function() {
       name = strrep(" ", 64),
       last_name = strrep(" ", 64),
       privileges = strrep(" ", 64),
+      responds_to = strrep(" ", 64),
       date_added = strrep(" ", 64)
     )
 
@@ -39,17 +40,27 @@ delete_user <- function(user_id, with_print = TRUE) {
   if (with_print) print(sprintf("deleted user with id %s", user_id))
 }
 
+get_user_id_from_privileges <- function(privileges) {
+  con <- db_connect()
+  data <- DBI::dbGetQuery(con, sprintf("SELECT user_id FROM users WHERE (privileges = '%s')", privileges))
+  DBI::dbDisconnect(con)
+  return(data$user_id)
+}
+
 
 # remove_table_from_reporte("users")
 # create_reporte_users()
 #
-# users <- data.frame(
-#   user_id = c("dgco93", "dgco26", "dgco84"),
-#   name = c("Samuel", "Miguel", "Leanna"),
-#   last_name =c("Calderon", "Rojas", "Zuñiga"),
-#   privileges = c("admin", "user", "user"),
-#   date_added = rep(lubridate::today("America/Lima"), 3) |> as.character()
-# )
-#
-# insert_user(users)
+
+# initial users dataset
+
+# data.frame(
+#   user_id = c("dgco93@mininter.gob.pe", "dgco26@mininter.gob.pe", "dgco84@mininter.gob.pe", "dgco80@mininter.gob.pe"),
+#   name = c("Samuel", "Miguel", "Leanna", "Gelin"),
+#   last_name =c("Calderon", "Rojas", "Zuñiga", "Espinoza"),
+#   privileges = c("admin", "user1", "user1", "user1"),
+#   responds_to = c("wolivos@mininter.gob.pe", "wolivos@mininter.gob.pe", "wolivos@mininter.gob.pe", "wolivos@mininter.gob.pe"),
+#   date_added = rep(lubridate::today("America/Lima"), 4) |> as.character()
+# ) |> insert_user()
+
 # get_users()
