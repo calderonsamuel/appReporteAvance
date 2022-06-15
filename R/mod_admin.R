@@ -24,20 +24,6 @@ mod_admin_ui <- function(id){
         )
       )
     )
-
-    # sidebarLayout(
-    #   sidebarPanel(
-    #     tabsetPanel(
-    #       tabPanel(
-    #         title = "Usuarios",
-    #         mod_admin_users_input(ns("admin_users_1"))
-    #       )
-    #     )
-    #   ),
-    #   mainPanel(
-    #     mod_admin_users_output(ns("admin_users_1"))
-    #   )
-    # )
   )
 }
 
