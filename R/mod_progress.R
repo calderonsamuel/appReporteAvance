@@ -45,51 +45,24 @@ mod_progress_ui <- function(id){
         width = 3
       )
     )
-    # wellPanel(
-    #   prettyRadioButtons(
-    #     inputId = ns("estado"),
-    #     label = "Indique estado de avance",
-    #     choices = c("Pendiente", "En proceso", "Postergado/Pausado",
-    #                 "Esperando revision", "Terminado"),
-    #     selected = character()
-    #   ),
-    #   textAreaInput(
-    #     inputId = ns("descripcion_avance"),
-    #     label = "Ingrese descripción del avance",
-    #     placeholder = "Sea lo más detallado posible"
-    #   )
-    # )
   )
 }
 
 #' progress Server Functions
 #'
 #' @noRd
-mod_progress_server <- function(id){
+mod_progress_server <- function(id, user_iniciado){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
     vals <- reactiveValues(
-      user_tasks = get_task_from_user(user = "dgco93")
-    )
-
-    tasks_by_status <- reactiveValues(
-      pendientes = get_tasks_pendientes(user = "dgco93"),
-      en_proceso = get_tasks_en_proceso(user = "dgco93")
+      pendientes = reactive(get_tasks_pendientes(user = user_iniciado()))
     )
 
     output$pendientes <- renderUI({
-      tasks_by_status$pendientes$task_description |>
+      vals$pendientes()$task_description |>
         lapply(box_pendientes)
-      # box_pendientes("Pendiente 1")
-      # data <- tasks_by_status$pendientes
-      # for (row in seq_len(nrow(data))) {
-      #   row_data <- data[row,]
-      # }
-      # tableOutput(ns("tabla_pendientes"))
     })
-
-    output$tabla_pendientes <- renderTable(vals$user_tasks)
 
   })
 }
@@ -98,7 +71,8 @@ mod_progress_testapp <- function() {
   ui <- fluidPage(mod_progress_ui("progress_1"))
 
   server <- function(input, output, session) {
-    mod_progress_server("progress_1")
+    user_iniciado <- reactive("dgco93@mininter.gob.pe")
+    mod_progress_server("progress_1", user_iniciado)
   }
 
   shinyApp(ui, server)
@@ -109,13 +83,3 @@ mod_progress_testapp <- function() {
 
 ## To be copied in the server
 # mod_progress_server("progress_1")
-
-## Functions
-convert_task_to_box <- function(task) {
-
-}
-bs4Dash::box(
-  title = ""
-)
-
-
