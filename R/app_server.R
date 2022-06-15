@@ -22,7 +22,10 @@ app_server <- function(input, output, session) {
   user_iniciado <- reactive(f$get_signed_in()$response$email)
 
 
-  output$my_ui <- renderUI(mod_secure_ui(ns("secure_1")))
+  output$my_ui <- renderUI({
+    f$req_sign_in()
+    mod_secure_ui(ns("secure_1"))
+  })
 
   mod_secure_server("secure_1", user_iniciado)
 
