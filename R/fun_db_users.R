@@ -47,6 +47,13 @@ get_user_id_from_privileges <- function(privileges) {
   return(data$user_id)
 }
 
+get_user_privilege_status <- function(user_id) {
+  con <- db_connect()
+  data <- DBI::dbGetQuery(con, sprintf("SELECT privileges FROM users WHERE (user_id = '%s')", user_id))
+  DBI::dbDisconnect(con)
+  return(data$privileges)
+}
+
 
 # remove_table_from_reporte("users")
 # create_reporte_users()

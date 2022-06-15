@@ -25,7 +25,6 @@ mod_secure_ui <- function(id){
         bs4Dash::tabItems(
           bs4Dash::tabItem(
             tabName = "tasks",
-            # verbatimTextOutput(ns("user_iniciado")),
             mod_tasks_ui(ns("tasks_1"))
           ),
           bs4Dash::tabItem(
@@ -34,7 +33,8 @@ mod_secure_ui <- function(id){
           ),
           bs4Dash::tabItem(
             tabName = "admin",
-            mod_admin_ui(ns("admin_1"))
+            uiOutput(ns("tab_admin"))
+            # mod_admin_ui(ns("admin_1"))
           )
         )
       )
@@ -48,12 +48,16 @@ mod_secure_ui <- function(id){
 mod_secure_server <- function(id, user_iniciado){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
-    # mod_form_page_server("form_page_1")
+
+    output$tab_admin <- renderUI({
+      validate(need(get_user_privilege_status(user_iniciado()) == "admin", "solo visible para administradores"))
+      mod_admin_ui(ns("admin_1"))
+    })
+
     mod_tasks_server("tasks_1", user_iniciado)
     mod_progress_server("progress_1", user_iniciado)
     mod_admin_server("admin_1")
 
-    # output$user_iniciado <- renderPrint(user_iniciado())
   })
 }
 
