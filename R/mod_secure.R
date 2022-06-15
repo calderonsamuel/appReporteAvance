@@ -49,8 +49,8 @@ mod_secure_server <- function(id, user_iniciado){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     # mod_form_page_server("form_page_1")
-    mod_tasks_server("tasks_1")
-    mod_progress_server("progress_1")
+    mod_tasks_server("tasks_1", user_iniciado)
+    mod_progress_server("progress_1", user_iniciado)
     mod_admin_server("admin_1")
 
     # output$user_iniciado <- renderPrint(user_iniciado())
