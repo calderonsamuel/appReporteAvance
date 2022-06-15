@@ -20,11 +20,12 @@ app_server <- function(input, output, session) {
   s <- firebase::Storage$new()
 
   user_iniciado <- reactive(f$get_signed_in()$response$email)
+  privileges <- reactive(get_user_privilege_status(user_iniciado()))
 
 
   output$my_ui <- renderUI({
     f$req_sign_in()
-    mod_secure_ui(ns("secure_1"))
+    mod_secure_ui(ns("secure_1"), privileges = privileges())
   })
 
   mod_secure_server("secure_1", user_iniciado)
