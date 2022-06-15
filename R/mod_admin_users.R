@@ -40,7 +40,7 @@ mod_admin_users_output <- function(id){
   ns <- NS(id)
   tagList(
     h3("Tabla de usuarios"),
-    tableOutput(ns("table_users"))
+    DT::DTOutput(ns("table_users"))
   )
 }
 
@@ -92,7 +92,11 @@ mod_admin_users_server <- function(id){
       ))
     })
 
-    output$table_users <- renderTable(vals$data_users)
+    output$table_users <- DT::renderDT(
+      expr = vals$data_users,
+      options = options_DT(),
+      selection = 'single'
+    )
 
     output$select_user <- renderUI({
       selectInput(inputId = ns("del_user_id"),
