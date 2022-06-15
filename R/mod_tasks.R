@@ -39,7 +39,7 @@ mod_tasks_ui <- function(id){
 #' tasks Server Functions
 #'
 #' @noRd
-mod_tasks_server <- function(id){
+mod_tasks_server <- function(id, user_iniciado){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
@@ -50,7 +50,7 @@ mod_tasks_server <- function(id){
 
     new_task_data <- reactive({
       data.frame(
-        reviewer = "dgco93",
+        reviewer = user_iniciado(),
         user_id = input$user,
         task_id = paste0("T", lubridate::now("America/Lima")),
         task_description = input$description,
@@ -113,7 +113,8 @@ mod_tasks_testapp <- function() {
   )
 
   server <- function(input, output, session) {
-    mod_tasks_server("tasks_1")
+    user_iniciado <- reactive("dgco93@mininter.gob.pe")
+    mod_tasks_server("tasks_1", user_iniciado)
   }
 
   shinyApp(ui, server)
