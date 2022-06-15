@@ -22,6 +22,7 @@ mod_admin_users_input <- function(id){
     ),
     bs4Dash::box(
       title = "Eliminar usuario",
+      width = 12,
       uiOutput(ns("select_user")),
       btn_eliminar(ns("delete_user"))
     )
