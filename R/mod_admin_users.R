@@ -13,6 +13,8 @@ mod_admin_users_input <- function(id){
     bs4Dash::box(
       title = "Agregar usuario",
       width = 12,
+      collapsed = TRUE,
+      status = "success",
       textInput(ns("user_id"), "ID"),
       textInput(ns("name"), "Nombres"),
       textInput(ns("last_name"), "Apellidos"),
@@ -23,6 +25,8 @@ mod_admin_users_input <- function(id){
     bs4Dash::box(
       title = "Eliminar usuario",
       width = 12,
+      status = "danger",
+      collapsed = TRUE,
       uiOutput(ns("select_user")),
       btn_eliminar(ns("delete_user"))
     )
