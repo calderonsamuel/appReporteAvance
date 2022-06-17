@@ -10,7 +10,8 @@ app_ui <- function(request) {
     golem_add_external_resources(),
     # Your application UI logic
 
-    firebase::reqSignin(
+    # see R/fun_firebase.R for function definition
+    reqSignin(
       uiOutput("my_ui")
     )
 
