@@ -17,9 +17,18 @@ mod_secure_ui <- function(id, privileges){
         expandOnHover = FALSE,
         bs4Dash::sidebarMenu(
           id = "sidebar",
-          bs4Dash::menuItem("Reporte de avance", tabName = "progress", icon = icon("tasks"), selected = TRUE),
+          bs4Dash::menuItem(
+            text = "Reporte de avance",
+            tabName = "progress",
+            icon = icon("tasks"),
+            selected = TRUE
+          ),
           if (privileges != "user1") bs4Dash::menuItem("Asignar tareas", tabName = "tasks", icon = icon("calendar-plus")),
-          if (privileges == "admin") bs4Dash::menuItem("Admin", tabName = "admin", icon = icon("user-shield"))
+          bs4Dash::menuItem(
+            text = "Admin",
+            icon = icon("user-shield"),
+            mod_admin_sidebar(ns("admin_1"), privileges = privileges) # returns a bs4Dash::menuSubitem
+          )
         )
       ),
       bs4Dash::dashboardBody(
@@ -32,11 +41,7 @@ mod_secure_ui <- function(id, privileges){
             tabName = "tasks",
             mod_tasks_ui(ns("tasks_1"))
           ),
-          bs4Dash::tabItem(
-            tabName = "admin",
-            # uiOutput(ns("tab_admin"))
-            mod_admin_ui(ns("admin_1"))
-          )
+          mod_admin_ui(ns("admin_1"), privileges = privileges) # returns a bs4Dash::tabItem
         )
       )
     )
@@ -59,7 +64,7 @@ mod_secure_server <- function(id, user_iniciado){
 
 mod_secure_testapp <- function() {
 
-  ui <- fluidPage(mod_secure_ui("test", privileges = "user1"))
+  ui <- fluidPage(mod_secure_ui("test", privileges = "admin"))
 
   server <- function(input, output, session) {
     user_iniciado <- reactive("dgco93@mininter.gob.pe")

@@ -7,43 +7,47 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-mod_admin_users_input <- function(id){
+mod_admin_users_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    bs4Dash::box(
-      title = "Agregar usuario",
-      width = 12,
-      collapsed = TRUE,
-      status = "success",
-      textInput(ns("user_id"), "ID"),
-      textInput(ns("name"), "Nombres"),
-      textInput(ns("last_name"), "Apellidos"),
-      selectInput(ns("privileges"), "Privilegios", choices = c("user1", "user2", "admin")),
-      selectInput(ns("responds_to"), "Responde a:", choices = get_user_id_from_privileges("user2")),
-      dateInput(ns("date_added"), "Fecha", language = "es", value = lubridate::today("America/Lima")),
-      btn_agregar(ns("insert_user"))
-    ),
-    bs4Dash::box(
-      title = "Eliminar usuario",
-      width = 12,
-      status = "danger",
-      collapsed = TRUE,
-      uiOutput(ns("select_user")),
-      btn_eliminar(ns("delete_user"))
+    fluidRow(
+      col_4(
+        bs4Dash::box(
+          width = 12,
+          bs4Dash::box(
+            title = "Agregar usuario",
+            width = 12,
+            collapsed = TRUE,
+            status = "success",
+            textInput(ns("user_id"), "ID"),
+            textInput(ns("name"), "Nombres"),
+            textInput(ns("last_name"), "Apellidos"),
+            selectInput(ns("privileges"), "Privilegios", choices = c("user1", "user2", "admin")),
+            selectInput(ns("responds_to"), "Responde a:", choices = get_user_id_from_privileges("user2")),
+            dateInput(ns("date_added"), "Fecha", language = "es", value = lubridate::today("America/Lima")),
+            btn_agregar(ns("insert_user"))
+          ),
+          bs4Dash::box(
+            title = "Eliminar usuario",
+            width = 12,
+            status = "danger",
+            collapsed = TRUE,
+            uiOutput(ns("select_user")),
+            btn_eliminar(ns("delete_user"))
+          )
+        )
+      ),
+      col_8(
+        bs4Dash::box(
+          width = 12,
+          h3("Tabla de usuarios"),
+          DT::DTOutput(ns("table_users"))
+        )
+      )
     )
   )
 }
 
-#' admin_users UI OUTPUT Functions
-#'
-#' @noRd
-mod_admin_users_output <- function(id){
-  ns <- NS(id)
-  tagList(
-    h3("Tabla de usuarios"),
-    DT::DTOutput(ns("table_users"))
-  )
-}
 
 #' admin_users Server Functions
 #'
