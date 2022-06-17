@@ -17,20 +17,20 @@ mod_secure_ui <- function(id, privileges){
         expandOnHover = FALSE,
         bs4Dash::sidebarMenu(
           id = "sidebar",
-          if (privileges != "user1") bs4Dash::menuItem("Asignar tareas", tabName = "tasks", icon = icon("calendar-plus")),
           bs4Dash::menuItem("Reporte de avance", tabName = "progress", icon = icon("tasks")),
+          if (privileges != "user1") bs4Dash::menuItem("Asignar tareas", tabName = "tasks", icon = icon("calendar-plus")),
           if (privileges == "admin") bs4Dash::menuItem("Admin", tabName = "admin", icon = icon("user-shield"))
         )
       ),
       bs4Dash::dashboardBody(
         bs4Dash::tabItems(
           bs4Dash::tabItem(
-            tabName = "tasks",
-            mod_tasks_ui(ns("tasks_1"))
-          ),
-          bs4Dash::tabItem(
             tabName = "progress",
             mod_progress_ui(ns("progress_1"))
+          ),
+          bs4Dash::tabItem(
+            tabName = "tasks",
+            mod_tasks_ui(ns("tasks_1"))
           ),
           bs4Dash::tabItem(
             tabName = "admin",
@@ -67,7 +67,7 @@ mod_secure_testapp <- function() {
   ui <- fluidPage(mod_secure_ui("test", privileges = "user1"))
 
   server <- function(input, output, session) {
-    user_iniciado <- reactive("dgco84@mininter.gob.pe")
+    user_iniciado <- reactive("dgco93@mininter.gob.pe")
     mod_secure_server("test", user_iniciado)
   }
 
