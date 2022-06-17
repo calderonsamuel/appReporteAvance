@@ -32,7 +32,7 @@ mod_admin_server <- function(id){
 mod_admin_menuItem <- function(id, privileges) {
   ns <- NS(id)
   if (privileges != "admin") return(NULL)
-  tagList(
+  # tagList(
     bs4Dash::menuItem(
       text = "Admin",
       icon = icon("user-shield"),
@@ -41,7 +41,7 @@ mod_admin_menuItem <- function(id, privileges) {
         tabName = "admin-users"
       )
     )
-  )
+  # )
 }
 
 mod_admin_testapp <- function(id = "mod_admin_1", privileges = "admin") {

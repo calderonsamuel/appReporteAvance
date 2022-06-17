@@ -9,7 +9,7 @@
 #' @importFrom shiny NS tagList
 mod_secure_ui <- function(id, privileges){
   ns <- NS(id)
-  tagList(
+  # tagList(
     bs4Dash::dashboardPage(
       bs4Dash::dashboardHeader(title = "Reporte"),
       bs4Dash::dashboardSidebar(
@@ -24,7 +24,13 @@ mod_secure_ui <- function(id, privileges){
             selected = TRUE
           ),
           if (privileges != "user1") bs4Dash::menuItem("Asignar tareas", tabName = "tasks", icon = icon("calendar-plus")),
-          mod_admin_menuItem(ns("admin_1"), privileges = privileges) # returns a bs4Dash::menuItem
+          if (privileges == "admin") {
+            bs4Dash::menuItem(
+              text = "Admin",
+              icon = icon("user-shield"),
+              tabName = "admin_users"
+            )
+          }
         )
       ),
       bs4Dash::dashboardBody(
@@ -37,11 +43,14 @@ mod_secure_ui <- function(id, privileges){
             tabName = "tasks",
             mod_tasks_ui(ns("tasks_1"))
           ),
-          mod_admin_ui(ns("admin_1")) # returns a bs4Dash::tabItem
+          bs4Dash::tabItem(
+            tabName = "admin_users",
+            mod_admin_users_ui(ns("admin_users_1"))
+          )
         )
       )
     )
-  )
+  # )
 }
 
 #' secure Server Functions
@@ -53,18 +62,19 @@ mod_secure_server <- function(id, user_iniciado){
 
     mod_tasks_server("tasks_1", user_iniciado)
     mod_progress_server("progress_1", user_iniciado)
-    mod_admin_server("admin_1")
+    # mod_admin_server("admin_1")
+    mod_admin_users_server("admin_users_1")
 
   })
 }
 
-mod_secure_testapp <- function(privileges = "admin") {
+mod_secure_testapp <- function(id = "test", privileges = "admin") {
 
-  ui <- mod_secure_ui("test", privileges = privileges)
+  ui <- mod_secure_ui(id, privileges = privileges)
 
   server <- function(input, output, session) {
     user_iniciado <- reactive("dgco93@mininter.gob.pe")
-    mod_secure_server("test", user_iniciado)
+    mod_secure_server(id, user_iniciado)
   }
 
   shinyApp(ui, server)
