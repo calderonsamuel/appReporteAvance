@@ -26,7 +26,7 @@ mod_secure_ui <- function(id, privileges){
           if (privileges != "user1") bs4Dash::menuItem("Asignar tareas", tabName = "tasks", icon = icon("calendar-plus")),
           if (privileges == "admin") {
             bs4Dash::menuItem(
-              text = "Admin",
+              text = "User admin",
               icon = icon("user-shield"),
               tabName = "admin_users"
             )
