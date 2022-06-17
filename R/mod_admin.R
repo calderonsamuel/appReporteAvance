@@ -7,14 +7,14 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-mod_admin_ui <- function(id, privileges){
+mod_admin_ui <- function(id){
   ns <- NS(id)
-  if (privileges != "admin") return(NULL) else {
+  # if (privileges != "admin") return(tagList()) else {
     bs4Dash::tabItem(
       tabName = "admin-users",
       mod_admin_users_ui(ns("admin_users_1"))
     )
-  }
+  # }
 }
 
 #' admin Server Functions
@@ -29,33 +29,33 @@ mod_admin_server <- function(id){
   })
 }
 
-mod_admin_sidebar <- function(id, privileges) {
+mod_admin_menuItem <- function(id, privileges) {
   ns <- NS(id)
   if (privileges != "admin") return(NULL)
   tagList(
+    bs4Dash::menuItem(
+      text = "Admin",
+      icon = icon("user-shield"),
       bs4Dash::menuSubItem(
         text = "Usuarios",
         tabName = "admin-users"
       )
+    )
   )
 }
 
 mod_admin_testapp <- function(id = "mod_admin_1", privileges = "admin") {
 
-  # ui <- fluidPage(mod_admin_ui("test title"))
   ui <- bs4Dash::dashboardPage(
     header = bs4Dash::dashboardHeader(title = "test"),
     sidebar = bs4Dash::dashboardSidebar(
       bs4Dash::sidebarMenu(
-        bs4Dash::menuItem(
-          text = "test menu",
-          mod_admin_sidebar(id, privileges = privileges)
-        )
+        mod_admin_menuItem(id, privileges)
       )
     ),
     body = bs4Dash::dashboardBody(
       bs4Dash::tabItems(
-        mod_admin_ui(id, privileges = privileges)
+        mod_admin_ui(id)
       )
     )
   )
