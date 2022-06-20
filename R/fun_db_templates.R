@@ -53,6 +53,6 @@ get_templates_from_user <- function(user_id) {
 # data.frame(
 #   template_id = "M02.01.01.00.02",
 #   template_description = "Diseño de políticas y estrategias para el control de drogas y cultivos ilegales",
-#   user_id = "dgco93@mininter.gob.pe"
+#   user_id = "team-politicas"
 # ) |>
 #   insert_template()

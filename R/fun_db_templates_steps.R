@@ -50,7 +50,7 @@ delete_template_steps <- function(template_id, with_print = TRUE) {
 #   setNames(c("step_id", "step_description")) |>
 #   dplyr::mutate(
 #     step_id = sprintf("step_%02i", step_id),
-#     user_id = "dgco93@mininter.gob.pe",
+#     user_id = "team-politicas",
 #     template_id = "M02.01.01.00.02"
 #   ) |>
 #   insert_template_steps()
