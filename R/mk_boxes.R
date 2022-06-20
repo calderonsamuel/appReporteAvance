@@ -1,4 +1,4 @@
-mk_box <- function(icon = NULL) {
+mk_box <- function(icon = NULL, background = NULL) {
   function(title = NULL, ...) {
     bs4Dash::box(
       ...,
@@ -6,7 +6,7 @@ mk_box <- function(icon = NULL) {
       footer = NULL,
       status = NULL,
       solidHeader = FALSE,
-      background = NULL,
+      background = background,
       width = 12, # default is 6´
       height = NULL,
       collapsible = TRUE,
@@ -19,11 +19,13 @@ mk_box <- function(icon = NULL) {
       elevation = NULL,
       headerBorder = TRUE,
       label = NULL,
-      dropdownMenu = NULL,
       sidebar = NULL,
+      dropdownMenu = NULL,
       id = NULL
     )
   }
 }
 
-box_pendientes <- mk_box(icon = shiny::icon("calendar"))
+box_pendientes <- mk_box(icon = icon("calendar"))
+box_pendientes_user <- mk_box(background = "olive")
+box_pendientes_group <- mk_box(background = "teal")
