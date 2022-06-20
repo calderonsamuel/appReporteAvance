@@ -53,6 +53,12 @@ mod_tasks_server <- function(id, user_iniciado){
         title = "Nueva tarea",
 
         selectInput(
+          inputId = ns("type"),
+          label = "Tipo de asignación",
+          choices = c("Usuario" = "user", "Grupo" = "team")
+        ),
+
+        selectInput(
           inputId = ns("user"),
           label = "Seleccione encargado",
           choices = with(data = get_users(),
@@ -66,6 +72,16 @@ mod_tasks_server <- function(id, user_iniciado){
           btn_agregar(ns("save"))
         )
       ))
+    })
+
+    observeEvent(input$type,{
+      if (input$type == "user") {
+        updateSelectInput(session, "user", choices = with(data = get_users(),
+                                                          expr = setNames(object = user_id,
+                                                                          nm = paste(name, last_name))))
+      } else {
+        updateSelectInput(session, "user", choices = get_groups()$group_id |> unique())
+      }
     })
 
     observeEvent(input$save, {

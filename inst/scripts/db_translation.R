@@ -9,3 +9,8 @@ mtcars2
 mtcars2 |>
   filter(cyl %in% c("6", "4")) |>
   show_query()
+
+# <SQL>
+#   SELECT *
+#   FROM `mtcars`
+#   WHERE (`cyl` IN ('6', '4'))
