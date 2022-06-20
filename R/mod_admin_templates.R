@@ -11,21 +11,19 @@ mod_admin_templates_ui <- function(id){
   ns <- NS(id)
   tagList(
     bs4Dash::box(
-      title = "Mis plantillas",
+      title = "Plantillas disponibles",
       width = 12,
-      collapsed = TRUE
-    ),
-    bs4Dash::box(
-      title = "Nueva plantilla",
-      width = 12,
-      fluidRow(
-        col_10(textInput(inputId = ns("temp_description"),
-                         label = NULL,
-                         placeholder = "Nombre de plantilla")),
-        col_1(btn_add(ns("add_template"))),
-        col_1(btn_trash(ns("rm_template")))
-      )#,
-      # tableOutput(ns("tabla"))
+      height = "600px",
+      sidebar = bs4Dash::boxSidebar(
+        id = "sidebar",
+        width = 25,
+        btn_refresh(ns("refresh")),
+        btn_add(ns("add_template")),
+        btn_trash(ns("rm_template"))
+      ),
+      div(),
+      DT::DTOutput(ns("table")),
+      div()
     )
   )
 }
@@ -34,64 +32,26 @@ mod_admin_templates_ui <- function(id){
 #'
 #' @noRd
 mod_admin_templates_server <- function(id, user_iniciado){
-  moduleServer( id, function(input, output, session){
+  moduleServer(id, function(input, output, session){
     ns <- session$ns
-
-    # R/reactive_utils.R
-    # step_count <- reactive_counter(input$add_step, input$rm_step,
-    #                                start_value = 1L, min_value = 1L)
 
     step_count <- reactiveVal(1L)
     step_list_numbers <- reactive(seq_len(step_count()))
-    template_id <- reactiveVal(character())
-
-    observeEvent(input$add_template, {
-      if (input$temp_description == "") {
-        alert_error(session = session, text = "¡Debe poner un nombre de plantilla!")
+    user_templates <- reactiveVal(data.frame())
+    template_id <- reactive({
+      if (input$template_id == "") {
+        paste0("TEMPLATE_", lubridate::now("America/Lima"))
       } else {
-        # Set new value for template id
-        template_id(paste0("TEMPLATE_", lubridate::now("America/Lima")))
-
-        showModal(modalDialog(
-          # title = "Añadir tareas a plantilla",
-          h2("Plantilla nueva:"),
-          h4(input$temp_description),
-          fluidRow(
-            col_10(
-              uiOutput(ns("step_list")),
-            ),
-            col_1(btn_add(ns("add_step"), size = "sm")),
-            col_1(btn_minus(ns("rm_step"), size = "sm"))
-          ),
-          footer = tagList(
-            modalButton("Cancelar"),
-            btn_agregar(ns("save_template_steps"))
-          )
-        ))
+        input$template_id
       }
-
-
     })
 
-    observeEvent(input$add_step, step_count(step_count() + 1L))
-
-    observeEvent(input$rm_step, if (step_count() > 1L) step_count(step_count() - 1L))
-
-    observeEvent(input$save_template_steps, {
-
-      updateTextInput(session = session,
-                      inputId = "temp_description",
-                      value = "")
-
-      # Resetear todos los inputs de step
-      step_list_numbers() |>
-        lapply(function(x) {
-          updateTextInput(session = session,
-                          inputId = sprintf("step_%02i", x),
-                          value = "")
-        })
-
-      removeModal()
+    template_data <- reactive({
+      data.frame(
+        template_id = template_id(),
+        template_description = input$temp_description,
+        user_id = user_iniciado()
+      )
     })
 
     template_steps_data <- reactive({
@@ -107,22 +67,92 @@ mod_admin_templates_server <- function(id, user_iniciado){
         do.call(what = rbind, args = _)
     })
 
+    observeEvent(input$refresh, {
+      user_templates(get_templates_from_user(user_iniciado()))
+    })
+
+    observeEvent(input$add_template, {
+
+        showModal(modalDialog(
+          title = "Añadir tareas a plantilla",
+          h5("Nombre de plantilla"),
+          textInput(inputId = ns("temp_description"),
+                    label = NULL,
+                    placeholder = "Ingresar nombre de plantilla"),
+          h5("ID de plantilla (opcional)"),
+          textInput(inputId = ns("template_id"),
+                    label = NULL,
+                    placeholder = "Opcional"),
+          # h2("Plantilla nueva:"),
+          h5("Ingresar tareas"),
+          fluidRow(
+            col_10(
+              uiOutput(ns("step_list")),
+            ),
+            col_1(btn_add(ns("add_step"), size = "sm")),
+            col_1(btn_minus(ns("rm_step"), size = "sm"))
+          ),
+          footer = tagList(
+            modalButton("Cancelar"),
+            btn_agregar(ns("save_template_steps"))
+          )
+        ))
+
+    })
+
+    observeEvent(input$add_step, step_count(step_count() + 1L))
+
+    observeEvent(input$rm_step, if (step_count() > 1L) step_count(step_count() - 1L))
+
+    observeEvent(input$save_template_steps, {
+
+      insert_template_steps(template_steps_data())
+      insert_template(template_data())
+
+      removeModal()
+
+      updateTextInput(session = session,
+                      inputId = "temp_description",
+                      value = "")
+
+      # Resetear todos los inputs de step
+      step_list_numbers() |>
+        lapply(function(x) {
+          updateTextInput(session = session,
+                          inputId = sprintf("step_%02i", x),
+                          value = "")
+        })
+
+      user_templates(get_templates_from_user(user_iniciado()))
+
+    })
+
+    observeEvent(input$rm_template, {
+      delete_template(template_id())
+      delete_template_steps(template_id())
+
+      alert_info(session = session, "Se eliminó la plantilla")
+
+      user_templates(get_templates_from_user(user_iniciado()))
+    })
+
     output$step_list <- renderUI({
       step_list_numbers() |>
         lapply(function(x) {
           textInput(
             inputId = ns(sprintf("step_%02i", x)),
             label = NULL,
-            placeholder = sprintf("Describa tarea %02i", x),
+            placeholder = sprintf("Ingresar tarea %02i", x),
             value = isolate(input[[sprintf("step_%02i", x)]])
           )
         })
     })
 
-    output$tabla <- renderTable({
-      validate(need(input[["step_01"]], "Sin datos de plantilla nueva"))
-      template_steps_data()
-    })
+    output$table <- DT::renderDT(
+      expr = user_templates(),
+      options = options_DT(),
+      selection = 'single'
+    )
 
 
   })
@@ -134,7 +164,8 @@ mod_admin_templates_testapp <- function(id = "test") {
     sidebar = bs4Dash::dashboardSidebar(
       bs4Dash::sidebarMenu(
         bs4Dash::menuItem(text = "Admin Templates",
-                          tabName = "templates")
+                          tabName = "templates",
+                          icon = icon("book"))
       )
     ),
     body = bs4Dash::dashboardBody(
