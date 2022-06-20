@@ -5,7 +5,6 @@
 #'
 #' @param ... taglist
 #'
-#' @return
 #' @noRd
 #'
 reqSignin <- function (...)
