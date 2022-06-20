@@ -35,6 +35,11 @@ mod_secure_ui <- function(id, privileges){
                 text = "Plantillas admin",
                 icon = icon("book"),
                 tabName = "admin_templates"
+              ),
+              bs4Dash::menuItem(
+                text = "Grupos admin",
+                icon = icon("users"),
+                tabName = "admin_groups"
               )
             )
           }
@@ -57,6 +62,10 @@ mod_secure_ui <- function(id, privileges){
           bs4Dash::tabItem(
             tabName = "admin_templates",
             mod_admin_templates_ui(ns("admin_templates_1"))
+          ),
+          bs4Dash::tabItem(
+            tabName = "admin_groups",
+            mod_admin_groups_ui(ns("admin_groups_1"))
           )
         )
       )
@@ -76,6 +85,7 @@ mod_secure_server <- function(id, user_iniciado){
     # mod_admin_server("admin_1")
     mod_admin_users_server("admin_users_1")
     mod_admin_templates_server("admin_templates_1")
+    mod_admin_groups_server("admin_groups_1")
 
   })
 }
