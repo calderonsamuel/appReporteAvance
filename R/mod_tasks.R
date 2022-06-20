@@ -14,7 +14,7 @@ mod_tasks_ui <- function(id){
       title = "Tareas actuales",
       width = 12,
       sidebar = bs4Dash::boxSidebar(
-        id = "sidebar",
+        id = ns("sidebar"),
         width = 25,
         btn_add(ns("add")),
         btn_trash(ns("remove"))
