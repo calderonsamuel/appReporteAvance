@@ -3,6 +3,7 @@ create_reporte_templates_steps <- function() {
 
   if (!DBI::dbExistsTable(con, "templates_steps")) {
     fields_list <- data.frame(
+      user_id = strrep(" ", 64),
       template_id = strrep(" ", 64),
       step_id = strrep(" ", 64),
       step_description = strrep(" ", 64)
