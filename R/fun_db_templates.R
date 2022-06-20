@@ -5,8 +5,7 @@ create_reporte_templates <- function() {
     fields_list <- data.frame(
       template_id = strrep(" ", 64),
       template_description = strrep(" ", 64),
-      step_id = strrep(" ", 64),
-      step_description = strrep(" ", 64)
+      user_id = strrep(" ", 64)
     )
 
     DBI::dbWriteTable(con, "templates", fields_list)
@@ -28,7 +27,9 @@ insert_template <- function(field_list, with_print = TRUE) {
   con <- db_connect()
   DBI::dbWriteTable(con, "templates", field_list, append = TRUE)
   DBI::dbDisconnect(con)
-  if (with_print) print(sprintf("inserted template with id %s", field_list$template_id))
+  if (with_print) {
+    print(sprintf("inserted template with id %s", field_list$template_id))
+  }
 }
 
 delete_template <- function(template_id, with_print = TRUE) {
@@ -40,3 +41,4 @@ delete_template <- function(template_id, with_print = TRUE) {
 
 # create_reporte_templates()
 # remove_table_from_reporte("templates")
+#
