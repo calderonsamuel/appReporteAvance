@@ -64,7 +64,8 @@ mod_admin_templates_server <- function(id, user_iniciado){
             step_description = input[[sprintf("step_%02i", x)]]
           )
         }) |>
-        do.call(what = rbind, args = _)
+        (\(x) do.call(what = rbind, args = x))() # ugly but owrks in R 4.1
+        # do.call(what = rbind, args = _)
     })
 
     observeEvent(input$refresh, {
