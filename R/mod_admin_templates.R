@@ -17,9 +17,10 @@ mod_admin_templates_ui <- function(id){
       sidebar = bs4Dash::boxSidebar(
         id = ns("sidebar"),
         width = 25,
-        btn_refresh(ns("refresh")),
+        # btn_refresh(ns("refresh")),
         btn_add(ns("add_template")),
-        btn_trash(ns("rm_template"))
+        btn_trash(ns("rm_template")),
+        btn_expand(ns("expand"))
       ),
       div(),
       DT::DTOutput(ns("table")),
@@ -37,7 +38,7 @@ mod_admin_templates_server <- function(id, user_iniciado){
 
     step_count <- reactiveVal(1L)
     step_list_numbers <- reactive(seq_len(step_count()))
-    user_templates <- reactiveVal(data.frame())
+    user_templates <- reactiveVal(get_templates())
     template_id <- reactive({
       if (input$template_id == "") {
         paste0("TEMPLATE_", lubridate::now("America/Lima"))
@@ -46,7 +47,7 @@ mod_admin_templates_server <- function(id, user_iniciado){
       }
     })
 
-    template_data <- reactive({
+    new_template_data <- reactive({
       data.frame(
         template_id = template_id(),
         template_description = input$temp_description,
@@ -54,7 +55,7 @@ mod_admin_templates_server <- function(id, user_iniciado){
       )
     })
 
-    template_steps_data <- reactive({
+    new_template_steps_data <- reactive({
       step_list_numbers() |>
         lapply(function(x) {
           data.frame(
@@ -68,9 +69,9 @@ mod_admin_templates_server <- function(id, user_iniciado){
         # do.call(what = rbind, args = _) # needs R 4.2
     })
 
-    observeEvent(input$refresh, {
-      user_templates(get_templates_from_user(user_iniciado()))
-    })
+    # observeEvent(input$refresh, {
+    #   user_templates(get_templates_from_user(user_iniciado()))
+    # })
 
     observeEvent(input$add_template, {
 
@@ -107,8 +108,8 @@ mod_admin_templates_server <- function(id, user_iniciado){
 
     observeEvent(input$save_template_steps, {
 
-      insert_template_steps(template_steps_data())
-      insert_template(template_data())
+      insert_template_steps(new_template_steps_data())
+      insert_template(new_template_data())
 
       removeModal()
 
@@ -176,7 +177,7 @@ mod_admin_templates_testapp <- function(id = "test") {
 
   server <- function(input, output, session) {
     user_iniciado <- reactive("dgco93@mininter.gob.pe")
-    mod_admin_templates_server(id, user_iniciado())
+    mod_admin_templates_server(id, user_iniciado)
   }
 
   shinyApp(ui, server)
