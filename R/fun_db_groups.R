@@ -41,7 +41,8 @@ delete_group <- function(group_id, with_print = TRUE) {
 
 get_groups_from_user <- function(user_id) {
   con <- db_connect()
-  data <- DBI::dbGetQuery(con, sprintf("SELECT * FROM groups WHERE (user_id = '%s')", user_id))
+  data <- DBI::dbGetQuery(con, sprintf("SELECT * FROM groups WHERE (user_id IN (%s))",
+                                       db_collapse_vector(user_id)))
   DBI::dbDisconnect(con)
   return(data)
 }

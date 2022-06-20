@@ -41,7 +41,8 @@ delete_task <- function(task_id, with_print = TRUE) {
 
 get_task_from_id <- function(task_id) {
   con <- db_connect()
-  data <- DBI::dbGetQuery(con, sprintf("SELECT * FROM tasks WHERE (task_id = '%s')", task_id))
+  data <- DBI::dbGetQuery(con, sprintf("SELECT * FROM tasks WHERE (task_id IN (%s))",
+                                       db_collapse_vector(task_id)))
   DBI::dbDisconnect(con)
   return(data)
 }
@@ -69,8 +70,9 @@ mk_task_getter <- function(status) {
     data <- try(
       expr = DBI::dbGetQuery(
         conn = con,
-        statement = sprintf("select * from tasks where (user_id = '%s' and status = '%s')",
-                            user_id, status)),
+        statement = sprintf("select * from tasks where (user_id IN (%s) and status = '%s')",
+                            db_collapse_vector(user_id),
+                            status)),
       silent = TRUE)
     DBI::dbDisconnect(con)
     return(data)
