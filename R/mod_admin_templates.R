@@ -15,7 +15,7 @@ mod_admin_templates_ui <- function(id){
       width = 12,
       height = "600px",
       sidebar = bs4Dash::boxSidebar(
-        id = "sidebar",
+        id = ns("sidebar"),
         width = 25,
         btn_refresh(ns("refresh")),
         btn_add(ns("add_template")),
@@ -65,7 +65,7 @@ mod_admin_templates_server <- function(id, user_iniciado){
           )
         }) |>
         (\(x) do.call(what = rbind, args = x))() # ugly but owrks in R 4.1
-        # do.call(what = rbind, args = _)
+        # do.call(what = rbind, args = _) # needs R 4.2
     })
 
     observeEvent(input$refresh, {
@@ -175,7 +175,8 @@ mod_admin_templates_testapp <- function(id = "test") {
   )
 
   server <- function(input, output, session) {
-    mod_admin_templates_server(id, user_iniciado = reactive("dgco93@mininter.gob.pe"))
+    user_iniciado <- reactive("dgco93@mininter.gob.pe")
+    mod_admin_templates_server(id, user_iniciado())
   }
 
   shinyApp(ui, server)
