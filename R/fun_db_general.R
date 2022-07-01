@@ -15,15 +15,6 @@ db_list_tables <- function() {
   return(tables)
 }
 
-# ensure_reporte <- function() {
-#   if(!RSQLite::dbCanConnect(RSQLite::SQLite(), "reporte_avance.db")) print("created reporte_avance.db")
-#   con <- RSQLite::dbConnect(RSQLite::SQLite(), "reporte_avance.db")
-#   RSQLite::dbDisconnect(con)
-# }
-
-# ensure_reporte()
-
-
 remove_table_from_reporte <- function(table) {
   con <- db_connect()
   DBI::dbRemoveTable(con, table)
@@ -31,4 +22,5 @@ remove_table_from_reporte <- function(table) {
   print(sprintf("deleted table '%s'", table))
 }
 
+db_collapse_vector <- function(x) paste0("'", x, "'") |> paste(collapse = ", ")
 

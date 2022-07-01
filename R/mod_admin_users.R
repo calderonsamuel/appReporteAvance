@@ -10,40 +10,16 @@
 mod_admin_users_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    fluidRow(
-      col_4(
-        bs4Dash::box(
-          width = 12,
-          bs4Dash::box(
-            title = "Agregar usuario",
-            width = 12,
-            collapsed = TRUE,
-            status = "success",
-            textInput(ns("user_id"), "ID"),
-            textInput(ns("name"), "Nombres"),
-            textInput(ns("last_name"), "Apellidos"),
-            selectInput(ns("privileges"), "Privilegios", choices = c("user1", "user2", "admin")),
-            selectInput(ns("responds_to"), "Responde a:", choices = get_user_id_from_privileges("user2")),
-            dateInput(ns("date_added"), "Fecha", language = "es", value = lubridate::today("America/Lima")),
-            btn_agregar(ns("insert_user"))
-          ),
-          bs4Dash::box(
-            title = "Eliminar usuario",
-            width = 12,
-            status = "danger",
-            collapsed = TRUE,
-            uiOutput(ns("select_user")),
-            btn_eliminar(ns("delete_user"))
-          )
-        )
+    bs4Dash::box(
+      title = "Gestión de usuarios",
+      width = 12,
+      sidebar = bs4Dash::boxSidebar(
+        id = ns("sidebar"),
+        width = 25,
+        btn_add(ns("add")),
+        btn_trash(ns("delete_user"))
       ),
-      col_8(
-        bs4Dash::box(
-          width = 12,
-          h3("Tabla de usuarios"),
-          DT::DTOutput(ns("table_users"))
-        )
-      )
+      DT::DTOutput(ns("tabla"))
     )
   )
 }
@@ -56,7 +32,9 @@ mod_admin_users_server <- function(id){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
-    vals <- reactiveValues(data_users = get_users())
+    vals <- reactiveValues(
+      data_users = get_users()
+    )
 
     new_user_data <- reactive({
       data.frame(
@@ -67,6 +45,28 @@ mod_admin_users_server <- function(id){
         responds_to = input$responds_to,
         date_added = as.character(input$date_added)
       )
+    })
+
+    user_for_deleting <- reactive({
+      vals$data_users$user_id[input$tabla_rows_selected]
+    })
+
+    observeEvent(input$add, {
+      showModal(modalDialog(
+        title = "Nuevo usuario",
+
+        textInput(ns("user_id"), "ID"),
+        textInput(ns("name"), "Nombres"),
+        textInput(ns("last_name"), "Apellidos"),
+        selectInput(ns("privileges"), "Privilegios", choices = c("user1", "user2", "admin")),
+        selectInput(ns("responds_to"), "Responde a:", choices = get_user_id_from_privileges("user2")),
+        dateInput(ns("date_added"), "Fecha", language = "es", value = lubridate::today("America/Lima")),
+
+        footer = tagList(
+          modalButton("Cancelar"),
+          btn_agregar(ns("insert_user"))
+        )
+      ))
     })
 
     observeEvent(input$insert_user, {
@@ -81,33 +81,49 @@ mod_admin_users_server <- function(id){
 
       vals$data_users <- get_users()
 
+      removeModal()
+
       alert_info(session = session, sprintf("Se añadió al usuario %s", input$user_id))
 
     })
 
     observeEvent(input$delete_user,{
 
-      delete_user(input$del_user_id)
-
+      delete_user(user_for_deleting())
+      alert_info(session, sprintf("Se eliminó al usuario %s", user_for_deleting()))
       vals$data_users <- get_users()
-
-      alert_info(session, sprintf("Se eliminó al usuario %s", input$user_id))
 
     })
 
-    output$table_users <- DT::renderDT(
+    output$tabla <- DT::renderDT(
       expr = vals$data_users,
       options = options_DT(),
       selection = 'single'
     )
 
-    output$select_user <- renderUI({
-      selectInput(inputId = ns("del_user_id"),
-                  label = "Elegir usuario a eliminar",
-                  choices = rev(vals$data_users$user_id))
-    })
-
   })
+}
+
+mod_admin_users_testapp <- function(id = "test") {
+  ui <- bs4Dash::dashboardPage(
+    header = bs4Dash::dashboardHeader(title = "TEST"),
+    sidebar = bs4Dash::dashboardSidebar(
+      bs4Dash::sidebarMenu(
+        bs4Dash::menuItem(text = "Admin USers",
+                          tabName = "users",
+                          icon = icon("user-edit"))
+      )
+    ),
+    body = bs4Dash::dashboardBody(
+      bs4Dash::tabItem(tabName = "users", mod_admin_users_ui(id))
+    )
+  )
+
+  server <- function(input, output, session) {
+    mod_admin_users_server(id)
+  }
+
+  shinyApp(ui, server)
 }
 
 ## To be copied in the UI

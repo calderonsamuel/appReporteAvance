@@ -47,3 +47,9 @@ btn_eliminar <- mk_btn(color = "danger", label = "Eliminar")
 
 #' @rdname buttons
 btn_minus <- mk_btn(color = "danger", label = icon("minus"))
+
+#' @rdname buttons
+btn_refresh <- mk_btn(color = "royal", label = icon("redo"))
+
+#' @rdname buttons
+btn_expand <- mk_btn(color = "royal", label = icon("expand-arrows-alt"))

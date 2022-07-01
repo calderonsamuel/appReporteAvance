@@ -6,6 +6,8 @@
 \alias{btn_trash}
 \alias{btn_agregar}
 \alias{btn_eliminar}
+\alias{btn_minus}
+\alias{btn_refresh}
 \title{Pre styled pretty action buttons}
 \usage{
 btn_add(inputId, icon = NULL, size = "md", block = FALSE, no_outline = TRUE)
@@ -21,6 +23,16 @@ btn_agregar(
 )
 
 btn_eliminar(
+  inputId,
+  icon = NULL,
+  size = "md",
+  block = FALSE,
+  no_outline = TRUE
+)
+
+btn_minus(inputId, icon = NULL, size = "md", block = FALSE, no_outline = TRUE)
+
+btn_refresh(
   inputId,
   icon = NULL,
   size = "md",
