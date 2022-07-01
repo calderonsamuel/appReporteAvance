@@ -54,6 +54,14 @@ get_user_privilege_status <- function(user_id) {
   return(data$privileges)
 }
 
+get_users_metadata <- function(user_id_list) {
+  con <- db_connect()
+  data <- DBI::dbGetQuery(con, sprintf("SELECT user_id, name, last_name FROM users WHERE (user_id IN (%s))",
+                                       db_collapse_vector(user_id_list)))
+  DBI::dbDisconnect(con)
+  return(data)
+}
+
 
 # remove_table_from_reporte("users")
 # create_reporte_users()
