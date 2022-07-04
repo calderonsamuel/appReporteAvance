@@ -66,11 +66,14 @@ gruser_insert <- function(field_list, with_print = TRUE) {
   }
 }
 
-gruser_remove <- function(user_id, with_print = TRUE) {
+gruser_remove <- function(group_id, user_id, with_print = TRUE) {
   con <- db_connect()
-  DBI::dbExecute(con, sprintf("DELETE FROM group_users WHERE (user_id = '%s')", user_id))
+  query <- glue::glue_sql("DELETE FROM group_users
+                          WHERE (user_id = {user_id}) AND (group_id = {group_id})",
+                          .con = con)
+  DBI::dbExecute(con, query)
   DBI::dbDisconnect(con)
-  if (with_print) print(sprintf("deleted group user with id %s", user_id))
+  if (with_print) message(glue::glue("deleted group user with id {user_id} from {group_id}"))
 }
 
 gruser_get_groups <- function(user_id) {
