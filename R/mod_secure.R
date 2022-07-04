@@ -90,12 +90,12 @@ mod_secure_server <- function(id, user_iniciado){
   })
 }
 
-mod_secure_testapp <- function(id = "test", privileges = "admin", user_iniciado = "samuelcs8.17@gmail.com") {
+mod_secure_testapp <- function(id = "test", privileges = "admin") {
 
   ui <- mod_secure_ui(id, privileges = privileges)
 
   server <- function(input, output, session) {
-    user_iniciado <- reactive(user_iniciado)
+    user_iniciado <- reactive("samuelcs8.17@gmail.com")
     mod_secure_server(id, user_iniciado)
   }
 
