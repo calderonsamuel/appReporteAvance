@@ -90,7 +90,7 @@ mod_secure_server <- function(id, user_iniciado){
   })
 }
 
-mod_secure_testapp <- function(id = "test", privileges = "admin", user_iniciado = "samuelcs8.18@gmail.com") {
+mod_secure_testapp <- function(id = "test", privileges = "admin", user_iniciado = "samuelcs8.17@gmail.com") {
 
   ui <- mod_secure_ui(id, privileges = privileges)
 
