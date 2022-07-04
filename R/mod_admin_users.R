@@ -88,11 +88,13 @@ mod_admin_users_server <- function(id){
     })
 
     observeEvent(input$delete_user,{
-
-      user_remove(user_for_deleting())
-      alert_info(session, sprintf("Se eliminó al usuario %s", user_for_deleting()))
-      vals$data_users <- user_get_all()
-
+        if (not_selected(user_for_deleting())) {
+            alert_error(session, "Debe seleccionar usuario a eliminar")
+        } else {
+            user_remove(user_for_deleting())
+            alert_info(session, sprintf("Se eliminó al usuario %s", user_for_deleting()))
+            vals$data_users <- user_get_all()
+        }
     })
 
     output$tabla <- DT::renderDT(
