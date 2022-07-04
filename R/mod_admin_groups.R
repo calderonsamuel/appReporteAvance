@@ -36,7 +36,7 @@ mod_admin_groups_server <- function(id, user_iniciado){
     ns <- session$ns
 
     vals <- reactiveValues(
-      users = get_users(),
+      users = user_get_all(),
       groups = get_groups()
     )
 
@@ -103,13 +103,13 @@ mod_admin_groups_server <- function(id, user_iniciado){
 
           DT::DTOutput(ns("tabla_user")),
 
-          div(),
+          tags$br(),
 
           h5("Agregar usuario a grupo"),
           selectInput(
             inputId = ns("user_id"),
             label = "Usuarios",
-            choices = with(data = get_users(),
+            choices = with(data = user_get_all(),
                            expr = setNames(object = user_id,
                                            nm = paste(name, last_name))),
             multiple = TRUE
@@ -127,9 +127,9 @@ mod_admin_groups_server <- function(id, user_iniciado){
     })
 
     observeEvent(input$add_user,{
-      showModal(modalDialog(
-        title = "hola"
-      ))
+
+
+
     })
 
     observeEvent(input$save_user, {

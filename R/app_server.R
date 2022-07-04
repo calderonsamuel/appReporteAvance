@@ -20,7 +20,7 @@ app_server <- function(input, output, session) {
   s <- firebase::Storage$new()
 
   user_iniciado <- reactive(f$get_signed_in()$response$email)
-  privileges <- reactive(get_user_privilege_status(user_iniciado()))
+  privileges <- reactive(user_get_privileges(user_iniciado()))
 
 
   output$my_ui <- renderUI({

@@ -33,7 +33,7 @@ mod_tasks_server <- function(id, user_iniciado){
 
     vals <- reactiveValues(
       data_tasks = get_tasks(),
-      users = get_users()$user_id
+      users = user_get_all()$user_id
     )
 
     new_task_data <- reactive({
@@ -61,7 +61,7 @@ mod_tasks_server <- function(id, user_iniciado){
         selectInput(
           inputId = ns("user"),
           label = "Seleccione encargado",
-          choices = with(data = get_users(),
+          choices = with(data = user_get_all(),
                          expr = setNames(object = user_id,
                                          nm = paste(name, last_name)))
         ),
@@ -76,7 +76,7 @@ mod_tasks_server <- function(id, user_iniciado){
 
     observeEvent(input$type,{
       if (input$type == "user") {
-        updateSelectInput(session, "user", choices = with(data = get_users(),
+        updateSelectInput(session, "user", choices = with(data = user_get_all(),
                                                           expr = setNames(object = user_id,
                                                                           nm = paste(name, last_name))))
       } else {
@@ -91,7 +91,6 @@ mod_tasks_server <- function(id, user_iniciado){
       } else {
         insert_task(new_task_data())
         vals$data_tasks <- get_tasks()
-        # updateSelectInput(session, "user", choices = get_users()$user_id)
         updateTextAreaInput(session, "description", value = "")
 
         removeModal()

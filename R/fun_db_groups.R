@@ -89,7 +89,7 @@ get_users_from_group <- function(group_id) {
 
 get_group_users_metadata <- function(group_id) {
   user_id_list <- get_users_from_group(group_id)
-  data <- get_users_metadata(user_id_list)
+  data <- user_get_names(user_id_list)
   return(data)
 }
 

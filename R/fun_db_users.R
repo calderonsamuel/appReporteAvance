@@ -7,59 +7,76 @@ create_reporte_users <- function() {
       name = strrep(" ", 64),
       last_name = strrep(" ", 64),
       privileges = strrep(" ", 64),
-      responds_to = strrep(" ", 64),
       date_added = strrep(" ", 64)
     )
 
     DBI::dbWriteTable(con, "users", field_list)
-    delete_user(user_id = strrep(" ", 64), with_print = FALSE)
-    print("created table 'users'")
+    user_remove(user_id = strrep(" ", 64), with_print = FALSE)
+    message("created table 'users'")
   }
 
   DBI::dbDisconnect(con)
 }
 
-insert_user <- function(user_data, with_print = TRUE) {
-  con <- db_connect()
-  DBI::dbWriteTable(con, "users", user_data, append = TRUE)
-  DBI::dbDisconnect(con)
-  if (with_print) print(sprintf("inserted user with id %s", user_data$user_id))
+user_get_all <- function() {
+    con <- db_connect()
+    data <- DBI::dbReadTable(con, "users")
+    DBI::dbDisconnect(con)
+    return(data)
 }
 
-get_users <- function() {
-  con <- db_connect()
-  data <- DBI::dbReadTable(con, "users")
-  DBI::dbDisconnect(con)
-  return(data)
+user_insert <- function(user_data) {
+    con <- db_connect()
+    DBI::dbWriteTable(con, "users", user_data, append = TRUE)
+    DBI::dbDisconnect(con)
+    message(sprintf("inserted user with id %s", user_data$user_id))
 }
 
-delete_user <- function(user_id, with_print = TRUE) {
-  con <- db_connect()
-  DBI::dbExecute(con, sprintf("DELETE FROM users WHERE (user_id = '%s')", user_id))
-  DBI::dbDisconnect(con)
-  if (with_print) print(sprintf("deleted user with id %s", user_id))
+user_remove <- function(user_id) {
+    con <- db_connect()
+    DBI::dbExecute(con,
+                   glue::glue_sql("DELETE FROM users WHERE (user_id = {user_id})", .con = con))
+    DBI::dbDisconnect(con)
+    message(glue::glue("deleted user with id {user_id}"))
 }
 
-get_user_id_from_privileges <- function(privileges) {
-  con <- db_connect()
-  data <- DBI::dbGetQuery(con, sprintf("SELECT user_id FROM users WHERE (privileges = '%s')", privileges))
-  DBI::dbDisconnect(con)
-  return(data$user_id)
+user_get_privileges <- function(user_id) {
+    con <- db_connect()
+    query <- glue::glue_sql("SELECT privileges
+                            FROM users
+                            WHERE (user_id = {user_id})",
+                            .con = con)
+    data <- DBI::dbGetQuery(con, query)
+    DBI::dbDisconnect(con)
+    return(data$privileges)
 }
 
-get_user_privilege_status <- function(user_id) {
-  con <- db_connect()
-  data <- DBI::dbGetQuery(con, sprintf("SELECT privileges FROM users WHERE (user_id = '%s')", user_id))
-  DBI::dbDisconnect(con)
-  return(data$privileges)
+user_get_from_privileges <- function(privileges) {
+    con <- db_connect()
+    query <- glue::glue_sql("SELECT user_id
+                            FROM users
+                            WHERE (privileges = {privileges})",
+                            .con = con)
+    data <- DBI::dbGetQuery(con, query)
+    DBI::dbDisconnect(con)
+    return(data$user_id)
 }
 
-get_users_metadata <- function(user_id_list) {
-  con <- db_connect()
-  data <- DBI::dbGetQuery(con, sprintf("SELECT user_id, name, last_name FROM users WHERE (user_id IN (%s))",
-                                       db_collapse_vector(user_id_list)))
-  DBI::dbDisconnect(con)
-  return(data)
+user_get_names <- function(user_id) {
+    con <- db_connect()
+    query <- glue::glue_sql("SELECT user_id, name, last_name
+                            FROM users
+                            WHERE (user_id IN ({vals*}))",
+                            vals = user_id,
+                            .con = con)
+    data <- DBI::dbGetQuery(con, query)
+    DBI::dbDisconnect(con)
+    return(data)
+}
+
+user_update <- function(user_id) {
+    con <- db_connect()
+    DBI::dbExecute(con, "")
 }
 
 
@@ -76,6 +93,6 @@ get_users_metadata <- function(user_id_list) {
 #   privileges = c("admin", "user1", "user1", "user1"),
 #   responds_to = c("wolivos@mininter.gob.pe", "wolivos@mininter.gob.pe", "wolivos@mininter.gob.pe", "wolivos@mininter.gob.pe"),
 #   date_added = rep(lubridate::today("America/Lima"), 4) |> as.character()
-# ) |> insert_user()
+# ) |> user_insert()
 
-# get_users()
+# user_get_all()

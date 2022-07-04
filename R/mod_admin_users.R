@@ -33,7 +33,7 @@ mod_admin_users_server <- function(id){
     ns <- session$ns
 
     vals <- reactiveValues(
-      data_users = get_users()
+      data_users = user_get_all()
     )
 
     new_user_data <- reactive({
@@ -59,7 +59,7 @@ mod_admin_users_server <- function(id){
         textInput(ns("name"), "Nombres"),
         textInput(ns("last_name"), "Apellidos"),
         selectInput(ns("privileges"), "Privilegios", choices = c("user1", "user2", "admin")),
-        selectInput(ns("responds_to"), "Responde a:", choices = get_user_id_from_privileges("user2")),
+        selectInput(ns("responds_to"), "Responde a:", choices = user_get_from_privileges("user2")),
         dateInput(ns("date_added"), "Fecha", language = "es", value = lubridate::today("America/Lima")),
 
         footer = tagList(
@@ -71,15 +71,15 @@ mod_admin_users_server <- function(id){
 
     observeEvent(input$insert_user, {
 
-      insert_user(new_user_data())
+      user_insert(new_user_data())
 
       updateTextInput(session, "user_id", value = "")
       updateTextInput(session, "name", value = "")
       updateTextInput(session, "last_name", value = "")
       updateSelectInput(session, "privileges", selected = "user1")
-      updateSelectInput(session, "responds_to", choices = get_user_id_from_privileges("user2"))
+      updateSelectInput(session, "responds_to", choices = user_get_from_privileges("user2"))
 
-      vals$data_users <- get_users()
+      vals$data_users <- user_get_all()
 
       removeModal()
 
@@ -89,9 +89,9 @@ mod_admin_users_server <- function(id){
 
     observeEvent(input$delete_user,{
 
-      delete_user(user_for_deleting())
+      user_remove(user_for_deleting())
       alert_info(session, sprintf("Se eliminó al usuario %s", user_for_deleting()))
-      vals$data_users <- get_users()
+      vals$data_users <- user_get_all()
 
     })
 
