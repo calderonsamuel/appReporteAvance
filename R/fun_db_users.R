@@ -79,6 +79,12 @@ user_update <- function(user_id) {
     DBI::dbExecute(con, "")
 }
 
+user_create <- function(user_data, group_id = "team-dgco") {
+    user_insert(user_data)
+    data <- data.frame(user_id = user_data$user_id, group_id = group_id)
+    gruser_insert(data)
+}
+
 
 # remove_table_from_reporte("users")
 # create_reporte_users()
