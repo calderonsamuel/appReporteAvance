@@ -37,7 +37,7 @@ mod_admin_groups_server <- function(id, user_iniciado){
 
     vals <- reactiveValues(
       users = user_get_all(),
-      groups = get_groups()
+      groups = group_get_all()
     )
 
     new_group_data <- reactive({
@@ -81,15 +81,15 @@ mod_admin_groups_server <- function(id, user_iniciado){
       if (length(selected_group_id()) == 0) {
         alert_error(session, "Debe seleccionar un grupo a eliminar")
       } else {
-        delete_group(selected_group_id())
-        vals$groups <- get_groups()
+        group_remove(selected_group_id())
+        vals$groups <- group_get_all()
         alert_info(session = session, "Grupo eliminado")
       }
     })
 
     observeEvent(input$save, {
-      insert_group(new_group_data())
-      vals$groups <- get_groups()
+      group_insert(new_group_data())
+      vals$groups <- group_get_all()
       removeModal()
       alert_success(session, "Grupo añadido")
     })
@@ -144,7 +144,7 @@ mod_admin_groups_server <- function(id, user_iniciado){
     )
 
     output$tabla_user <- DT::renderDT(
-      expr = get_group_users_metadata(selected_group_id()),
+      expr = gruser_get_metadata(selected_group_id()),
       options = options_DT(),
       selection = 'single'
     )

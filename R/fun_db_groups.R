@@ -8,7 +8,7 @@ create_reporte_groups <- function() {
     )
 
     DBI::dbWriteTable(con, "groups", fields_list)
-    delete_group(group_id = strrep(" ", 64), with_print = FALSE)
+    group_remove(group_id = strrep(" ", 64), with_print = FALSE)
     print("created table 'groups'")
   }
 
@@ -25,21 +25,23 @@ create_reporte_group_users <- function() {
     )
 
     DBI::dbWriteTable(con, "group_users", fields_list)
-    delete_group(group_id = strrep(" ", 64), with_print = FALSE)
+    group_remove(group_id = strrep(" ", 64), with_print = FALSE)
     print("created table 'group_users'")
   }
 
   DBI::dbDisconnect(con)
 }
 
-get_groups <- function() {
+
+group_get_all <- function() {
   con <- db_connect()
   data <- DBI::dbReadTable(con, "groups")
   DBI::dbDisconnect(con)
   return(data)
 }
 
-insert_group <- function(field_list, with_print = TRUE) {
+
+group_insert <- function(field_list, with_print = TRUE) {
   con <- db_connect()
   DBI::dbWriteTable(con, "groups", field_list, append = TRUE)
   DBI::dbDisconnect(con)
@@ -48,14 +50,14 @@ insert_group <- function(field_list, with_print = TRUE) {
   }
 }
 
-delete_group <- function(group_id, with_print = TRUE) {
+group_remove <- function(group_id, with_print = TRUE) {
   con <- db_connect()
   DBI::dbExecute(con, sprintf("DELETE FROM groups WHERE (group_id = '%s')", group_id))
   DBI::dbDisconnect(con)
   if (with_print) print(sprintf("deleted group with id %s", group_id))
 }
 
-insert_group_user <- function(field_list, with_print = TRUE) {
+gruser_insert <- function(field_list, with_print = TRUE) {
   con <- db_connect()
   DBI::dbWriteTable(con, "group_users", field_list, append = TRUE)
   DBI::dbDisconnect(con)
@@ -64,14 +66,14 @@ insert_group_user <- function(field_list, with_print = TRUE) {
   }
 }
 
-delete_group_user <- function(user_id, with_print = TRUE) {
+gruser_remove <- function(user_id, with_print = TRUE) {
   con <- db_connect()
   DBI::dbExecute(con, sprintf("DELETE FROM group_users WHERE (user_id = '%s')", user_id))
   DBI::dbDisconnect(con)
   if (with_print) print(sprintf("deleted group user with id %s", user_id))
 }
 
-get_groups_from_user <- function(user_id) {
+gruser_get_groups <- function(user_id) {
   con <- db_connect()
   data <- DBI::dbGetQuery(con, sprintf("SELECT * FROM group_users WHERE (user_id IN (%s))",
                                        db_collapse_vector(user_id)))
@@ -79,7 +81,7 @@ get_groups_from_user <- function(user_id) {
   return(data$group_id) # return a chr vector
 }
 
-get_users_from_group <- function(group_id) {
+gruser_get_from_group <- function(group_id) {
   con <- db_connect()
   data <- DBI::dbGetQuery(con, sprintf("SELECT * FROM group_users WHERE (group_id IN (%s))",
                                        db_collapse_vector(group_id)))
@@ -87,8 +89,8 @@ get_users_from_group <- function(group_id) {
   return(data$user_id) # return a chr vector
 }
 
-get_group_users_metadata <- function(group_id) {
-  user_id_list <- get_users_from_group(group_id)
+gruser_get_metadata <- function(group_id) {
+  user_id_list <- gruser_get_from_group(group_id)
   data <- user_get_names(user_id_list)
   return(data)
 }
@@ -104,7 +106,7 @@ get_group_users_metadata <- function(group_id) {
 #   group_id = "team-ejemplo",
 #   group_description = "Un ejemplo del funcionamiento de los grupos"
 # ) |>
-#   insert_group()
+#   group_insert()
 
 ## Group user insertion
 
@@ -112,5 +114,5 @@ get_group_users_metadata <- function(group_id) {
 #   group_id = "team-ejemplo",
 #   user_id = "dgco93@mininter.gob.pe"
 # ) |>
-#   insert_group_user()
+#   gruser_insert()
 

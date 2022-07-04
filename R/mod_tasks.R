@@ -80,7 +80,7 @@ mod_tasks_server <- function(id, user_iniciado){
                                                           expr = setNames(object = user_id,
                                                                           nm = paste(name, last_name))))
       } else {
-        updateSelectInput(session, "user", choices = get_groups()$group_id |> unique())
+        updateSelectInput(session, "user", choices = group_get_all()$group_id)
       }
     })
 

@@ -19,3 +19,7 @@ reactive_counter <- function(input_add, input_rm,
 
   step_count
 }
+
+not_selected <- function(x) {
+    length(x) == 0L
+}

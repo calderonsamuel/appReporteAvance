@@ -63,7 +63,7 @@ mod_progress_server <- function(id, user_iniciado){
 
 
     vals <- reactiveValues(
-      groups = reactive(get_groups_from_user(user_iniciado()))
+      groups = reactive(gruser_get_groups(user_iniciado()))
       # pendientes_user = reactive(get_tasks_pendientes(user = user_iniciado())),
       # pendientes_group = reactive(get_tasks_pendientes(user = ))
     )
@@ -102,7 +102,7 @@ mod_progress_testapp <- function(id = "test") {
   )
 
   server <- function(input, output, session) {
-    user_iniciado <- reactive("dgco93@mininter.gob.pe")
+    user_iniciado <- reactive("samuelcs8.17@gmail.com")
     mod_progress_server(id, user_iniciado)
   }
 
