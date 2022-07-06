@@ -36,24 +36,45 @@ mod_admin_groups_server <- function(id, user_iniciado){
     ns <- session$ns
 
     vals <- reactiveValues(
-      users = user_get_all(),
+      users = user_get_all()$user_id |> setdiff("samuelcs8.17@gmail.com"),
       groups = group_get_all()
     )
 
+    selected_group <- reactive(vals$groups$group_id[input$tabla_rows_selected])
+    selected_user <- reactive(grusers_tbl()$user_id[input$tabla_user_rows_selected])
+
+    grusers_current <- reactive({
+        selected_group() |>
+            gruser_get_from_group()
+    }) |>
+        bindEvent(selected_group(), input$remove_user, label = "grusers_current")
+
+    grusers_choices <- reactive({
+        availables <- setdiff(vals$users, grusers_current()) |> sort()
+
+        setNames(object = availables,
+                 nm = user_get_names(availables))
+    })
+
+    grusers_tbl <- reactive({
+        data.frame(
+            user_id = grusers_current(),
+            names = grusers_current() |> user_get_names()
+        )
+    })
+
     new_group_data <- reactive({
-      data.frame(
-        group_id = input$group_id,
-        group_description = input$group_description
-        # user_id = input$user_id
-      )
+        data.frame(
+            group_id = input$group_id,
+            group_description = input$group_description
+        )
     })
 
-    selected_group_id <- reactive({
-      vals$groups$group_id[input$tabla_rows_selected]
-    })
-
-    selected_user_id <- reactive({
-      vals$users$user_id[input$tabla_user_rows_selected]
+    new_gruser_data <- reactive({
+        data.frame(
+            group_id = selected_group(),
+            user_id = input$user_id
+        )
     })
 
     observeEvent(input$add, {
@@ -78,10 +99,10 @@ mod_admin_groups_server <- function(id, user_iniciado){
     })
 
     observeEvent(input$remove, {
-      if (length(selected_group_id()) == 0) {
+      if (length(selected_group()) == 0) {
         alert_error(session, "Debe seleccionar un grupo a eliminar")
       } else {
-        group_remove(selected_group_id())
+        group_remove(selected_group())
         vals$groups <- group_get_all()
         alert_info(session = session, "Grupo eliminado")
       }
@@ -95,7 +116,7 @@ mod_admin_groups_server <- function(id, user_iniciado){
     })
 
     observeEvent(input$user_edit, {
-      if (length(selected_group_id()) == 0) {
+      if (length(selected_group()) == 0) {
         alert_error(session, "Debe seleccionar un grupo a editar")
       } else {
         showModal(modalDialog(
@@ -109,9 +130,7 @@ mod_admin_groups_server <- function(id, user_iniciado){
           selectInput(
             inputId = ns("user_id"),
             label = "Usuarios",
-            choices = with(data = user_get_all(),
-                           expr = setNames(object = user_id,
-                                           nm = paste(name, last_name))),
+            choices = grusers_choices(),
             multiple = TRUE
 
           ),
@@ -126,16 +145,33 @@ mod_admin_groups_server <- function(id, user_iniciado){
       }
     })
 
-    observeEvent(input$add_user,{
+    observe({
+        gruser_insert(new_gruser_data())
+
+        updateSelectInput(
+            session = session,
+            inputId = "user_id",
+            selected = NULL,
+            choices = grusers_choices()
+        )
+
+        alert_info(session, "Usuario añadido a grupo")
+    }) |>
+        bindEvent(input$add_user)
+
+    observe({
+        if (not_selected(selected_user())) {
+            alert_error(session, "Debe seleccionar usuario")
+        } else {
+            gruser_remove(group_id = selected_group(),
+                          user_id = selected_user())
+
+            alert_info(session, "Usuario eliminado de grupo")
+        }
+    }) |>
+        bindEvent(input$remove_user)
 
 
-
-    })
-
-    observeEvent(input$save_user, {
-      removeModal()
-      alert_success(session, "Usuario añadido")
-    })
 
     output$tabla <- DT::renderDT(
       expr = vals$groups,
@@ -144,7 +180,7 @@ mod_admin_groups_server <- function(id, user_iniciado){
     )
 
     output$tabla_user <- DT::renderDT(
-      expr = gruser_get_metadata(selected_group_id()),
+      expr = grusers_tbl(),
       options = options_DT(),
       selection = 'single'
     )
@@ -176,7 +212,7 @@ mod_admin_groups_testapp <- function(id = "test") {
     mod_admin_groups_server(id, user_iniciado = reactive("dgco93@mininter.gob.pe"))
   }
 
-  shinyApp(ui, server)
+  shinyApp(ui, server, options = list(autoreload = TRUE))
 }
 
 ## To be copied in the UI
