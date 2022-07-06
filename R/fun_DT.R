@@ -5,7 +5,7 @@ options_DT <- function() {
     pageLength = 10,
     lengthMenu = c(10, 25, 40),
     language = list(
-      emptyTable = "Cliente no tiene registros en esta sección",
+      emptyTable = "Tabla sin registros",
       zeroRecords = "Cliente no existe. Buscar con otros datos o Agregar cliente",
       infoEmpty = "Datos no coinciden con ningún registro.",
       infoFiltered = "(filtrado de un total de _MAX_ registros)",
