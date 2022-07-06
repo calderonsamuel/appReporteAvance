@@ -62,16 +62,18 @@ user_get_from_privileges <- function(privileges) {
     return(data$user_id)
 }
 
-user_get_names <- function(user_id) {
+user_get_names <- function(user_id, show_query = FALSE) {
     con <- db_connect()
-    query <- glue::glue_sql("SELECT user_id, name, last_name
+    query <- glue::glue_sql("SELECT name, last_name
                             FROM users
-                            WHERE (user_id IN ({vals*}))",
+                            WHERE (user_id IN ({vals*}))
+                            ORDER BY user_id",
                             vals = user_id,
                             .con = con)
     data <- DBI::dbGetQuery(con, query)
     DBI::dbDisconnect(con)
-    return(data)
+    if (show_query) return(query)
+    return(paste(data$last_name, data$name, sep = ", "))
 }
 
 user_update <- function(user_id) {
