@@ -9,7 +9,7 @@ create_reporte_group_users <- function() {
 
         DBI::dbWriteTable(con, "group_users", fields_list)
         group_remove(group_id = strrep(" ", 64), with_print = FALSE)
-        print("created table 'group_users'")
+        message("created table 'group_users'")
     }
 
     DBI::dbDisconnect(con)
@@ -20,7 +20,7 @@ gruser_insert <- function(field_list, with_print = TRUE) {
     DBI::dbWriteTable(con, "group_users", field_list, append = TRUE)
     DBI::dbDisconnect(con)
     if (with_print) {
-        print(sprintf("inserted user with id '%s' into '%s'", field_list$user_id, field_list$group_id))
+        message(sprintf("inserted user with id '%s' into '%s'", field_list$user_id, field_list$group_id))
     }
 }
 

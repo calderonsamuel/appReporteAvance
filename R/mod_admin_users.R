@@ -88,7 +88,7 @@ mod_admin_users_server <- function(id){
     })
 
     observeEvent(input$delete_user,{
-        if (not_selected(user_for_deleting())) {
+        if (isTruthy(user_for_deleting())) {
             alert_error(session, "Debe seleccionar usuario a eliminar")
         } else {
             user_remove(user_for_deleting())

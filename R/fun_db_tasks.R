@@ -12,7 +12,7 @@ create_reporte_tasks <- function() {
 
     DBI::dbWriteTable(con, "tasks", task_list)
     delete_task(task_id = strrep(" ", 64), with_print = FALSE)
-    print("created table 'tasks'")
+    message("created table 'tasks'")
   }
 
   DBI::dbDisconnect(con)
@@ -29,14 +29,14 @@ insert_task <- function(task_list, with_print = TRUE) {
   con <- db_connect()
   DBI::dbWriteTable(con, "tasks", task_list, append = TRUE)
   DBI::dbDisconnect(con)
-  if(with_print) print(sprintf("inserted task with id %s", task_list$task_id))
+  if(with_print) message(sprintf("inserted task with id %s", task_list$task_id))
 }
 
 delete_task <- function(task_id, with_print = TRUE) {
   con <- db_connect()
   DBI::dbExecute(con, sprintf("DELETE FROM tasks WHERE (task_id = '%s')", task_id))
   DBI::dbDisconnect(con)
-  if(with_print) print(sprintf("deleted task with id %s", task_id))
+  if(with_print) message(sprintf("deleted task with id %s", task_id))
 }
 
 get_task_from_id <- function(task_id) {
@@ -54,7 +54,7 @@ mdf_task_status <- function(task_id, new_status, with_print = TRUE) {
   delete_task(task_id, with_print = FALSE)
   insert_task(task, with_print = FALSE)
   DBI::dbDisconnect(con)
-  if(with_print) print(sprintf("modified task with id %s", task$task_id))
+  if(with_print) message(sprintf("modified task with id %s", task$task_id))
 }
 
 get_task_from_user <- function(user) {

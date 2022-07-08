@@ -12,7 +12,7 @@ create_reporte_progress <- function() {
 
     DBI::dbWriteTable(con, "progress", fields_list)
     delete_status(status_id = strrep(" ", 64), with_print = FALSE)
-    print("created table 'progress'")
+    message("created table 'progress'")
   }
 
   DBI::dbDisconnect(con)
@@ -29,14 +29,14 @@ insert_status <- function(field_list, with_print = TRUE) {
   con <- db_connect()
   DBI::dbWriteTable(con, "progress", field_list, append = TRUE)
   DBI::dbDisconnect(con)
-  if (with_print) print(sprintf("inserted status with id %s", field_list$status_id))
+  if (with_print) message(sprintf("inserted status with id %s", field_list$status_id))
 }
 
 delete_status <- function(status_id, with_print = TRUE) {
   con <- db_connect()
   DBI::dbExecute(con, sprintf("DELETE FROM progress WHERE (status_id = '%s')", status_id))
   DBI::dbDisconnect(con)
-  if (with_print) print(sprintf("deleted status with id %s", task_id))
+  if (with_print) message(sprintf("deleted status with id %s", task_id))
 }
 
 # create_reporte_progress()
