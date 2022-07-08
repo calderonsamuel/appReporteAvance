@@ -41,8 +41,14 @@ delete_task <- function(task_id, with_print = TRUE) {
 
 get_task_from_id <- function(task_id) {
   con <- db_connect()
-  data <- DBI::dbGetQuery(con, sprintf("SELECT * FROM tasks WHERE (task_id IN (%s))",
-                                       db_collapse_vector(task_id)))
+  query <- glue::glue_sql(
+      "SELECT *
+      FROM tasks
+      WHERE (task_id IN ({vals*}))",
+      vals = task_id,
+      .con = con
+  )
+  data <- DBI::dbGetQuery(con, query)
   DBI::dbDisconnect(con)
   return(data)
 }
@@ -67,13 +73,14 @@ get_task_from_user <- function(user) {
 mk_task_getter <- function(status) {
   function(user_id) {
     con <- db_connect()
-    data <- try(
-      expr = DBI::dbGetQuery(
-        conn = con,
-        statement = sprintf("select * from tasks where (user_id IN (%s) and status = '%s')",
-                            db_collapse_vector(user_id),
-                            status)),
-      silent = TRUE)
+    query <- glue::glue_sql(
+        "SELECT *
+        FROM tasks
+        WHERE (user_id IN ({vals*}) and status = {status})",
+        vals = user_id,
+        .con = con
+    )
+    data <- DBI::dbGetQuery(con, query) |> try(silent = TRUE)
     DBI::dbDisconnect(con)
     return(data)
   }

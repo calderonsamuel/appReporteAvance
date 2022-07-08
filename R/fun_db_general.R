@@ -21,6 +21,3 @@ remove_table_from_reporte <- function(table) {
   DBI::dbDisconnect(con)
   message(sprintf("deleted table '%s'", table))
 }
-
-db_collapse_vector <- function(x) paste0("'", x, "'") |> paste(collapse = ", ")
-

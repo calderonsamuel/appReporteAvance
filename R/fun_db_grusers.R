@@ -36,16 +36,26 @@ gruser_remove <- function(group_id, user_id, with_print = TRUE) {
 
 gruser_get_groups <- function(user_id) {
     con <- db_connect()
-    data <- DBI::dbGetQuery(con, sprintf("SELECT * FROM group_users WHERE (user_id IN (%s))",
-                                         db_collapse_vector(user_id)))
+    query <- glue::glue_sql("SELECT *
+                            FROM group_users
+                            WHERE (user_id IN ({vals*}))",
+                            vals = user_id,
+                            .con = con)
+    data <- DBI::dbGetQuery(con, query)
     DBI::dbDisconnect(con)
     return(data$group_id) # return a chr vector
 }
 
 gruser_get_from_group <- function(group_id) {
     con <- db_connect()
-    data <- DBI::dbGetQuery(con, sprintf("SELECT * FROM group_users WHERE (group_id IN (%s))",
-                                         db_collapse_vector(group_id)))
+    query <- glue::glue_sql(
+        "SELECT *
+        FROM group_users
+        WHERE (group_id IN ({vals*}))",
+        vals = group_id,
+        .con = con
+    )
+    data <- DBI::dbGetQuery(con, query)
     DBI::dbDisconnect(con)
     return(sort(data$user_id)) # return a chr vector
 }
