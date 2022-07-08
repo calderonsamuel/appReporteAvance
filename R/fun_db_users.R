@@ -56,7 +56,8 @@ user_get_from_privileges <- function(privileges) {
     con <- db_connect()
     query <- glue::glue_sql("SELECT user_id
                             FROM users
-                            WHERE (privileges = {privileges})",
+                            WHERE (privileges IN ({vals*}))",
+                            vals = privileges,
                             .con = con)
     data <- DBI::dbGetQuery(con, query)
     DBI::dbDisconnect(con)
