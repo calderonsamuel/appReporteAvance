@@ -7,7 +7,7 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-mod_admin_groups_ui <- function(id){
+mod_groups_ui <- function(id){
   ns <- NS(id)
   tagList(
     # waiter::autoWaiter(),
@@ -31,7 +31,7 @@ mod_admin_groups_ui <- function(id){
 #' admin_groups Server Functions
 #'
 #' @noRd
-mod_admin_groups_server <- function(id, user_iniciado){
+mod_groups_server <- function(id, user_iniciado){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
@@ -213,7 +213,7 @@ mod_admin_groups_server <- function(id, user_iniciado){
   })
 }
 
-mod_admin_groups_testapp <- function(id = "test") {
+mod_groups_testapp <- function(id = "test") {
   ui <- tagList(
     bs4Dash::dashboardPage(
       # preloader = list(html = waiter::spin_1(), color = "#333e48"),
@@ -226,7 +226,7 @@ mod_admin_groups_testapp <- function(id = "test") {
         )
       ),
       body = bs4Dash::dashboardBody(
-        bs4Dash::tabItem(tabName = "groups", mod_admin_groups_ui(id))
+        bs4Dash::tabItem(tabName = "groups", mod_groups_ui(id))
       )
     )
   )
@@ -234,14 +234,14 @@ mod_admin_groups_testapp <- function(id = "test") {
 
 
   server <- function(input, output, session) {
-    mod_admin_groups_server(id, user_iniciado = reactive("dgco93@mininter.gob.pe"))
+    mod_groups_server(id, user_iniciado = reactive("dgco93@mininter.gob.pe"))
   }
 
   shinyApp(ui, server, options = list(autoreload = TRUE))
 }
 
 ## To be copied in the UI
-# mod_admin_groups_ui("admin_groups_1")
+# mod_groups_ui("admin_groups_1")
 
 ## To be copied in the server
-# mod_admin_groups_server("admin_groups_1")
+# mod_groups_server("admin_groups_1")
