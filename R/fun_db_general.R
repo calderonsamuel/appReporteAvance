@@ -19,5 +19,5 @@ db_remove_table <- function(table) {
   con <- db_connect()
   DBI::dbRemoveTable(con, table)
   DBI::dbDisconnect(con)
-  message(sprintf("deleted table '%s'", table))
+  glue::glue("deleted table '{table}'") |> message()
 }

@@ -20,7 +20,9 @@ gruser_insert <- function(field_list, with_print = TRUE) {
     DBI::dbWriteTable(con, "group_users", field_list, append = TRUE)
     DBI::dbDisconnect(con)
     if (with_print) {
-        message(sprintf("inserted user with id '%s' into '%s'", field_list$user_id, field_list$group_id))
+        user_id <- field_list$user_id
+        group_id <- field_list$group_id
+        glue::glue("inserted user with id {user_id} into {group_id}") |> message()
     }
 }
 
@@ -31,7 +33,7 @@ gruser_remove <- function(group_id, user_id, with_print = TRUE) {
                           .con = con)
     DBI::dbExecute(con, query)
     DBI::dbDisconnect(con)
-    if (with_print) message(glue::glue("deleted group user with id {user_id} from {group_id}"))
+    if (with_print) glue::glue("deleted group user with id {user_id} from {group_id}") |> message()
 }
 
 gruser_get_groups <- function(user_id) {
@@ -73,7 +75,7 @@ gruser_purge <- function(user_id, with) {
                           .con = con)
     DBI::dbExecute(con, query)
     DBI::dbDisconnect(con)
-    message(glue::glue("deleted group user with id {user_id}"))
+    glue::glue("deleted group user with id {user_id}") |> message()
 }
 
 ## Group user insertion

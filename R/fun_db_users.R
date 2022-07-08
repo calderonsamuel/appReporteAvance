@@ -29,7 +29,8 @@ user_insert <- function(user_data) {
     con <- db_connect()
     DBI::dbWriteTable(con, "users", user_data, append = TRUE)
     DBI::dbDisconnect(con)
-    message(sprintf("inserted user with id %s", user_data$user_id))
+    user_id <- user_data$user_id
+    glue::glue("inserted user with id '{user_id}'") |> message
 }
 
 user_remove <- function(user_id) {

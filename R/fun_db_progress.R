@@ -29,14 +29,21 @@ progress_insert <- function(field_list, with_print = TRUE) {
   con <- db_connect()
   DBI::dbWriteTable(con, "progress", field_list, append = TRUE)
   DBI::dbDisconnect(con)
-  if (with_print) message(sprintf("inserted status with id %s", field_list$status_id))
+  if (with_print) {
+      status_id <- field_list$status_id
+      glue::glue("inserted status with id {status_id}") |> message()
+  }
 }
 
 progress_remove <- function(status_id, with_print = TRUE) {
   con <- db_connect()
-  DBI::dbExecute(con, sprintf("DELETE FROM progress WHERE (status_id = '%s')", status_id))
+  statement <- glue::glue_sql("DELETE
+                              FROM progress
+                              WHERE (status_id = {status_id})",
+                              .con = con)
+  DBI::dbExecute(con, statement)
   DBI::dbDisconnect(con)
-  if (with_print) message(sprintf("deleted status with id %s", task_id))
+  if (with_print) glue::glue("deleted status with id {task_id}") |> message()
 }
 
 # create_reporte_progress()

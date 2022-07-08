@@ -28,20 +28,30 @@ template_insert <- function(field_list, with_print = TRUE) {
   DBI::dbWriteTable(con, "templates", field_list, append = TRUE)
   DBI::dbDisconnect(con)
   if (with_print) {
-    message(sprintf("inserted template with id %s", field_list$template_id))
+      template_id <- field_list$template_id
+      glue::glue("inserted template with id {template_id}") |>
+          message()
   }
 }
 
 template_remove <- function(template_id, with_print = TRUE) {
   con <- db_connect()
-  DBI::dbExecute(con, sprintf("DELETE FROM templates WHERE (template_id = '%s')", template_id))
+  statement <- glue::glue_sql("DELETE
+                              FROM templates
+                              WHERE (template_id = {template_id})",
+                              .con = con)
+  DBI::dbExecute(con, statement)
   DBI::dbDisconnect(con)
-  if (with_print) message(sprintf("deleted template with id %s", template_id))
+  if (with_print) glue::glue("deleted template with id {template_id}") |> message()
 }
 
 template_get_from_user <- function(user_id) {
   con <- db_connect()
-  data <- DBI::dbGetQuery(con, sprintf("SELECT * FROM templates WHERE (user_id = '%s')", user_id))
+  query <- glue::glue_sql("SELECT *
+                          FROM templates
+                          WHERE (user_id = {user_id})",
+                          .con = con)
+  data <- DBI::dbGetQuery(con, query)
   DBI::dbDisconnect(con)
   return(data)
 }

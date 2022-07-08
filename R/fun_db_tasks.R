@@ -29,14 +29,21 @@ task_insert <- function(task_list, with_print = TRUE) {
   con <- db_connect()
   DBI::dbWriteTable(con, "tasks", task_list, append = TRUE)
   DBI::dbDisconnect(con)
-  if(with_print) message(sprintf("inserted task with id %s", task_list$task_id))
+  if(with_print) {
+      task_id <- task_list$task_id
+      glue::glue("inserted task with id {task_id}") |> message()
+  }
 }
 
 task_remove <- function(task_id, with_print = TRUE) {
   con <- db_connect()
-  DBI::dbExecute(con, sprintf("DELETE FROM tasks WHERE (task_id = '%s')", task_id))
+  statement <- glue::glue_sql("DELETE
+                              FROM tasks
+                              WHERE (task_id = {task_id})",
+                              .con = con)
+  DBI::dbExecute(con, statement)
   DBI::dbDisconnect(con)
-  if(with_print) message(sprintf("deleted task with id %s", task_id))
+  if(with_print) glue::glue("deleted task with id {task_id}") |> message()
 }
 
 task_get_from_id <- function(task_id) {
@@ -60,12 +67,16 @@ task_modify_status <- function(task_id, new_status, with_print = TRUE) {
   task_remove(task_id, with_print = FALSE)
   task_insert(task, with_print = FALSE)
   DBI::dbDisconnect(con)
-  if(with_print) message(sprintf("modified task with id %s", task$task_id))
+  if(with_print) glue::glue("modified task with id {task_id}") |> message()
 }
 
-task_get_from_user <- function(user) {
+task_get_from_user <- function(user_id) {
   con <- db_connect()
-  data <- DBI::dbGetQuery(con, sprintf("SELECT * FROM tasks WHERE (user_id = '%s')", user))
+  query <- glue::glue_sql("SELECT *
+                          FROM tasks
+                          WHERE (user_id = {user_id})",
+                          .con = con)
+  data <- DBI::dbGetQuery(con, query)
   DBI::dbDisconnect(con)
   return(data)
 }

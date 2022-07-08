@@ -29,15 +29,21 @@ step_insert <- function(field_list, with_print = TRUE) {
   DBI::dbWriteTable(con, "templates_steps", field_list, append = TRUE)
   DBI::dbDisconnect(con)
   if (with_print) {
-    message(sprintf("inserted steps %s in template with id %s", field_list$step_id, field_list$template_id))
+      step_id <- field_list$step_id
+      template_id <- field_list$template_id
+      glue::glue("inserted steps {step_id} in template with id {template_id}") |> message()
   }
 }
 
 step_remove <- function(template_id, with_print = TRUE) {
   con <- db_connect()
-  DBI::dbExecute(con, sprintf("DELETE FROM templates_steps WHERE (template_id = '%s')", template_id))
+  statement <- glue::glue_sql("DELETE
+                              FROM templates_steps
+                              WHERE (template_id = {template_id})",
+                              .con = con)
+  DBI::dbExecute(con, statement)
   DBI::dbDisconnect(con)
-  if (with_print) message(sprintf("deleted template steps with id %s", template_id))
+  if (with_print) glue::glue("deleted template steps with id {template_id}") |> message()
 }
 
 # create_reporte_templates_steps()

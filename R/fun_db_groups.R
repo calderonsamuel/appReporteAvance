@@ -30,15 +30,17 @@ group_insert <- function(field_list, with_print = TRUE) {
   DBI::dbWriteTable(con, "groups", field_list, append = TRUE)
   DBI::dbDisconnect(con)
   if (with_print) {
-    message(sprintf("inserted group with id '%s'", field_list$group_id))
+      group_id <- field_list$group_id
+      glue::glue("inserted group with id {group_id}") |> message()
   }
 }
 
 group_remove <- function(group_id, with_print = TRUE) {
   con <- db_connect()
-  DBI::dbExecute(con, sprintf("DELETE FROM groups WHERE (group_id = '%s')", group_id))
+  statement <- glue::glue_sql("DELETE FROM groups WHERE (group_id = {group_id})")
+  DBI::dbExecute(con, statement)
   DBI::dbDisconnect(con)
-  if (with_print) message(sprintf("deleted group with id %s", group_id))
+  if (with_print) glue::glue("deleted group with id {group_id}") |> message()
 }
 
 
