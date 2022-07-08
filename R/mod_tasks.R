@@ -16,6 +16,7 @@ mod_tasks_ui <- function(id){
       sidebar = bs4Dash::boxSidebar(
         id = ns("sidebar"),
         width = 25,
+        h5("Administrar tareas"),
         btn_add(ns("add")),
         btn_trash(ns("remove"))
       ),
@@ -33,14 +34,32 @@ mod_tasks_server <- function(id, user_iniciado){
 
     vals <- reactiveValues(
       data_tasks = task_get_all(),
-      users = user_get_all()$user_id
+      users = user_get_from_privileges(c("user1", "user2"))
     )
+
+    user_choices <- reactive({
+        setNames(
+            object = vals$users,
+            nm = vals$users |> user_get_names()
+        )
+    })
+
+    templates_choices <- reactive({
+        groups <- gruser_get_groups(user_iniciado())
+        template_owners <- union(user_iniciado(), groups)
+        templates <- template_get_from_user(template_owners)
+        setNames(
+            object = templates$template_id,
+            nm = templates$template_description #|> template_get
+        )
+    })
 
     new_task_data <- reactive({
       data.frame(
         reviewer = user_iniciado(),
         user_id = input$user,
-        task_id = paste0("T", lubridate::now("America/Lima")),
+        task_id = ids::proquint(use_openssl = TRUE) ,
+        # task_id = paste0("T", lubridate::now("America/Lima")),
         task_description = input$description,
         status = "Pendiente"
       )
@@ -61,10 +80,28 @@ mod_tasks_server <- function(id, user_iniciado){
         selectInput(
           inputId = ns("user"),
           label = "Seleccione encargado",
-          choices = with(data = user_get_all(),
-                         expr = setNames(object = user_id,
-                                         nm = paste(name, last_name)))
+          choices = user_choices()
+          # choices = with(data = user_get_all(),
+          #                expr = setNames(object = user_id,
+          #                                nm = paste(name, last_name)))
         ),
+
+        shinyWidgets::awesomeCheckbox(
+            inputId = ns("use_template"),
+            label = "¿Necesita plantilla?",
+            status = "info"
+        ),
+
+        conditionalPanel(
+            condition = "input.use_template",
+            ns = ns,
+            selectInput(
+                inputId = ns("template"),
+                label = "Seleccione plantilla",
+                choices = templates_choices()
+            )
+        ),
+
         textAreaInput(ns("description"), "Descripción de tarea"),
 
         footer = tagList(
@@ -76,9 +113,7 @@ mod_tasks_server <- function(id, user_iniciado){
 
     observeEvent(input$type,{
       if (input$type == "user") {
-        updateSelectInput(session, "user", choices = with(data = user_get_all(),
-                                                          expr = setNames(object = user_id,
-                                                                          nm = paste(name, last_name))))
+        updateSelectInput(session, "user", choices = user_choices())
       } else {
         updateSelectInput(session, "user", choices = group_get_all()$group_id)
       }
