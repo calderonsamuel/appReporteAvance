@@ -37,44 +37,53 @@ mod_admin_groups_server <- function(id, user_iniciado){
 
     vals <- reactiveValues(
       users = user_get_all()$user_id |> setdiff("samuelcs8.17@gmail.com"),
-      groups = group_get_all()
+      groups = group_get_all(),
+      grusers_current = data.frame()
     )
 
-    selected_group <- reactive(vals$groups$group_id[input$tabla_rows_selected])
-    selected_user <- reactive(grusers_tbl()$user_id[input$tabla_user_rows_selected])
+    selected_group <- reactive({
+        data <- vals$groups$group_id[input$tabla_rows_selected]
+        message("updating selected_group()")
+        return(data)
+    })
 
-    grusers_current <- reactive({
-        selected_group() |>
-            gruser_get_from_group()
-    }) |>
-        bindEvent(selected_group(), input$remove_user, label = "grusers_current")
+    selected_user <- reactive({
+        data <- grusers_tbl()$user_id[input$tabla_user_rows_selected]
+        message("updating selected_user()")
+        return(data)
+    })
 
     grusers_choices <- reactive({
-        availables <- setdiff(vals$users, grusers_current()) |> sort()
-
-        setNames(object = availables,
-                 nm = user_get_names(availables))
+        availables <- setdiff(vals$users, vals$grusers_current) |> sort()
+        data <- setNames(object = availables, nm = user_get_names(availables))
+        message("updating grusers_choices()")
+        return(data)
     })
 
     grusers_tbl <- reactive({
-        data.frame(
-            user_id = grusers_current(),
-            names = grusers_current() |> user_get_names()
+        data <- data.frame(
+            user_id = vals$grusers_current,
+            names = vals$grusers_current |> user_get_names()
         )
+        message("updating grusers_tbl()")
+        return(data)
     })
 
     new_group_data <- reactive({
-        data.frame(
+        data <- data.frame(
             group_id = input$group_id,
-            group_description = input$group_description
-        )
+            group_description = input$group_description)
+        message("updating new_group_data()")
+        return(data)
     })
 
     new_gruser_data <- reactive({
-        data.frame(
+        data <- data.frame(
             group_id = selected_group(),
             user_id = input$user_id
         )
+        message("updating new_gruser_data()")
+        return(data)
     })
 
     observeEvent(input$add, {
@@ -116,9 +125,11 @@ mod_admin_groups_server <- function(id, user_iniciado){
     })
 
     observeEvent(input$user_edit, {
+        message("pulsed user_edit")
       if (length(selected_group()) == 0) {
         alert_error(session, "Debe seleccionar un grupo a editar")
       } else {
+          vals$grusers_current <- selected_group() |> gruser_get_from_group()
         showModal(modalDialog(
           title = "Administrar usuarios de grupo",
 
@@ -146,30 +157,44 @@ mod_admin_groups_server <- function(id, user_iniciado){
     })
 
     observe({
-        gruser_insert(new_gruser_data())
+        message("pulsed add_user")
+        if (isTruthy(input$user_id)) {
+            gruser_insert(new_gruser_data())
 
+            vals$grusers_current <- selected_group() |> gruser_get_from_group()
+
+            alert_info(session, "Usuario añadido a grupo")
+        } else {
+            alert_error(session, "Debe escoger algún usuario")
+        }
+
+    }) |>
+        bindEvent(input$add_user)
+
+    observe({
+        message("pulsed remove_user")
+        if (isTruthy(selected_user())) {
+            gruser_remove(group_id = selected_group(),
+                          user_id = selected_user())
+
+            vals$grusers_current <- selected_group() |> gruser_get_from_group()
+
+            alert_info(session, "Usuario eliminado de grupo")
+        } else {
+            alert_error(session, "Debe seleccionar usuario")
+        }
+    }) |>
+        bindEvent(input$remove_user)
+
+    observe({
         updateSelectInput(
             session = session,
             inputId = "user_id",
             selected = NULL,
             choices = grusers_choices()
         )
-
-        alert_info(session, "Usuario añadido a grupo")
     }) |>
-        bindEvent(input$add_user)
-
-    observe({
-        if (not_selected(selected_user())) {
-            alert_error(session, "Debe seleccionar usuario")
-        } else {
-            gruser_remove(group_id = selected_group(),
-                          user_id = selected_user())
-
-            alert_info(session, "Usuario eliminado de grupo")
-        }
-    }) |>
-        bindEvent(input$remove_user)
+        bindEvent(input$add_user, input$remove_user)
 
 
 
