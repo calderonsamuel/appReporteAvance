@@ -61,7 +61,7 @@ mod_secure_ui <- function(id, privileges){
           ),
           bs4Dash::tabItem(
             tabName = "admin_templates",
-            mod_admin_templates_ui(ns("admin_templates_1"))
+            mod_templates_ui(ns("admin_templates_1"))
           ),
           bs4Dash::tabItem(
             tabName = "admin_groups",
@@ -84,7 +84,7 @@ mod_secure_server <- function(id, user_iniciado){
     mod_progress_server("progress_1", user_iniciado)
     # mod_admin_server("admin_1")
     mod_users_server("admin_users_1")
-    mod_admin_templates_server("admin_templates_1")
+    mod_templates_server("admin_templates_1")
     mod_groups_server("admin_groups_1")
 
   })
