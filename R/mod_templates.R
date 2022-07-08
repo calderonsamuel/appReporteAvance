@@ -153,7 +153,8 @@ mod_templates_server <- function(id, user_iniciado){
     output$table <- DT::renderDT(
       expr = user_templates(),
       options = options_DT(),
-      selection = 'single'
+      selection = 'single',
+      style = "bootstrap4"
     )
 
 

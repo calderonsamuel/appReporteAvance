@@ -115,7 +115,8 @@ mod_tasks_server <- function(id, user_iniciado){
     output$tabla <- DT::renderDT(
       expr = vals$data_tasks,
       options = options_DT(),
-      selection = 'single'
+      selection = 'single',
+      style = "bootstrap4"
     )
 
   })

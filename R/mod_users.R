@@ -100,7 +100,8 @@ mod_users_server <- function(id){
     output$tabla <- DT::renderDT(
       expr = vals$data_users,
       options = options_DT(),
-      selection = 'single'
+      selection = 'single',
+      style = "bootstrap4"
     )
 
   })

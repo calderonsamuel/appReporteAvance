@@ -201,13 +201,15 @@ mod_groups_server <- function(id, user_iniciado){
     output$tabla <- DT::renderDT(
       expr = vals$groups,
       options = options_DT(),
-      selection = 'single'
+      selection = 'single',
+      style = "bootstrap4"
     )
 
     output$tabla_user <- DT::renderDT(
       expr = grusers_tbl(),
       options = options_DT(),
-      selection = 'single'
+      selection = 'single',
+      style = "bootstrap4"
     )
 
   })

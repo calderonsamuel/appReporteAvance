@@ -1,6 +1,6 @@
 options_DT <- function() {
   list(
-    dom = "t",
+    dom = "tp",
     scrollX = TRUE,
     pageLength = 10,
     lengthMenu = c(10, 25, 40),
