@@ -88,7 +88,7 @@ user_create <- function(user_data, group_id = "team-dgco") {
 }
 
 
-# remove_table_from_reporte("users")
+# db_remove_table("users")
 # create_reporte_users()
 #
 

@@ -10,21 +10,21 @@ create_reporte_templates_steps <- function() {
     )
 
     DBI::dbWriteTable(con, "templates_steps", fields_list)
-    delete_template_steps(template_id = strrep(" ", 64), with_print = FALSE)
+    step_remove(template_id = strrep(" ", 64), with_print = FALSE)
     message("created table 'templates_steps'")
   }
 
   DBI::dbDisconnect(con)
 }
 
-get_template_steps <- function() {
+step_get_all <- function() {
   con <- db_connect()
   data <- DBI::dbReadTable(con, "templates_steps")
   DBI::dbDisconnect(con)
   return(data)
 }
 
-insert_template_steps <- function(field_list, with_print = TRUE) {
+step_insert <- function(field_list, with_print = TRUE) {
   con <- db_connect()
   DBI::dbWriteTable(con, "templates_steps", field_list, append = TRUE)
   DBI::dbDisconnect(con)
@@ -33,7 +33,7 @@ insert_template_steps <- function(field_list, with_print = TRUE) {
   }
 }
 
-delete_template_steps <- function(template_id, with_print = TRUE) {
+step_remove <- function(template_id, with_print = TRUE) {
   con <- db_connect()
   DBI::dbExecute(con, sprintf("DELETE FROM templates_steps WHERE (template_id = '%s')", template_id))
   DBI::dbDisconnect(con)
@@ -41,7 +41,7 @@ delete_template_steps <- function(template_id, with_print = TRUE) {
 }
 
 # create_reporte_templates_steps()
-# remove_table_from_reporte("templates_steps")
+# db_remove_table("templates_steps")
 #
 
 # readxl::read_excel("inst/data-raw/template_example.xlsx") |>
@@ -53,5 +53,5 @@ delete_template_steps <- function(template_id, with_print = TRUE) {
 #     user_id = "team-politicas",
 #     template_id = "M02.01.01.00.02"
 #   ) |>
-#   insert_template_steps()
+#   step_insert()
 

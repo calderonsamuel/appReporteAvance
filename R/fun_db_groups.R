@@ -42,7 +42,7 @@ group_remove <- function(group_id, with_print = TRUE) {
 }
 
 
-# remove_table_from_reporte("groups")
+# db_remove_table("groups")
 # create_reporte_groups()
 
 # create_reporte_group_users()

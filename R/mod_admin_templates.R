@@ -38,7 +38,7 @@ mod_admin_templates_server <- function(id, user_iniciado){
 
     step_count <- reactiveVal(1L)
     step_list_numbers <- reactive(seq_len(step_count()))
-    user_templates <- reactiveVal(get_templates())
+    user_templates <- reactiveVal(template_get_all())
     template_id <- reactive({
       if (input$template_id == "") {
         paste0("TEMPLATE_", lubridate::now("America/Lima"))
@@ -70,7 +70,7 @@ mod_admin_templates_server <- function(id, user_iniciado){
     })
 
     # observeEvent(input$refresh, {
-    #   user_templates(get_templates_from_user(user_iniciado()))
+    #   user_templates(template_get_from_user(user_iniciado()))
     # })
 
     observeEvent(input$add_template, {
@@ -108,8 +108,8 @@ mod_admin_templates_server <- function(id, user_iniciado){
 
     observeEvent(input$save_template_steps, {
 
-      insert_template_steps(new_template_steps_data())
-      insert_template(new_template_data())
+      step_insert(new_template_steps_data())
+      template_insert(new_template_data())
 
       removeModal()
 
@@ -125,17 +125,17 @@ mod_admin_templates_server <- function(id, user_iniciado){
                           value = "")
         })
 
-      user_templates(get_templates_from_user(user_iniciado()))
+      user_templates(template_get_from_user(user_iniciado()))
 
     })
 
     observeEvent(input$rm_template, {
-      delete_template(template_id())
-      delete_template_steps(template_id())
+      template_remove(template_id())
+      step_remove(template_id())
 
       alert_info(session = session, "Se eliminó la plantilla")
 
-      user_templates(get_templates_from_user(user_iniciado()))
+      user_templates(template_get_from_user(user_iniciado()))
     })
 
     output$step_list <- renderUI({

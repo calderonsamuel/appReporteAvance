@@ -15,7 +15,7 @@ db_list_tables <- function() {
   return(tables)
 }
 
-remove_table_from_reporte <- function(table) {
+db_remove_table <- function(table) {
   con <- db_connect()
   DBI::dbRemoveTable(con, table)
   DBI::dbDisconnect(con)

@@ -64,13 +64,13 @@ mod_progress_server <- function(id, user_iniciado){
 
     vals <- reactiveValues(
       groups = reactive(gruser_get_groups(user_iniciado()))
-      # pendientes_user = reactive(get_tasks_pendientes(user = user_iniciado())),
-      # pendientes_group = reactive(get_tasks_pendientes(user = ))
+      # pendientes_user = reactive(task_status_pendientes(user = user_iniciado())),
+      # pendientes_group = reactive(task_status_pendientes(user = ))
     )
 
     pendientes <- reactiveValues(
-      user = reactive(get_tasks_pendientes(user = user_iniciado())),
-      group = reactive(get_tasks_pendientes(user = vals$groups()))
+      user = reactive(task_status_pendientes(user = user_iniciado())),
+      group = reactive(task_status_pendientes(user = vals$groups()))
     )
 
     output$pendientes <- renderUI({

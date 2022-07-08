@@ -32,7 +32,7 @@ mod_tasks_server <- function(id, user_iniciado){
     ns <- session$ns
 
     vals <- reactiveValues(
-      data_tasks = get_tasks(),
+      data_tasks = task_get_all(),
       users = user_get_all()$user_id
     )
 
@@ -89,8 +89,8 @@ mod_tasks_server <- function(id, user_iniciado){
       if (input$description == "") {
         alert_error(session, "Debe añadir una descripción")
       } else {
-        insert_task(new_task_data())
-        vals$data_tasks <- get_tasks()
+        task_insert(new_task_data())
+        vals$data_tasks <- task_get_all()
         updateTextAreaInput(session, "description", value = "")
 
         removeModal()
@@ -104,8 +104,8 @@ mod_tasks_server <- function(id, user_iniciado){
       if (length(task_for_deleting()) == 0) {
         alert_error(session, "Debe seleccionar una tarea a eliminar")
       } else {
-        delete_task(task_for_deleting())
-        vals$data_tasks <- get_tasks()
+        task_remove(task_for_deleting())
+        vals$data_tasks <- task_get_all()
         alert_info(session, "Tarea eliminada")
       }
 

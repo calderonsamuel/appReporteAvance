@@ -11,35 +11,35 @@ create_reporte_tasks <- function() {
     )
 
     DBI::dbWriteTable(con, "tasks", task_list)
-    delete_task(task_id = strrep(" ", 64), with_print = FALSE)
+    task_remove(task_id = strrep(" ", 64), with_print = FALSE)
     message("created table 'tasks'")
   }
 
   DBI::dbDisconnect(con)
 }
 
-get_tasks <- function() {
+task_get_all <- function() {
   con <- db_connect()
   data <- DBI::dbReadTable(con, "tasks")
   DBI::dbDisconnect(con)
   return(data)
 }
 
-insert_task <- function(task_list, with_print = TRUE) {
+task_insert <- function(task_list, with_print = TRUE) {
   con <- db_connect()
   DBI::dbWriteTable(con, "tasks", task_list, append = TRUE)
   DBI::dbDisconnect(con)
   if(with_print) message(sprintf("inserted task with id %s", task_list$task_id))
 }
 
-delete_task <- function(task_id, with_print = TRUE) {
+task_remove <- function(task_id, with_print = TRUE) {
   con <- db_connect()
   DBI::dbExecute(con, sprintf("DELETE FROM tasks WHERE (task_id = '%s')", task_id))
   DBI::dbDisconnect(con)
   if(with_print) message(sprintf("deleted task with id %s", task_id))
 }
 
-get_task_from_id <- function(task_id) {
+task_get_from_id <- function(task_id) {
   con <- db_connect()
   query <- glue::glue_sql(
       "SELECT *
@@ -53,17 +53,17 @@ get_task_from_id <- function(task_id) {
   return(data)
 }
 
-mdf_task_status <- function(task_id, new_status, with_print = TRUE) {
+task_modify_status <- function(task_id, new_status, with_print = TRUE) {
   con <- db_connect()
-  task <- get_task_from_id(task_id)
+  task <- task_get_from_id(task_id)
   task$status <- new_status
-  delete_task(task_id, with_print = FALSE)
-  insert_task(task, with_print = FALSE)
+  task_remove(task_id, with_print = FALSE)
+  task_insert(task, with_print = FALSE)
   DBI::dbDisconnect(con)
   if(with_print) message(sprintf("modified task with id %s", task$task_id))
 }
 
-get_task_from_user <- function(user) {
+task_get_from_user <- function(user) {
   con <- db_connect()
   data <- DBI::dbGetQuery(con, sprintf("SELECT * FROM tasks WHERE (user_id = '%s')", user))
   DBI::dbDisconnect(con)
@@ -86,15 +86,15 @@ mk_task_getter <- function(status) {
   }
 }
 
-get_tasks_pendientes <- mk_task_getter("Pendiente")
-get_tasks_en_proceso <- mk_task_getter("En proceso")
-get_tasks_pausado <- mk_task_getter("Pausado")
-get_tasks_en_revision <- mk_task_getter("En revisión")
-get_tasks_terminado <- mk_task_getter("Terminado")
+task_status_pendientes <- mk_task_getter("Pendiente")
+task_status_en_proceso <- mk_task_getter("En proceso")
+task_status_pausado <- mk_task_getter("Pausado")
+task_status_en_revision <- mk_task_getter("En revisión")
+task_status_terminado <- mk_task_getter("Terminado")
 
 # create_reporte_tasks()
-# remove_table_from_reporte("tasks")
-# get_tasks()
+# db_remove_table("tasks")
+# task_get_all()
 #
 # data.frame(
 #   reviewer = "dgco93",
@@ -102,9 +102,9 @@ get_tasks_terminado <- mk_task_getter("Terminado")
 #   task_id = "123",
 #   task_description = "Una tarea importate",
 #   status = "Pendiente"
-# ) |> insert_task()
+# ) |> task_insert()
 #
-# get_tasks()
-# delete_task("AOI001")
-# get_tasks()
+# task_get_all()
+# task_remove("AOI001")
+# task_get_all()
 

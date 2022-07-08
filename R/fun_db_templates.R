@@ -9,21 +9,21 @@ create_reporte_templates <- function() {
     )
 
     DBI::dbWriteTable(con, "templates", fields_list)
-    delete_template(template_id = strrep(" ", 64), with_print = FALSE)
+    template_remove(template_id = strrep(" ", 64), with_print = FALSE)
     message("created table 'templates'")
   }
 
   DBI::dbDisconnect(con)
 }
 
-get_templates <- function() {
+template_get_all <- function() {
   con <- db_connect()
   data <- DBI::dbReadTable(con, "templates")
   DBI::dbDisconnect(con)
   return(data)
 }
 
-insert_template <- function(field_list, with_print = TRUE) {
+template_insert <- function(field_list, with_print = TRUE) {
   con <- db_connect()
   DBI::dbWriteTable(con, "templates", field_list, append = TRUE)
   DBI::dbDisconnect(con)
@@ -32,14 +32,14 @@ insert_template <- function(field_list, with_print = TRUE) {
   }
 }
 
-delete_template <- function(template_id, with_print = TRUE) {
+template_remove <- function(template_id, with_print = TRUE) {
   con <- db_connect()
   DBI::dbExecute(con, sprintf("DELETE FROM templates WHERE (template_id = '%s')", template_id))
   DBI::dbDisconnect(con)
   if (with_print) message(sprintf("deleted template with id %s", template_id))
 }
 
-get_templates_from_user <- function(user_id) {
+template_get_from_user <- function(user_id) {
   con <- db_connect()
   data <- DBI::dbGetQuery(con, sprintf("SELECT * FROM templates WHERE (user_id = '%s')", user_id))
   DBI::dbDisconnect(con)
@@ -47,7 +47,7 @@ get_templates_from_user <- function(user_id) {
 }
 
 # create_reporte_templates()
-# remove_table_from_reporte("templates")
+# db_remove_table("templates")
 #
 
 # data.frame(
@@ -55,4 +55,4 @@ get_templates_from_user <- function(user_id) {
 #   template_description = "Diseño de políticas y estrategias para el control de drogas y cultivos ilegales",
 #   user_id = "team-politicas"
 # ) |>
-#   insert_template()
+#   template_insert()
