@@ -7,7 +7,7 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-mod_admin_users_ui <- function(id) {
+mod_users_ui <- function(id) {
   ns <- NS(id)
   tagList(
     bs4Dash::box(
@@ -28,7 +28,7 @@ mod_admin_users_ui <- function(id) {
 #' admin_users Server Functions
 #'
 #' @noRd
-mod_admin_users_server <- function(id){
+mod_users_server <- function(id){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
@@ -106,7 +106,7 @@ mod_admin_users_server <- function(id){
   })
 }
 
-mod_admin_users_testapp <- function(id = "test") {
+mod_users_testapp <- function(id = "test") {
   ui <- bs4Dash::dashboardPage(
     header = bs4Dash::dashboardHeader(title = "TEST"),
     sidebar = bs4Dash::dashboardSidebar(
@@ -117,20 +117,20 @@ mod_admin_users_testapp <- function(id = "test") {
       )
     ),
     body = bs4Dash::dashboardBody(
-      bs4Dash::tabItem(tabName = "users", mod_admin_users_ui(id))
+      bs4Dash::tabItem(tabName = "users", mod_users_ui(id))
     )
   )
 
   server <- function(input, output, session) {
-    mod_admin_users_server(id)
+    mod_users_server(id)
   }
 
   shinyApp(ui, server)
 }
 
 ## To be copied in the UI
-# mod_admin_users_input("admin_users_1")
-# mod_admin_users_output("admin_users_1")
+# mod_users_input("admin_users_1")
+# mod_users_output("admin_users_1")
 
 ## To be copied in the server
-# mod_admin_users_server("admin_users_1")
+# mod_users_server("admin_users_1")

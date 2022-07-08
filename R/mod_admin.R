@@ -12,7 +12,7 @@ mod_admin_ui <- function(id){
   # if (privileges != "admin") return(tagList()) else {
     bs4Dash::tabItem(
       tabName = "admin-users",
-      mod_admin_users_ui(ns("admin_users_1"))
+      mod_users_ui(ns("admin_users_1"))
     )
   # }
 }
@@ -24,7 +24,7 @@ mod_admin_server <- function(id){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
-    mod_admin_users_server("admin_users_1")
+    mod_users_server("admin_users_1")
 
   })
 }
