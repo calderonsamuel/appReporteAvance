@@ -43,6 +43,18 @@ group_remove <- function(group_id, with_print = TRUE) {
   if (with_print) glue::glue("deleted group with id {group_id}") |> message()
 }
 
+group_get_from_group_id <- function(group_id) {
+  con <- db_connect()
+  query <- glue::glue_sql("SELECT *
+                          FROM groups
+                          WHERE (group_id IN ({vals*}))",
+                          vals = group_id,
+                          .con = con)
+  data <- DBI::dbGetQuery(con, query)
+  DBI::dbDisconnect(con)
+  return(data)
+}
+
 
 # db_remove_table("groups")
 # create_reporte_groups()
