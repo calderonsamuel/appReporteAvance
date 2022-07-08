@@ -23,7 +23,7 @@ mod_templates_ui <- function(id){
         btn_expand(ns("expand"))
       ),
       div(),
-      DT::DTOutput(ns("table")),
+      DT::DTOutput(ns("tabla")),
       div()
     )
   )
@@ -39,6 +39,15 @@ mod_templates_server <- function(id, user_iniciado){
     step_count <- reactiveVal(1L)
     step_list_numbers <- reactive(seq_len(step_count()))
     user_templates <- reactiveVal(template_get_all())
+
+    selected_template <- reactive({
+        data <- user_templates()[input$tabla_rows_selected,]
+        message("updating selected_template()")
+        return(data)
+    })
+
+    expanded_template <- reactive(step_get_from_template(selected_template()$template_id))
+
     template_id <- reactive({
       if (input$template_id == "") {
         paste0("TEMPLATE_", lubridate::now("America/Lima"))
@@ -69,10 +78,6 @@ mod_templates_server <- function(id, user_iniciado){
         # do.call(what = rbind, args = _) # needs R 4.2
     })
 
-    # observeEvent(input$refresh, {
-    #   user_templates(template_get_from_user(user_iniciado()))
-    # })
-
     observeEvent(input$add_template, {
 
         showModal(modalDialog(
@@ -101,6 +106,19 @@ mod_templates_server <- function(id, user_iniciado){
         ))
 
     })
+
+    observe({
+
+        showModal(modalDialog(
+            title = "Detalle de plantilla",
+            size = "l",
+            h4(selected_template()$template_description),
+            h6(selected_template()$template_id),
+            DT::DTOutput(ns("expanded_template")),
+            footer = modalButton("Cerrar")
+        ))
+
+    }) |> bindEvent(input$expand)
 
     observeEvent(input$add_step, step_count(step_count() + 1L))
 
@@ -150,11 +168,18 @@ mod_templates_server <- function(id, user_iniciado){
         })
     })
 
-    output$table <- DT::renderDT(
+    output$tabla <- DT::renderDT(
       expr = user_templates(),
       options = options_DT(),
       selection = 'single',
       style = "bootstrap4"
+    )
+
+    output$expanded_template <- DT::renderDT(
+        expr = expanded_template() |> subset(select = c(step_id, step_description)),
+        options = options_DT(),
+        selection = 'single',
+        style = "bootstrap4"
     )
 
 

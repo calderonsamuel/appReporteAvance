@@ -46,6 +46,17 @@ step_remove <- function(template_id, with_print = TRUE) {
   if (with_print) glue::glue("deleted template steps with id {template_id}") |> message()
 }
 
+step_get_from_template <- function(template_id) {
+    con <- db_connect()
+    query <- glue::glue_sql("SELECT *
+                            FROM templates_steps
+                            WHERE (template_id = {template_id})",
+                            .con = con)
+    data <- DBI::dbGetQuery(con, query)
+    DBI::dbDisconnect(con)
+    return(data)
+}
+
 # create_reporte_templates_steps()
 # db_remove_table("templates_steps")
 #
