@@ -10,12 +10,13 @@ URL: https://github.com/calderonsamuel/appReporteAvance
 BugReports: https://github.com/calderonsamuel/appReporteAvance/issues
 Imports: 
     bs4Dash,
-    bslib,
     config (>= 0.3.1),
     DBI,
     DT,
     firebase,
+    glue,
     golem (>= 0.3.2),
+    ids,
     lubridate,
     RMariaDB,
     shiny (>= 1.7.1),

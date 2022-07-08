@@ -8,6 +8,10 @@
 \alias{btn_eliminar}
 \alias{btn_minus}
 \alias{btn_refresh}
+\alias{btn_expand}
+\alias{btn_user_add}
+\alias{btn_user_remove}
+\alias{btn_user_edit}
 \title{Pre styled pretty action buttons}
 \usage{
 btn_add(inputId, icon = NULL, size = "md", block = FALSE, no_outline = TRUE)
@@ -33,6 +37,32 @@ btn_eliminar(
 btn_minus(inputId, icon = NULL, size = "md", block = FALSE, no_outline = TRUE)
 
 btn_refresh(
+  inputId,
+  icon = NULL,
+  size = "md",
+  block = FALSE,
+  no_outline = TRUE
+)
+
+btn_expand(inputId, icon = NULL, size = "md", block = FALSE, no_outline = TRUE)
+
+btn_user_add(
+  inputId,
+  icon = NULL,
+  size = "md",
+  block = FALSE,
+  no_outline = TRUE
+)
+
+btn_user_remove(
+  inputId,
+  icon = NULL,
+  size = "md",
+  block = FALSE,
+  no_outline = TRUE
+)
+
+btn_user_edit(
   inputId,
   icon = NULL,
   size = "md",
