@@ -57,6 +57,18 @@ template_get_from_user <- function(user_id) {
   return(data)
 }
 
+template_get_description <- function(template_id) {
+    con <- db_connect()
+    query <- glue::glue_sql("SELECT template_description
+                          FROM templates
+                          WHERE (template_id IN ({vals*}))",
+                          vals = template_id,
+                          .con = con)
+    data <- DBI::dbGetQuery(con, query)
+    DBI::dbDisconnect(con)
+    return(data$template_description)
+}
+
 # create_reporte_templates()
 # db_remove_table("templates")
 #

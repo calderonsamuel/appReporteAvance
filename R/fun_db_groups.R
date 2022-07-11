@@ -55,6 +55,18 @@ group_get_from_group_id <- function(group_id) {
   return(data)
 }
 
+group_get_description <- function(group_id) {
+    con <- db_connect()
+    query <- glue::glue_sql("SELECT group_description
+                          FROM groups
+                          WHERE (group_id IN ({vals*}))",
+                          vals = group_id,
+                          .con = con)
+    data <- DBI::dbGetQuery(con, query)
+    DBI::dbDisconnect(con)
+    return(data$group_description)
+}
+
 
 # db_remove_table("groups")
 # create_reporte_groups()
