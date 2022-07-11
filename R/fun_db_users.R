@@ -61,7 +61,7 @@ user_get_from_privileges <- function(privileges) {
                             .con = con)
     data <- DBI::dbGetQuery(con, query)
     DBI::dbDisconnect(con)
-    return(data$user_id)
+    return(data$user_id |> sort())
 }
 
 user_get_names <- function(user_id, show_query = FALSE) {
