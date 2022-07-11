@@ -76,7 +76,8 @@ task_get_from_user <- function(user_id) {
   con <- db_connect()
   query <- glue::glue_sql("SELECT *
                           FROM tasks
-                          WHERE (user_id = {user_id})",
+                          WHERE (user_id IN ({vals*}))",
+                          vals = user_id,
                           .con = con)
   data <- DBI::dbGetQuery(con, query)
   DBI::dbDisconnect(con)
