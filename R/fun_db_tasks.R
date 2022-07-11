@@ -61,13 +61,14 @@ task_get_from_id <- function(task_id) {
 }
 
 task_modify_status <- function(task_id, new_status, with_print = TRUE) {
-  con <- db_connect()
-  task <- task_get_from_id(task_id)
-  task$status <- new_status
-  task_remove(task_id, with_print = FALSE)
-  task_insert(task, with_print = FALSE)
-  DBI::dbDisconnect(con)
-  if(with_print) glue::glue("modified task with id {task_id}") |> message()
+    con <- db_connect()
+    statement <- glue::glue_sql("UPDATE tasks
+                                SET status = {new_status}
+                                WHERE task_id = {task_id}",
+                                .con = con)
+    DBI::dbExecute(con, statement)
+    DBI::dbDisconnect(con)
+    if(with_print) glue::glue("modified task with id {task_id}") |> message()
 }
 
 task_get_from_user <- function(user_id) {
