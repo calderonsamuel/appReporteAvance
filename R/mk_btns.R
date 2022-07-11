@@ -46,6 +46,9 @@ btn_agregar <- mk_btn(color = "success", label = "Agregar")
 btn_eliminar <- mk_btn(color = "danger", label = "Eliminar")
 
 #' @rdname buttons
+btn_modificar <- mk_btn(color = "primary", label = "Modificar")
+
+#' @rdname buttons
 btn_minus <- mk_btn(color = "danger", label = icon("minus"))
 
 #' @rdname buttons

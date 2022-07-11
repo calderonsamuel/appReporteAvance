@@ -60,25 +60,50 @@ mod_progress_server <- function(id, user_iniciado){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
+    groups <- reactive({
+        user_iniciado() |>
+            gruser_get_groups()
+    })
 
-
-    vals <- reactiveValues(
-      groups = reactive(gruser_get_groups(user_iniciado()))
-      # pendientes_user = reactive(task_status_pendientes(user = user_iniciado())),
-      # pendientes_group = reactive(task_status_pendientes(user = ))
-    )
+    current_tasks <- reactive({
+        list(
+            user = task_get_from_user(user_iniciado()) |> split(~status),
+            groups = task_get_from_user(groups()) |> split(~status)
+        )
+    })
 
     pendientes <- reactiveValues(
       user = reactive(task_status_pendientes(user = user_iniciado())),
-      group = reactive(task_status_pendientes(user = vals$groups()))
+      group = reactive(task_status_pendientes(user = groups()))
+    )
+
+    en_proceso <- reactiveValues(
+        user = reactive(task_status_en_proceso(user_id = user_iniciado())),
+        group = reactive(task_status_en_proceso(user_id = groups()))
     )
 
     output$pendientes <- renderUI({
       tagList(
-        pendientes$user()$task_description |>
-          lapply(box_pendientes_user),
-        pendientes$group()$task_description |>
-          lapply(box_pendientes_group)
+        # pendientes$user()$task_description |>
+        #   lapply(box_pendientes_user),
+        # pendientes$group()$task_description |>
+        #   lapply(box_pendientes_group)
+          pendientes$group() |>
+              (\(x) {
+                  x$user_id <- group_get_description(x$user_id)
+                  x$reviewer <- user_get_names(x$reviewer)
+                  x$template_id <- template_get_description(x$template_id)
+                  return(x)
+              })() |>
+              split(~task_id) |>
+              lapply(\(x) box_group(
+                  task = x
+                  # inputId = x$task_id,
+                  #   task_description = x$task_description,
+                  #   user_id = x$user_id,
+                  #   reviewer = x$reviewer,
+                  #   template_id = x$template_id
+                    ))
       )
 
     })
@@ -102,7 +127,7 @@ mod_progress_testapp <- function(id = "test") {
   )
 
   server <- function(input, output, session) {
-    user_iniciado <- reactive("samuelcs8.17@gmail.com")
+    user_iniciado <- reactive("dgco93@mininter.gob.pe")
     mod_progress_server(id, user_iniciado)
   }
 
