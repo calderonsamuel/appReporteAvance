@@ -5,13 +5,14 @@ create_reporte_progress <- function() {
     fields_list <- data.frame(
       task_id = strrep(" ", 64),
       status_id = strrep(" ", 64),
+      step_id = strrep(" ", 64),
       status = strrep(" ", 64),
       time = strrep(" ", 64),
       explain = strrep(" ", 64)
     )
 
     DBI::dbWriteTable(con, "progress", fields_list)
-    progress_remove(status_id = strrep(" ", 64), with_print = FALSE)
+    progress_remove(task_id = strrep(" ", 64), status_id = strrep(" ", 64), with_print = FALSE)
     message("created table 'progress'")
   }
 
@@ -35,15 +36,15 @@ progress_insert <- function(field_list, with_print = TRUE) {
   }
 }
 
-progress_remove <- function(status_id, with_print = TRUE) {
+progress_remove <- function(task_id, status_id, with_print = TRUE) {
   con <- db_connect()
   statement <- glue::glue_sql("DELETE
                               FROM progress
-                              WHERE (status_id = {status_id})",
+                              WHERE (status_id = {status_id} AND task_id = {task_id})",
                               .con = con)
   DBI::dbExecute(con, statement)
   DBI::dbDisconnect(con)
-  if (with_print) glue::glue("deleted status with id {task_id}") |> message()
+  if (with_print) glue::glue("deleted status with id '{status_id}' from '{task_id}'") |> message()
 }
 
 # create_reporte_progress()

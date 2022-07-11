@@ -54,15 +54,44 @@ mod_tasks_server <- function(id, user_iniciado){
         )
     })
 
+    template_id <- reactive({
+        ifelse(isTruthy(input$use_template), input$template, NA_character_)
+    })
+
+    step_id <- reactive({
+        if (isTruthy(input$use_template)) {
+            step_get_from_template(template_id())$step_id
+        } else {
+            "step_01"
+        }
+    })
+
+    current_tasks <- reactive({
+        vals$data_tasks |>
+            subset(select = c(user_id, template_id, task_description, status)) |>
+            setNames(c("Encargado", "Plantilla", "Descripción de tarea", "Estado actual"))
+    })
+
     new_task_data <- reactive({
       data.frame(
         reviewer = user_iniciado(),
         user_id = input$user,
         task_id = ids::proquint(use_openssl = TRUE) ,
-        # task_id = paste0("T", lubridate::now("America/Lima")),
         task_description = input$description,
+        template_id = template_id(),
         status = "Pendiente"
       )
+    })
+
+    new_progress_data <- reactive({
+        data.frame(
+            task_id = new_task_data()$task_id,
+            status_id = ids::proquint(use_openssl = TRUE),
+            step_id = step_id(),
+            status = "Pendiente",
+            time = lubridate::now("America/Lima") |> as.character(),
+            explain = "Asignado"
+        )
     })
 
     task_for_deleting <- reactive(vals$data_tasks$task_id[input$tabla_rows_selected])
@@ -81,9 +110,6 @@ mod_tasks_server <- function(id, user_iniciado){
           inputId = ns("user"),
           label = "Seleccione encargado",
           choices = user_choices()
-          # choices = with(data = user_get_all(),
-          #                expr = setNames(object = user_id,
-          #                                nm = paste(name, last_name)))
         ),
 
         shinyWidgets::awesomeCheckbox(
@@ -104,12 +130,16 @@ mod_tasks_server <- function(id, user_iniciado){
 
         textAreaInput(ns("description"), "Descripción de tarea"),
 
+        verbatimTextOutput(ns("debug")),
+
         footer = tagList(
           modalButton("Cancelar"),
           btn_agregar(ns("save"))
         )
       ))
     })
+
+    output$debug <- renderPrint(list(template_id(), step_id(), step_get_from_template(input$template)))
 
     observeEvent(input$type,{
       if (input$type == "user") {
@@ -125,6 +155,7 @@ mod_tasks_server <- function(id, user_iniciado){
         alert_error(session, "Debe añadir una descripción")
       } else {
         task_insert(new_task_data())
+        progress_insert(new_progress_data())
         vals$data_tasks <- task_get_all()
         updateTextAreaInput(session, "description", value = "")
 
@@ -136,7 +167,7 @@ mod_tasks_server <- function(id, user_iniciado){
 
     observeEvent(input$remove,{
 
-      if (length(task_for_deleting()) == 0) {
+      if (!isTruthy(task_for_deleting())) {
         alert_error(session, "Debe seleccionar una tarea a eliminar")
       } else {
         task_remove(task_for_deleting())
@@ -148,7 +179,7 @@ mod_tasks_server <- function(id, user_iniciado){
 
 
     output$tabla <- DT::renderDT(
-      expr = vals$data_tasks,
+      expr = current_tasks(),
       options = options_DT(),
       selection = 'single',
       style = "bootstrap4"

@@ -7,6 +7,7 @@ create_reporte_tasks <- function() {
       user_id = strrep(" ", 64),
       task_id = strrep(" ", 64),
       task_description = strrep(" ", 64),
+      template_id = strrep(" ", 64),
       status = strrep(" ", 64)
     )
 
