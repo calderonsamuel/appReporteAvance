@@ -74,7 +74,8 @@ task_modify_status <- function(task_id, new_status, with_print = TRUE) {
 
 task_get_from_user <- function(user_id) {
   con <- db_connect()
-  query <- glue::glue_sql("SELECT *
+  query <- glue::glue_sql("SELECT task_id, task_description, status,
+                          user_id, reviewer, template_id
                           FROM tasks
                           WHERE (user_id IN ({vals*}))",
                           vals = user_id,

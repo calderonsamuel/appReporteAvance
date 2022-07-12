@@ -58,6 +58,7 @@ template_get_from_user <- function(user_id) {
 }
 
 template_get_description <- function(template_id) {
+    if (is.na(template_id)) return("Sin plantilla")
     con <- db_connect()
     query <- glue::glue_sql("SELECT template_description
                           FROM templates

@@ -1,14 +1,14 @@
 mk_box <- function(icon = NULL, background = NULL) {
-  function(..., task, inputId = NULL, task_description = NULL, label = NULL, dropdownMenu = NULL
+  function(task, ..., inputId = NULL, task_description = NULL, label = NULL, dropdownMenu = NULL
            #user_id, reviewer, template_id
            ) {
-      if (nrow(task) == 0) return(NULL)
+      if (length(task) == 0) return(NULL)
 
     bs4Dash::box(
       title = task$task_description,
-      h6(paste0("Responsable: ", task$user_id)),
-      h6(paste0("Asignado por: ", task$reviewer)),
-      h6(paste0("Plantilla: ", task$template_id)),
+      h6(paste0("Responsable: ", task$assignee$user_name)),
+      h6(paste0("Asignado por: ", task$reviewer$user_name)),
+      h6(paste0("Plantilla: ", task$template$template_description)),
       dropdownMenu = bs4Dash::boxDropdown(
           bs4Dash::boxDropdownItem("Modificar", id = task$task_id)
       ),

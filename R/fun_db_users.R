@@ -65,6 +65,7 @@ user_get_from_privileges <- function(privileges) {
 }
 
 user_get_names <- function(user_id, show_query = FALSE) {
+    if (grepl("^team", user_id)) return(group_get_description(user_id))
     con <- db_connect()
     query <- glue::glue_sql("SELECT name, last_name
                             FROM users
