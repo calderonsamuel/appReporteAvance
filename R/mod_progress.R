@@ -107,17 +107,6 @@ mod_progress_testapp <- function(id = "test") {
   shinyApp(ui, server)
 }
 
-# mod_progress_testapp <- function() {
-#   ui <- fluidPage(mod_progress_ui("progress_1"))
-#
-#   server <- function(input, output, session) {
-#     user_iniciado <- reactive("dgco93@mininter.gob.pe")
-#     mod_progress_server("progress_1", user_iniciado)
-#   }
-#
-#   shinyApp(ui, server)
-# }
-
 ## To be copied in the UI
 # mod_progress_ui("progress_1")
 
