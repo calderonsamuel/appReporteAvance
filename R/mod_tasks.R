@@ -76,7 +76,7 @@ mod_tasks_server <- function(id, user_iniciado){
       data.frame(
         reviewer = user_iniciado(),
         user_id = input$user,
-        task_id = ids::proquint(use_openssl = TRUE) ,
+        task_id = ids::proquint(use_openssl = TRUE, n_words = 3) ,
         task_description = input$description,
         template_id = template_id(),
         status = "Pendiente"
@@ -130,7 +130,7 @@ mod_tasks_server <- function(id, user_iniciado){
 
         textAreaInput(ns("description"), "Descripción de tarea"),
 
-        verbatimTextOutput(ns("debug")),
+        # verbatimTextOutput(ns("debug")),
 
         footer = tagList(
           modalButton("Cancelar"),
@@ -139,7 +139,7 @@ mod_tasks_server <- function(id, user_iniciado){
       ))
     })
 
-    output$debug <- renderPrint(list(template_id(), step_id(), step_get_from_template(input$template)))
+    # output$debug <- renderPrint(list(template_id(), step_id(), step_get_from_template(input$template)))
 
     observeEvent(input$type,{
       if (input$type == "user") {
