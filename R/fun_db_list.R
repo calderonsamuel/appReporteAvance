@@ -15,7 +15,7 @@ task_list_from_user <- function(user_id = "dgco93@mininter.gob.pe"){
                 user_name = user_get_names(x$reviewer)
             )
             x$template <- list(
-                teamplate_id = x$template,
+                template_id = x$template,
                 template_description = template_get_description(x$template)
             )
             return(x)

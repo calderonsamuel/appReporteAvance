@@ -85,6 +85,17 @@ task_get_from_user <- function(user_id) {
   return(data)
 }
 
+task_get_status <- function(task_id) {
+    con <- db_connect()
+    query <- glue::glue_sql("SELECT status
+                          FROM tasks
+                          WHERE (task_id IN ({task_id}))",
+                          .con = con)
+    data <- DBI::dbGetQuery(con, query)
+    DBI::dbDisconnect(con)
+    return(data$status)
+}
+
 mk_task_getter <- function(status) {
   function(user_id) {
     con <- db_connect()

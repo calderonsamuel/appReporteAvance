@@ -6,6 +6,7 @@ create_reporte_progress <- function() {
       task_id = strrep(" ", 64),
       status_id = strrep(" ", 64),
       step_id = strrep(" ", 64),
+      reported_by = strrep(" ", 64),
       status = strrep(" ", 64),
       time = strrep(" ", 64),
       explain = strrep(" ", 64)
@@ -45,6 +46,29 @@ progress_remove <- function(task_id, status_id, with_print = TRUE) {
   DBI::dbExecute(con, statement)
   DBI::dbDisconnect(con)
   if (with_print) glue::glue("deleted status with id '{status_id}' from '{task_id}'") |> message()
+}
+
+progress_get_step_status <- function(task_id, step_id) {
+    con <- db_connect()
+    query <- glue::glue_sql("SELECT status
+                            FROM progress
+                            WHERE (task_id = {task_id}
+                            AND step_id = {step_id})
+                            ORDER BY time DESC
+                            LIMIT 1",
+                            .con = con)
+    data <- DBI::dbGetQuery(con, query)
+    DBI::dbDisconnect(con)
+    return(data$status)
+}
+
+progress_status_choices <- function(status) {
+    switch(status,
+        Pendiente = c("En proceso", "Pausado"),
+        `En proceso` = c("Pausado", "En revisión"),
+        Pausado = c("En proceso", "En revisión"),
+        `En revisión` = c("En proceso", "Terminado")
+    )
 }
 
 # create_reporte_progress()

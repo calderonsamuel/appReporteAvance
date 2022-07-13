@@ -47,6 +47,11 @@ step_remove <- function(template_id, with_print = TRUE) {
 }
 
 step_get_from_template <- function(template_id) {
+    if(is.na(template_id)) {
+        data <- list(step_id = "step_01",
+                     step_description = "Actividad única")
+        return(data)
+    }
     con <- db_connect()
     query <- glue::glue_sql("SELECT *
                             FROM templates_steps
@@ -55,6 +60,18 @@ step_get_from_template <- function(template_id) {
     data <- DBI::dbGetQuery(con, query)
     DBI::dbDisconnect(con)
     return(data)
+}
+
+step_get_description <- function(template_id, step_id) {
+    con <- db_connect()
+    query <- glue::glue_sql("SELECT step_description
+                            FROM templates_steps
+                            WHERE (template_id = {template_id}
+                            AND step_id = {step_id})",
+                            .con = con)
+    data <- DBI::dbGetQuery(con, query)
+    DBI::dbDisconnect(con)
+    return(data$step_description)
 }
 
 # create_reporte_templates_steps()
