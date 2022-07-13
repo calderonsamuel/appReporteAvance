@@ -10,6 +10,47 @@
 mod_progress_ui <- function(id){
   ns <- NS(id)
   tagList(
+      fluidRow(
+          bs4Dash::box(
+              title = "Reportar avance de tarea",
+              width = 12,
+              id = ns("box_reporte"),
+              collapsed = TRUE,
+              fluidRow(
+                  selectInput(
+                      inputId = ns("step_id"),
+                      label = "Seleccione actividad",
+                      choices = c("step_01")
+                      # choices = task_in_modal()$step_choices
+                  ) |> col_4(),
+
+                  selectInput(
+                      inputId = ns("status"),
+                      label = "Seleccione nuevo estado",
+                      choices = c(
+                          "Pendiente",
+                          "En proceso",
+                          "Pausado",
+                          "En revisión",
+                          "Terminado"
+                      )
+                  ) |> col_4(),
+
+                  textInput(
+                      inputId = ns("step_explain"),
+                      label = "Explique los cambios"
+                  ) |> col_4()
+              ),
+              fluidRow(
+                  col_2(
+                      btn_cancelar(ns("cancelar"), block = TRUE)
+                  ),
+                  col_2(
+                      btn_guardar(ns("modificar"), block = TRUE)
+                  )
+              )
+          )
+      ),
     fluidRow(
       bs4Dash::box(
         title = "Pendiente",
@@ -64,6 +105,8 @@ mod_progress_ui <- function(id){
 mod_progress_server <- function(id, user_iniciado){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
+
+    bs4Dash::updateBox(id = "box_reporte", action = "remove")
 
     user_id <- isolate(user_iniciado())
     user_groups <- gruser_get_groups(user_id)
@@ -127,39 +170,8 @@ mod_progress_server <- function(id, user_iniciado){
             lapply(function(x) {
                 observe({
                     rv$task_to_modify <- x # set new value
-                    message(paste0("L:130 task to modify is '", rv$task_to_modify, "'"))
-                    # rv$
 
-                    showModal(modalDialog(
-                        title = "Reportar avance de tarea",
-
-                        selectInput(
-                            inputId = ns("step_id"),
-                            label = "Seleccione actividad",
-                            choices = task_in_modal()$step_choices
-                        ),
-
-                        selectInput(
-                            inputId = ns("status"),
-                            label = "Seleccione nuevo estado",
-                            choices = c("Pendiente", "En proceso", "Pausado",
-                                        "En revisión", "Terminado")
-                            # choices = ""
-                        ),
-
-                        textAreaInput(
-                            inputId = ns("step_explain"),
-                            label = "Explique los cambios"
-                        ),
-
-                        # verbatimTextOutput(ns("debug")),
-
-                        footer = tagList(
-                                        modalButton("Cancelar"),
-                                        btn_modificar(ns("modificar"))
-                                    )
-
-                    ))
+                    bs4Dash::updateBox(id = "box_reporte", action = "restore")
 
                 }) |>
                     bindEvent(input[[x]])
@@ -197,6 +209,15 @@ mod_progress_server <- function(id, user_iniciado){
         # )
     }) |>
         bindEvent(input$step_id)
+
+    observe({
+        bs4Dash::updateBox(id = "box_reporte", action = "remove")
+    }) |>
+        bindEvent(input$cancelar)
+
+
+
+
 
     output$pendientes <- renderUI(
         tagList(pendientes() |> lapply(box_group, ns = ns))
