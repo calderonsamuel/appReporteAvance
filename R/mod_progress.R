@@ -71,10 +71,9 @@ mod_progress_server <- function(id, user_iniciado){
 
     rv <- reactiveValues(
         task_list = task_list_from_user(task_owners),
-        task_to_modify = NA_character_
+        task_to_modify = NA_character_, # Modificado en observer
+        btn_task_id_pressed = 0
     )
-
-    last_btn_pressed <- reactiveVal(NA_character_) # Modificado en observer
 
     task_ids <- task_get_from_user(task_owners)$task_id
 
@@ -128,6 +127,8 @@ mod_progress_server <- function(id, user_iniciado){
             lapply(function(x) {
                 observe({
                     rv$task_to_modify <- x # set new value
+                    message(paste0("L:130 task to modify is '", rv$task_to_modify, "'"))
+                    # rv$
 
                     showModal(modalDialog(
                         title = "Reportar avance de tarea",
@@ -165,29 +166,30 @@ mod_progress_server <- function(id, user_iniciado){
             })
     })
 
-
     observe({
 
         if (input$step_explain == "") return(alert_error(session, "Debe explicar cambios"))
 
-        progress_insert(new_progress_data())
+        progress_insert(new_progress_data()) |> suppressMessages()
 
         if (is.na(task_in_modal()$template_id)) {
             task_modify_status(
                 task_id = rv$task_to_modify,
                 new_status = input$status
-            )
+            ) |> suppressMessages()
         }
-
-        rv$task_list <- task_list_from_user(task_owners)
+        rv$task_list[[rv$task_to_modify]]$status <- input$status
+        rv$task_list[[rv$task_to_modify]]$status |> message()
+        # rv$task_list <- task_list_from_user(task_owners)
         alert_info(session, "Estado de actividad actualizado")
         removeModal()
 
     }) |>
         bindEvent(input$modificar)
+        # bindEvent(rv$btn_modify_pressed)
 
     observe({
-        message("updating status_choices")
+        # message("updating status_choices")
         # updateSelectInput(
         #     session = session,
         #     inputId = "status",
