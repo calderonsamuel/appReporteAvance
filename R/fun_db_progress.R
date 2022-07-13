@@ -49,6 +49,7 @@ progress_remove <- function(task_id, status_id, with_print = TRUE) {
 }
 
 progress_get_step_status <- function(task_id, step_id) {
+    if (is.na(task_id)) return("Pendiente")
     con <- db_connect()
     query <- glue::glue_sql("SELECT status
                             FROM progress
@@ -63,12 +64,19 @@ progress_get_step_status <- function(task_id, step_id) {
 }
 
 progress_status_choices <- function(status) {
-    switch(status,
-        Pendiente = c("En proceso", "Pausado"),
-        `En proceso` = c("Pausado", "En revisión"),
-        Pausado = c("En proceso", "En revisión"),
-        `En revisión` = c("En proceso", "Terminado")
-    )
+    status_str <- str(status) |> as.character()
+    message(status_str)
+    status <- if (!isTruthy(status)) "Pendiente" else status
+    paste0("status is '", status, "'") |> message()
+    if (status == "Pendiente") {
+        c("En proceso", "Pausado")
+    } else if (status == "En proceso") {
+        c("Pausado", "En revisión")
+    } else if (status == "Pausado") {
+        c("En proceso", "En revisión")
+    } else if (status == "En revisión") {
+        c("En proceso", "Terminado")
+    }
 }
 
 # create_reporte_progress()

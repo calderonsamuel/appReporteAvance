@@ -65,31 +65,27 @@ mod_progress_server <- function(id, user_iniciado){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
-    groups <- reactive({
-        user_iniciado() |>
-            gruser_get_groups()
-    })
+    user_id <- isolate(user_iniciado())
+    user_groups <- gruser_get_groups(user_id)
+    task_owners <- union(user_id, user_groups)
 
-    all_owners <- reactive(union(user_iniciado(), groups()))
-
-    last_btn_pressed <- reactiveVal(character()) # Modificado en observer
-
-    task_list <- reactiveValues(
-        all = reactive(task_list_from_user(all_owners()))
+    rv <- reactiveValues(
+        task_list = task_list_from_user(task_owners),
+        task_to_modify = NA_character_
     )
 
-    # Se asume que los id de tarea no cambian, aunque cambien sus estados
-    task_ids <- reactive(task_get_from_user(all_owners())$task_id)
+    last_btn_pressed <- reactiveVal(NA_character_) # Modificado en observer
+
+    task_ids <- task_get_from_user(task_owners)$task_id
 
     task_in_modal <- reactive({
-        task <- task_list$all()[[last_btn_pressed()]]
+        task <- rv$task_list[[rv$task_to_modify]]
         template_id <- task$template$template_id
         template_description <- task$template$template_description
         steps <- step_get_from_template(template_id)
 
         list(
             status = task$status,
-            # assignee = task$assignee$user_id,
             template_id = template_id,
             template_description = template_description,
             step_choices = setNames(steps$step_id, steps$step_description)
@@ -98,20 +94,20 @@ mod_progress_server <- function(id, user_iniciado){
 
     step <- reactiveValues(
         status_choices = reactive(
-            progress_get_step_status(last_btn_pressed(), input$step_id) |>
+            progress_get_step_status(rv$task_to_modify, input$step_id) |>
             progress_status_choices()
         )
     )
 
-    pendientes <- reactive(task_list_subset_by_status(task_list$all(), "Pendiente"))
-    en_proceso <- reactive(task_list_subset_by_status(task_list$all(), "En proceso"))
-    pausado <- reactive(task_list_subset_by_status(task_list$all(), "Pausado"))
-    en_revision <- reactive(task_list_subset_by_status(task_list$all(), "En revisión"))
-    terminado <- reactive(task_list_subset_by_status(task_list$all(), "Terminado"))
+    pendientes <- reactive(task_list_subset_by_status(rv$task_list, "Pendiente"))
+    en_proceso <- reactive(task_list_subset_by_status(rv$task_list, "En proceso"))
+    pausado <- reactive(task_list_subset_by_status(rv$task_list, "Pausado"))
+    en_revision <- reactive(task_list_subset_by_status(rv$task_list, "En revisión"))
+    terminado <- reactive(task_list_subset_by_status(rv$task_list, "Terminado"))
 
     new_progress_data <- reactive(
         data.frame(
-            task_id = last_btn_pressed(),
+            task_id = rv$task_to_modify,
             status_id = ids::proquint(use_openssl = TRUE),
             step_id = input$step_id,
             reported_by = user_iniciado(),
@@ -123,15 +119,16 @@ mod_progress_server <- function(id, user_iniciado){
         bindEvent(input$modificar)
 
     # output$debug <- renderPrint(new_status_data())
-    # output$debug <- renderPrint(last_btn_pressed())
+    # output$debug <- renderPrint(rv$task_to_modify)
 
     # Observer de todos los botones "Modificar" en los boxes.
-    # modifica last_btn_pressed y muestra modal dialog
+    # modifica rv$task_to_modify y muestra modal dialog
     observe({
-        task_ids() |>
+        task_ids |>
             lapply(function(x) {
                 observe({
-                    last_btn_pressed(x)
+                    rv$task_to_modify <- x # set new value
+
                     showModal(modalDialog(
                         title = "Reportar avance de tarea",
 
@@ -144,7 +141,9 @@ mod_progress_server <- function(id, user_iniciado){
                         selectInput(
                             inputId = ns("status"),
                             label = "Seleccione nuevo estado",
-                            choices = ""
+                            choices = c("Pendiente", "En proceso", "Pausado",
+                                        "En revisión", "Terminado")
+                            # choices = ""
                         ),
 
                         textAreaInput(
@@ -160,6 +159,7 @@ mod_progress_server <- function(id, user_iniciado){
                                     )
 
                     ))
+
                 }) |>
                     bindEvent(input[[x]])
             })
@@ -168,30 +168,31 @@ mod_progress_server <- function(id, user_iniciado){
 
     observe({
 
+        if (input$step_explain == "") return(alert_error(session, "Debe explicar cambios"))
+
         progress_insert(new_progress_data())
 
         if (is.na(task_in_modal()$template_id)) {
             task_modify_status(
-                task_id = last_btn_pressed(),
+                task_id = rv$task_to_modify,
                 new_status = input$status
             )
         }
 
-        removeModal()
-
-        task_list$all <- reactive(union(user_iniciado(), groups()) |>
-                                      task_list_from_user())
+        rv$task_list <- task_list_from_user(task_owners)
         alert_info(session, "Estado de actividad actualizado")
+        removeModal()
 
     }) |>
         bindEvent(input$modificar)
 
     observe({
-        updateSelectInput(
-            session = session,
-            inputId = "status",
-            choices = step$status_choices()
-        )
+        message("updating status_choices")
+        # updateSelectInput(
+        #     session = session,
+        #     inputId = "status",
+        #     choices = step$status_choices()
+        # )
     }) |>
         bindEvent(input$step_id)
 
