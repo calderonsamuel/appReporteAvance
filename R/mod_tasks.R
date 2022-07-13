@@ -34,13 +34,21 @@ mod_tasks_server <- function(id, user_iniciado){
 
     vals <- reactiveValues(
       data_tasks = task_get_all(),
-      users = user_get_from_privileges(c("user1", "user2"))
+      users = user_get_from_privileges(c("user1", "user2")),
+      groups = group_get_all()$group_id
     )
 
     user_choices <- reactive({
         setNames(
             object = vals$users,
-            nm = vals$users |> user_get_names()
+            nm = vals$users |> lapply(user_get_names) |> unlist()
+        )
+    })
+
+    group_choices <- reactive({
+        setNames(
+            object = vals$groups,
+            nm = vals$groups |> lapply(group_get_description) |> unlist()
         )
     })
 
@@ -50,7 +58,7 @@ mod_tasks_server <- function(id, user_iniciado){
         templates <- template_get_from_user(template_owners)
         setNames(
             object = templates$template_id,
-            nm = templates$template_description #|> template_get
+            nm = templates$template_description
         )
     })
 
@@ -88,6 +96,7 @@ mod_tasks_server <- function(id, user_iniciado){
             task_id = new_task_data()$task_id,
             status_id = ids::proquint(use_openssl = TRUE),
             step_id = step_id(),
+            reported_by = user_iniciado(),
             status = "Pendiente",
             time = lubridate::now("America/Lima") |> as.character(),
             explain = "Asignado"
@@ -145,7 +154,7 @@ mod_tasks_server <- function(id, user_iniciado){
       if (input$type == "user") {
         updateSelectInput(session, "user", choices = user_choices())
       } else {
-        updateSelectInput(session, "user", choices = group_get_all()$group_id)
+        updateSelectInput(session, "user", choices = group_choices())
       }
     })
 
