@@ -18,6 +18,7 @@ task_list_from_user <- function(user_id = "dgco93@mininter.gob.pe"){
                 template_id = x$template,
                 template_description = template_get_description(x$template)
             )
+            x$steps <- progress_step_status_list(x$task_id, x$template$template_id)
             return(x)
         })
 
@@ -28,4 +29,15 @@ task_list_from_user <- function(user_id = "dgco93@mininter.gob.pe"){
 task_list_subset_by_status <- function(task_list, status) {
     index <- task_list |> lapply(\(x) x$status == status) |> unlist()
     task_list[index]
+}
+
+progress_step_status_list <- function(task_id, template_id) {
+    step_list_ids <- step_get_from_template(template_id)$step_id
+    data <- step_list_ids |>
+        lapply(\(x) list(
+            step_id = x,
+            step_status = progress_get_step_status(task_id, x)
+        )) |>
+        setNames(step_list_ids)
+    return(data)
 }
