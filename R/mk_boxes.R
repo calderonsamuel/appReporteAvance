@@ -1,7 +1,8 @@
 mk_box <- function(icon = NULL, background = NULL) {
   function(task, ..., label = NULL, dropdownMenu = NULL, ns = NULL) {
-      if (length(task) == 0) return(NULL)
+      if (!isTruthy(task)) return(NULL)
         id <- if (is.null(ns)) task$task_id else ns(task$task_id)
+      # id <- ns(task$task_id)
     bs4Dash::box(
       title = task$task_description,
       h6(paste0("Responsable: ", task$assignee$user_name)),

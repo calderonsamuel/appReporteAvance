@@ -47,7 +47,7 @@ step_remove <- function(template_id, with_print = TRUE) {
 }
 
 step_get_from_template <- function(template_id) {
-    if(is.na(template_id)) {
+    if(!isTruthy(template_id)) {
         data <- list(step_id = "step_01",
                      step_description = "Actividad única")
         return(data)

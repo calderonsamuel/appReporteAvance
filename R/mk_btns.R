@@ -4,13 +4,13 @@
 #'
 #' @return A function to generate action buttons with a particular styling
 #'
-mk_btn <- function(color, label) {
+mk_btn <- function(color, label, style = "jelly") {
   function(inputId, icon = NULL, size = "md", block = FALSE,
            no_outline = TRUE) {
     shinyWidgets::actionBttn(
       inputId = inputId,
       label = label,
-      style = "jelly",
+      style = style,
       color = color,
       icon = icon,
       size = size,
@@ -41,6 +41,12 @@ btn_trash <- mk_btn(color = "danger", label = icon("trash"))
 
 #' @rdname buttons
 btn_agregar <- mk_btn(color = "success", label = "Agregar")
+
+#' @rdname buttons
+btn_guardar <- mk_btn(color = "success", label = "Guardar ", style = "simple")
+
+#' @rdname buttons
+btn_cancelar <- mk_btn(color = "danger", label = "Cancelar", style = "simple")
 
 #' @rdname buttons
 btn_eliminar <- mk_btn(color = "danger", label = "Eliminar")
