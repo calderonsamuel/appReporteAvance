@@ -15,7 +15,7 @@ mod_progress_ui <- function(id){
               title = "Reportar avance de tarea",
               width = 12,
               id = ns("box_reporte"),
-              collapsed = TRUE,
+              collapsible = FALSE,
               fluidRow(
                   selectInput(
                       inputId = ns("step_id"),
@@ -38,7 +38,8 @@ mod_progress_ui <- function(id){
 
                   textInput(
                       inputId = ns("step_explain"),
-                      label = "Explique los cambios"
+                      label = "Explique los cambios",
+                      placeholder = "Ingrese texto aquí"
                   ) |> col_4()
               ),
               fluidRow(
@@ -49,7 +50,7 @@ mod_progress_ui <- function(id){
                       btn_guardar(ns("modificar"), block = TRUE)
                   )
               )
-          )
+          ) #|> tagAppendAttributes(style = "display: hidden")
       ),
     fluidRow(
       bs4Dash::box(
@@ -118,6 +119,13 @@ mod_progress_server <- function(id, user_iniciado){
         btn_task_id_pressed = 0
     )
 
+    buttons <- reactiveVal()
+
+    desperate_reactive <- reactive(
+        task_ids |>
+            lapply(\(x) input[[x]])
+    )
+
     task_ids <- task_get_from_user(task_owners)$task_id
 
     task_in_modal <- reactive({
@@ -130,11 +138,19 @@ mod_progress_server <- function(id, user_iniciado){
             status = task$status,
             template_id = template_id,
             template_description = template_description,
+            step_id = steps$step_id,
+            step_description = steps$step_description,
             step_choices = setNames(steps$step_id, steps$step_description)
         )
     })
 
     step <- reactiveValues(
+        step_choices = reactive(
+          setNames(
+              object = task_in_modal()$step_id,
+              nm = task_in_modal()$step_description
+          )
+        ),
         status_choices = reactive(
             progress_get_step_status(rv$task_to_modify, input$step_id) |>
             progress_status_choices()
@@ -171,6 +187,34 @@ mod_progress_server <- function(id, user_iniciado){
                 observe({
                     rv$task_to_modify <- x # set new value
 
+                    step$status_choices <- reactive(
+                        progress_get_step_status(rv$task_to_modify, input$step_id) |>
+                            progress_status_choices()
+                    )
+
+                    message(paste("task to modify is", x))
+
+                    buttons(buttons() + 1)
+
+                    updateSelectInput(
+                        session = session,
+                        inputId = "step_id",
+                        choices = step$step_choices()
+                        # choices = rnorm(3)
+                    )
+
+                    updateSelectInput(
+                        session = session,
+                        inputId = "status",
+                        choices = step$status_choices()
+                    )
+
+                    updateTextInput(
+                        session = session,
+                        inputId = "step_explain",
+                        value = ""
+                    )
+
                     bs4Dash::updateBox(id = "box_reporte", action = "restore")
 
                 }) |>
@@ -187,7 +231,7 @@ mod_progress_server <- function(id, user_iniciado){
         if (is.na(task_in_modal()$template_id)) {
             task_modify_status(
                 task_id = rv$task_to_modify,
-                new_status = input$status
+                new_status = task_compute_status(rv$task_to_modify)
             ) |> suppressMessages()
         }
         rv$task_list[[rv$task_to_modify]]$status <- input$status
@@ -202,18 +246,18 @@ mod_progress_server <- function(id, user_iniciado){
 
     observe({
         # message("updating status_choices")
-        # updateSelectInput(
-        #     session = session,
-        #     inputId = "status",
-        #     choices = step$status_choices()
-        # )
+        updateSelectInput(
+            session = session,
+            inputId = "status",
+            choices = step$status_choices()
+        )
     }) |>
-        bindEvent(input$step_id)
+        bindEvent(input$step_id, desperate_reactive())
 
     observe({
         bs4Dash::updateBox(id = "box_reporte", action = "remove")
     }) |>
-        bindEvent(input$cancelar)
+        bindEvent(input$cancelar, input$modificar)
 
 
 
@@ -240,6 +284,7 @@ mod_progress_server <- function(id, user_iniciado){
 
 mod_progress_testapp <- function(id = "test") {
   ui <- bs4Dash::dashboardPage(
+      preloader = list(html = tagList(waiter::spin_1(), "Cargando ..."), color = "#3c8dbc"),
     header = bs4Dash::dashboardHeader(title = "TEST"),
     sidebar = bs4Dash::dashboardSidebar(
       bs4Dash::sidebarMenu(
