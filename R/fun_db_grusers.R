@@ -8,57 +8,42 @@ create_reporte_group_users <- function() {
         )
 
         DBI::dbWriteTable(con, "group_users", fields_list)
-        group_remove(group_id = strrep(" ", 64), with_print = FALSE)
+        group_remove(group_id = strrep(" ", 64))
         message("created table 'group_users'")
     }
 
     DBI::dbDisconnect(con)
 }
 
-gruser_insert <- function(field_list, with_print = TRUE) {
+gruser_insert <- function(field_list) {
     con <- db_connect()
     DBI::dbWriteTable(con, "group_users", field_list, append = TRUE)
     DBI::dbDisconnect(con)
-    if (with_print) {
-        user_id <- field_list$user_id
-        group_id <- field_list$group_id
-        glue::glue("inserted user with id {user_id} into {group_id}") |> message()
-    }
+    glue::glue("inserted user with id {user_id} into {group_id}",
+               user_id = field_list$user_id,
+               group_id = field_list$group_id) |> message()
 }
 
-gruser_remove <- function(group_id, user_id, with_print = TRUE) {
-    con <- db_connect()
-    query <- glue::glue_sql("DELETE FROM group_users
-                          WHERE (user_id = {user_id}) AND (group_id = {group_id})",
-                          .con = con)
-    DBI::dbExecute(con, query)
-    DBI::dbDisconnect(con)
-    if (with_print) glue::glue("deleted group user with id {user_id} from {group_id}") |> message()
+gruser_remove <- function(group_id, user_id) {
+    statement <- "DELETE FROM group_users
+              WHERE (user_id = {user_id}) AND (group_id = {group_id})"
+    db_execute_statement(statement, user_id = user_id, group_id = group_id)
+    glue::glue("deleted group user with id {user_id} from {group_id}") |> message()
 }
 
 gruser_get_groups <- function(user_id) {
-    con <- db_connect()
-    query <- glue::glue_sql("SELECT *
-                            FROM group_users
-                            WHERE (user_id IN ({vals*}))",
-                            vals = user_id,
-                            .con = con)
-    data <- DBI::dbGetQuery(con, query)
-    DBI::dbDisconnect(con)
+    query <- "SELECT *
+            FROM group_users
+            WHERE (user_id IN ({vals*}))"
+    data <- db_get_query(query, vals = user_id)
     return(data$group_id) # return a chr vector
 }
 
 gruser_get_from_group <- function(group_id) {
-    con <- db_connect()
-    query <- glue::glue_sql(
-        "SELECT *
-        FROM group_users
-        WHERE (group_id IN ({vals*}))",
-        vals = group_id,
-        .con = con
-    )
-    data <- DBI::dbGetQuery(con, query)
-    DBI::dbDisconnect(con)
+    query <- "SELECT *
+            FROM group_users
+            WHERE (group_id IN ({vals*}))"
+    data <- db_get_query(query, vals = group_id)
     return(sort(data$user_id)) # return a chr vector
 }
 
@@ -69,12 +54,9 @@ gruser_get_metadata <- function(group_id) {
 }
 
 gruser_purge <- function(user_id, with) {
-    con <- db_connect()
-    query <- glue::glue_sql("DELETE FROM group_users
-                          WHERE (user_id = {user_id})",
-                          .con = con)
-    DBI::dbExecute(con, query)
-    DBI::dbDisconnect(con)
+    statement <- "DELETE FROM group_users
+                  WHERE (user_id = {user_id})"
+    db_execute_statement(statement, user_id = user_id)
     glue::glue("deleted group user with id {user_id}") |> message()
 }
 

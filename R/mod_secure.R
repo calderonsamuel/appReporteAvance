@@ -84,7 +84,7 @@ mod_secure_server <- function(id, user_iniciado){
     mod_progress_server("progress_1", user_iniciado)
     # mod_admin_server("admin_1")
     mod_users_server("admin_users_1")
-    mod_templates_server("admin_templates_1")
+    mod_templates_server("admin_templates_1", isolate(user_iniciado()))
     mod_groups_server("admin_groups_1")
 
   })

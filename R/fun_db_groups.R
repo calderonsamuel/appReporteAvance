@@ -8,7 +8,7 @@ create_reporte_groups <- function() {
     )
 
     DBI::dbWriteTable(con, "groups", fields_list)
-    group_remove(group_id = strrep(" ", 64), with_print = FALSE)
+    group_remove(group_id = strrep(" ", 64))
     message("created table 'groups'")
   }
 
@@ -18,52 +18,38 @@ create_reporte_groups <- function() {
 
 
 group_get_all <- function() {
-  con <- db_connect()
-  data <- DBI::dbReadTable(con, "groups")
-  DBI::dbDisconnect(con)
-  return(data)
+    query <- "SELECT * FROM groups"
+    data <- db_get_query(query)
+    return(data)
 }
 
-
-group_insert <- function(field_list, with_print = TRUE) {
-  con <- db_connect()
-  DBI::dbWriteTable(con, "groups", field_list, append = TRUE)
-  DBI::dbDisconnect(con)
-  if (with_print) {
-      group_id <- field_list$group_id
-      glue::glue("inserted group with id {group_id}") |> message()
-  }
+group_insert <- function(field_list) {
+    con <- db_connect()
+    DBI::dbWriteTable(con, "groups", field_list, append = TRUE)
+    DBI::dbDisconnect(con)
+    glue::glue("inserted group with id {group_id}", group_id = field_list$group_id) |>
+        message()
 }
 
-group_remove <- function(group_id, with_print = TRUE) {
-  con <- db_connect()
-  statement <- glue::glue_sql("DELETE FROM groups WHERE (group_id = {group_id})")
-  DBI::dbExecute(con, statement)
-  DBI::dbDisconnect(con)
-  if (with_print) glue::glue("deleted group with id {group_id}") |> message()
+group_remove <- function(group_id) {
+    statement <- "DELETE FROM groups WHERE (group_id = {group_id})"
+    db_execute_statement(statement, group_id = group_id)
+    glue::glue("deleted group with id {group_id}") |> message()
 }
 
 group_get_from_group_id <- function(group_id) {
-  con <- db_connect()
-  query <- glue::glue_sql("SELECT *
-                          FROM groups
-                          WHERE (group_id IN ({vals*}))",
-                          vals = group_id,
-                          .con = con)
-  data <- DBI::dbGetQuery(con, query)
-  DBI::dbDisconnect(con)
-  return(data)
+    query <- "SELECT *
+              FROM groups
+              WHERE (group_id IN ({vals*}))"
+    data <- db_get_query(query, vals = group_id)
+    return(data)
 }
 
 group_get_description <- function(group_id) {
-    con <- db_connect()
-    query <- glue::glue_sql("SELECT group_description
-                          FROM groups
-                          WHERE (group_id IN ({vals*}))",
-                          vals = group_id,
-                          .con = con)
-    data <- DBI::dbGetQuery(con, query)
-    DBI::dbDisconnect(con)
+    query <- "SELECT group_description
+              FROM groups
+              WHERE (group_id IN ({vals*}))"
+    data <- db_get_query(query, vals = group_id)
     return(data$group_description)
 }
 

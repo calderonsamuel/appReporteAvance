@@ -36,9 +36,13 @@ mod_templates_server <- function(id, user_iniciado){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
 
+    user_id <- user_iniciado
+    group_id <- gruser_get_groups(user_id)
+    all_owners <- union(user_id, group_id)
+
     step_count <- reactiveVal(1L)
     step_list_numbers <- reactive(seq_len(step_count()))
-    user_templates <- reactiveVal(template_get_all())
+    user_templates <- reactiveVal(template_get_from_user(all_owners))
 
     selected_template <- reactive({
         data <- user_templates()[input$tabla_rows_selected,]
@@ -46,11 +50,13 @@ mod_templates_server <- function(id, user_iniciado){
         return(data)
     })
 
-    expanded_template <- reactive(step_get_from_template(selected_template()$template_id))
+    selected_template_id <- reactive(selected_template()$template_id)
+
+    expanded_template <- reactive(step_get_from_template(selected_template_id()))
 
     template_id <- reactive({
       if (input$template_id == "") {
-        paste0("TEMPLATE_", lubridate::now("America/Lima"))
+          ids::proquint(n_words = 3, use_openssl = TRUE)
       } else {
         input$template_id
       }
@@ -60,7 +66,7 @@ mod_templates_server <- function(id, user_iniciado){
       data.frame(
         template_id = template_id(),
         template_description = input$temp_description,
-        user_id = user_iniciado()
+        user_id = user_id
       )
     })
 
@@ -68,7 +74,7 @@ mod_templates_server <- function(id, user_iniciado){
       step_list_numbers() |>
         lapply(function(x) {
           data.frame(
-            user_id = user_iniciado(),
+            user_id = user_id,
             template_id = template_id(),
             step_id = sprintf("step_%02i", x),
             step_description = input[[sprintf("step_%02i", x)]]
@@ -135,6 +141,10 @@ mod_templates_server <- function(id, user_iniciado){
                       inputId = "temp_description",
                       value = "")
 
+      updateTextInput(session = session,
+                      inputId = "template_id",
+                      value = "")
+
       # Resetear todos los inputs de step
       step_list_numbers() |>
         lapply(function(x) {
@@ -143,17 +153,20 @@ mod_templates_server <- function(id, user_iniciado){
                           value = "")
         })
 
-      user_templates(template_get_from_user(user_iniciado()))
+      alert_success(session, "Plantilla añadida")
+
+      user_templates(template_get_from_user(all_owners))
+
 
     })
 
     observeEvent(input$rm_template, {
-      template_remove(template_id())
-      step_remove(template_id())
+      template_remove(selected_template_id())
+      step_remove(selected_template_id())
 
       alert_info(session = session, "Se eliminó la plantilla")
 
-      user_templates(template_get_from_user(user_iniciado()))
+      user_templates(template_get_from_user(all_owners))
     })
 
     output$step_list <- renderUI({
@@ -202,7 +215,7 @@ mod_templates_testapp <- function(id = "test") {
   )
 
   server <- function(input, output, session) {
-    user_iniciado <- reactive("dgco93@mininter.gob.pe")
+    user_iniciado <- "dgco93@mininter.gob.pe"
     mod_templates_server(id, user_iniciado)
   }
 
