@@ -18,9 +18,12 @@ Imports:
     golem (>= 0.3.2),
     ids,
     lubridate,
+    purrr,
     RMariaDB,
+    RSQLite,
     shiny (>= 1.7.1),
-    shinyWidgets
+    shinyWidgets,
+    waiter
 Suggests: 
     spelling,
     testthat (>= 3.0.0)

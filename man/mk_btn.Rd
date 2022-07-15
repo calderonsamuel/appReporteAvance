@@ -4,13 +4,17 @@
 \alias{mk_btn}
 \title{Pretty action buttons factory}
 \usage{
-mk_btn(color, label)
+mk_btn(color, label, style = "jelly")
 }
 \arguments{
 \item{color}{Color of the button : \code{default}, \code{primary}, \code{warning},
 \code{danger}, \code{success}, \code{royal}.}
 
 \item{label}{The contents of the button, usually a text label.}
+
+\item{style}{Style of the button, to choose between \code{simple}, \code{bordered},
+\code{minimal}, \code{stretch}, \code{jelly}, \code{gradient}, \code{fill},
+\code{material-circle}, \code{material-flat}, \code{pill}, \code{float}, \code{unite}.}
 }
 \value{
 A function to generate action buttons with a particular styling

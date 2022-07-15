@@ -65,9 +65,9 @@ progress_get_step_status <- function(task_id, step_id) {
 
 progress_status_choices <- function(status) {
     status_str <- str(status) |> as.character()
-    message(status_str)
+    # message(status_str)
     status <- if (!isTruthy(status)) "Pendiente" else status
-    paste0("status is '", status, "'") |> message()
+    # paste0("status is '", status, "'") |> message()
     if (status == "Pendiente") {
         c("En proceso", "Pausado")
     } else if (status == "En proceso") {
