@@ -11,6 +11,7 @@ mod_secure_ui <- function(id, privileges){
   ns <- NS(id)
   # tagList(
     bs4Dash::dashboardPage(
+        preloader = list(html = tagList(waiter::spin_1(), "Cargando ..."), color = "#3c8dbc"),
       bs4Dash::dashboardHeader(title = "Reporte"),
       bs4Dash::dashboardSidebar(
         collapsed = TRUE,
@@ -82,7 +83,6 @@ mod_secure_server <- function(id, user_iniciado){
 
     mod_tasks_server("tasks_1", user_iniciado)
     mod_progress_server("progress_1", user_iniciado)
-    # mod_admin_server("admin_1")
     mod_users_server("admin_users_1")
     mod_templates_server("admin_templates_1", isolate(user_iniciado()))
     mod_groups_server("admin_groups_1")
@@ -90,12 +90,12 @@ mod_secure_server <- function(id, user_iniciado){
   })
 }
 
-mod_secure_testapp <- function(id = "test", privileges = "admin") {
+mod_secure_testapp <- function(id = "test", privileges = "user1") {
 
   ui <- mod_secure_ui(id, privileges = privileges)
 
   server <- function(input, output, session) {
-    user_iniciado <- reactive("samuelcs8.17@gmail.com")
+    user_iniciado <- reactive("dgco93@mininter.gob.pe")
     mod_secure_server(id, user_iniciado)
   }
 
