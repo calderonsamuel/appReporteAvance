@@ -12,7 +12,7 @@ create_reporte_tasks <- function() {
     )
 
     DBI::dbWriteTable(con, "tasks", task_list)
-    task_remove(task_id = strrep(" ", 64), with_print = FALSE)
+    task_remove(task_id = strrep(" ", 64))
     message("created table 'tasks'")
   }
 
@@ -20,96 +20,67 @@ create_reporte_tasks <- function() {
 }
 
 task_get_all <- function() {
-  con <- db_connect()
-  data <- DBI::dbReadTable(con, "tasks")
-  DBI::dbDisconnect(con)
-  return(data)
+    data <- db_get_query("SELECT * FROM tasks")
+    return(data)
 }
 
-task_insert <- function(task_list, with_print = TRUE) {
-  con <- db_connect()
-  DBI::dbWriteTable(con, "tasks", task_list, append = TRUE)
-  DBI::dbDisconnect(con)
-  if(with_print) {
-      task_id <- task_list$task_id
-      glue::glue("inserted task with id {task_id}") |> message()
-  }
+task_insert <- function(task_list) {
+    con <- db_connect()
+    DBI::dbWriteTable(con, "tasks", task_list, append = TRUE)
+    DBI::dbDisconnect(con)
+    glue::glue("inserted task with id {task_id}", task_id = task_list$task_id) |>
+      message()
 }
 
-task_remove <- function(task_id, with_print = TRUE) {
-  con <- db_connect()
-  statement <- glue::glue_sql("DELETE
-                              FROM tasks
-                              WHERE (task_id = {task_id})",
-                              .con = con)
-  DBI::dbExecute(con, statement)
-  DBI::dbDisconnect(con)
-  if(with_print) glue::glue("deleted task with id {task_id}") |> message()
+task_remove <- function(task_id) {
+    statement <- "DELETE
+                  FROM tasks
+                  WHERE (task_id = {task_id})"
+    db_execute_statement(statement, task_id = task_id)
+    glue::glue("deleted task with id {task_id}") |> message()
 }
 
 task_get_from_id <- function(task_id) {
-  con <- db_connect()
-  query <- glue::glue_sql(
-      "SELECT *
-      FROM tasks
-      WHERE (task_id IN ({vals*}))",
-      vals = task_id,
-      .con = con
-  )
-  data <- DBI::dbGetQuery(con, query)
-  DBI::dbDisconnect(con)
-  return(data)
+    query <- "SELECT *
+              FROM tasks
+              WHERE (task_id IN ({vals*}))"
+    data <- db_get_query(query, vals = task_id)
+    return(data)
 }
 
-task_modify_status <- function(task_id, new_status, with_print = TRUE) {
-    con <- db_connect()
-    statement <- glue::glue_sql("UPDATE tasks
-                                SET status = {new_status}
-                                WHERE task_id = {task_id}",
-                                .con = con)
-    DBI::dbExecute(con, statement)
-    DBI::dbDisconnect(con)
-    if(with_print) glue::glue("modified task with id {task_id}") |> message()
+task_modify_status <- function(task_id, new_status) {
+    statement <- "UPDATE tasks
+                SET status = {new_status}
+                WHERE task_id = {task_id}"
+    db_execute_statement(statement, new_status = new_status, task_id = task_id)
+    glue::glue("modified task with id {task_id}") |> message()
 }
 
 task_get_from_user <- function(user_id) {
-  con <- db_connect()
-  query <- glue::glue_sql("SELECT task_id, task_description, status,
-                          user_id, reviewer, template_id
-                          FROM tasks
-                          WHERE (user_id IN ({vals*}))",
-                          vals = user_id,
-                          .con = con)
-  data <- DBI::dbGetQuery(con, query)
-  DBI::dbDisconnect(con)
-  return(data)
+    query <- "SELECT task_id, task_description, status,
+              user_id, reviewer, template_id
+              FROM tasks
+              WHERE (user_id IN ({vals*}))"
+    data <- db_get_query(query, vals = user_id)
+    return(data)
 }
 
 task_get_status <- function(task_id) {
-    con <- db_connect()
-    query <- glue::glue_sql("SELECT status
-                          FROM tasks
-                          WHERE (task_id IN ({task_id}))",
-                          .con = con)
-    data <- DBI::dbGetQuery(con, query)
-    DBI::dbDisconnect(con)
+    query <- "SELECT status
+              FROM tasks
+              WHERE (task_id IN ({task_id}))"
+    data <- db_get_query(query, task_id = task_id)
     return(data$status)
 }
 
 mk_task_getter <- function(status) {
-  function(user_id) {
-    con <- db_connect()
-    query <- glue::glue_sql(
-        "SELECT *
-        FROM tasks
-        WHERE (user_id IN ({vals*}) and status = {status})",
-        vals = user_id,
-        .con = con
-    )
-    data <- DBI::dbGetQuery(con, query) |> try(silent = TRUE)
-    DBI::dbDisconnect(con)
-    return(data)
-  }
+    function(user_id) {
+        query <- "SELECT *
+                FROM tasks
+                WHERE (user_id IN ({vals*}) and status = {status})"
+        data <- db_get_query(query, vals = user_id, status = status)
+        return(data)
+    }
 }
 
 task_status_pendientes <- mk_task_getter("Pendiente")

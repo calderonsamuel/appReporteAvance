@@ -38,7 +38,7 @@ db_get_query <- function(...) {
     return(data)
 }
 
-db_execute_statement <- function(statement_str, ...) {
+db_execute_statement <- function(...) {
     con <- db_connect()
     dots <- list(...)
     dots[[".con"]] <- con
