@@ -51,7 +51,7 @@ task_compute_status <- function(task_id) {
         "Pendiente"
     } else if (all(step_status == "Terminado")) {
         "Terminado"
-    } else if (any(step_status == "En revisión")) {
+    } else if (all(step_status == "En revisión")) {
         "En revisión"
     } else if (any(step_status == "Pausado")){
         "Pausado"
