@@ -235,7 +235,7 @@ mod_progress_server <- function(id, user_iniciado){
             ) |> suppressMessages()
         }
         rv$task_list[[rv$task_to_modify]]$status <- input$status
-        rv$task_list[[rv$task_to_modify]]$status |> message()
+        # rv$task_list[[rv$task_to_modify]]$status |> message()
         # rv$task_list <- task_list_from_user(task_owners)
         alert_info(session, "Estado de actividad actualizado")
         removeModal()
