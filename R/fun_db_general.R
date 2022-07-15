@@ -27,26 +27,23 @@ db_remove_table <- function(table) {
   glue::glue("deleted table '{table}'") |> message()
 }
 
-db_get_query <- function(query_str, vals = NULL) {
+db_get_query <- function(...) {
     con <- db_connect()
-    if (is.null(vals)) {
-        query <- glue::glue_sql(query_str, .con = con, vals = vals)
-    } else {
-        query <- glue::glue_sql(query_str, .con = con)
-    }
+    dots <- list(...)
+    dots[[".con"]] <- con
+    query <- do.call(what = glue::glue_sql, args = dots)
 
     data <- DBI::dbGetQuery(con, query)
     DBI::dbDisconnect(con)
     return(data)
 }
 
-db_execute_statement <- function(statement_str, vals = NULL) {
+db_execute_statement <- function(statement_str, ...) {
     con <- db_connect()
-    if (is.null(vals)) {
-        statement <- glue::glue_sql(statement_str, .con = con, vals = vals)
-    } else {
-        statement <- glue::glue_sql(statement_str, .con = con)
-    }
+    dots <- list(...)
+    dots[[".con"]] <- con
+
+    statement <- do.call(what = glue::glue_sql, args = dots)
 
     DBI::dbExecute(con, statement)
     DBI::dbDisconnect(con)
