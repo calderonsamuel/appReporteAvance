@@ -284,7 +284,7 @@ mod_progress_server <- function(id, user_iniciado){
 
 mod_progress_testapp <- function(id = "test") {
   ui <- bs4Dash::dashboardPage(
-      preloader = list(html = tagList(waiter::spin_1(), "Cargando ..."), color = "#3c8dbc"),
+      preloader = list(html = tagList(waiter::spin_pixel(), HTML("<br/>Cargando ...")), color = "#3c8dbc"),
     header = bs4Dash::dashboardHeader(title = "TEST"),
     sidebar = bs4Dash::dashboardSidebar(
       bs4Dash::sidebarMenu(
