@@ -5,7 +5,10 @@
 \alias{btn_add}
 \alias{btn_trash}
 \alias{btn_agregar}
+\alias{btn_guardar}
+\alias{btn_cancelar}
 \alias{btn_eliminar}
+\alias{btn_modificar}
 \alias{btn_minus}
 \alias{btn_refresh}
 \alias{btn_expand}
@@ -26,7 +29,31 @@ btn_agregar(
   no_outline = TRUE
 )
 
+btn_guardar(
+  inputId,
+  icon = NULL,
+  size = "md",
+  block = FALSE,
+  no_outline = TRUE
+)
+
+btn_cancelar(
+  inputId,
+  icon = NULL,
+  size = "md",
+  block = FALSE,
+  no_outline = TRUE
+)
+
 btn_eliminar(
+  inputId,
+  icon = NULL,
+  size = "md",
+  block = FALSE,
+  no_outline = TRUE
+)
+
+btn_modificar(
   inputId,
   icon = NULL,
   size = "md",
