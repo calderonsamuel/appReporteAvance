@@ -36,9 +36,9 @@ mod_groups_server <- function(id, user_iniciado){
     ns <- session$ns
 
     vals <- reactiveValues(
-      users = user_get_all()$user_id |> setdiff("samuelcs8.17@gmail.com"),
+      users = user_get_from_privileges(c("user1", "user2")),
       groups = group_get_all(),
-      grusers_current = data.frame()
+      grusers_current = character()
     )
 
     selected_group <- reactive({
@@ -55,7 +55,7 @@ mod_groups_server <- function(id, user_iniciado){
 
     grusers_choices <- reactive({
         availables <- setdiff(vals$users, vals$grusers_current) |> sort()
-        data <- setNames(object = availables, nm = user_get_names(availables))
+        data <- setNames(object = availables, nm = availables |> purrr::map_chr(user_get_names))
         message("updating grusers_choices()")
         return(data)
     })

@@ -21,10 +21,8 @@ create_reporte_progress <- function() {
 }
 
 progress_get_all <- function() {
-  con <- db_connect()
-  data <- DBI::dbReadTable(con, "progress")
-  DBI::dbDisconnect(con)
-  return(data)
+    query <- "SELECT * FROM progress"
+    db_get_query(query)
 }
 
 progress_insert <- function(field_list, with_print = TRUE) {
@@ -38,28 +36,25 @@ progress_insert <- function(field_list, with_print = TRUE) {
 }
 
 progress_remove <- function(task_id, status_id, with_print = TRUE) {
-  con <- db_connect()
-  statement <- glue::glue_sql("DELETE
-                              FROM progress
-                              WHERE (status_id = {status_id} AND task_id = {task_id})",
-                              .con = con)
-  DBI::dbExecute(con, statement)
-  DBI::dbDisconnect(con)
-  if (with_print) glue::glue("deleted status with id '{status_id}' from '{task_id}'") |> message()
+    statement <-
+        "DELETE
+        FROM progress
+        WHERE (status_id = {status_id} AND task_id = {task_id})"
+    db_execute_statement(statement, status_id = status_id, task_id = task_id)
+
+    glue::glue("deleted status with id '{status_id}' from '{task_id}'") |> message()
 }
 
 progress_get_step_status <- function(task_id, step_id) {
     if (is.na(task_id)) return("Pendiente")
-    con <- db_connect()
-    query <- glue::glue_sql("SELECT status
-                            FROM progress
-                            WHERE (task_id = {task_id}
-                            AND step_id = {step_id})
-                            ORDER BY time DESC
-                            LIMIT 1",
-                            .con = con)
-    data <- DBI::dbGetQuery(con, query)
-    DBI::dbDisconnect(con)
+    query <-
+        "SELECT status
+        FROM progress
+        WHERE (task_id = {task_id}
+        AND step_id = {step_id})
+        ORDER BY time DESC
+        LIMIT 1"
+    data <- db_get_query(query, task_id = task_id, step_id = step_id)
     return(data$status)
 }
 

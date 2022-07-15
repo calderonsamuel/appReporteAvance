@@ -11,7 +11,7 @@ create_reporte_users <- function() {
     )
 
     DBI::dbWriteTable(con, "users", field_list)
-    user_remove(user_id = strrep(" ", 64), with_print = FALSE)
+    user_remove(user_id = strrep(" ", 64))
     message("created table 'users'")
   }
 
@@ -19,9 +19,8 @@ create_reporte_users <- function() {
 }
 
 user_get_all <- function() {
-    con <- db_connect()
-    data <- DBI::dbReadTable(con, "users")
-    DBI::dbDisconnect(con)
+    query <- "SELECT * from users"
+    data <- db_get_query(query)
     return(data)
 }
 
@@ -34,54 +33,39 @@ user_insert <- function(user_data) {
 }
 
 user_remove <- function(user_id) {
-    con <- db_connect()
-    DBI::dbExecute(con,
-                   glue::glue_sql("DELETE FROM users WHERE (user_id = {user_id})", .con = con))
-    DBI::dbDisconnect(con)
+    statement <- "DELETE FROM users WHERE (user_id = {user_id})"
+    db_execute_statement(statement, user_id = user_id)
     message(glue::glue("deleted user with id {user_id}"))
 }
 
 user_get_privileges <- function(user_id) {
-    con <- db_connect()
-    query <- glue::glue_sql("SELECT privileges
-                            FROM users
-                            WHERE (user_id = {user_id})",
-                            .con = con)
-    data <- DBI::dbGetQuery(con, query)
-    DBI::dbDisconnect(con)
+    query <-    "SELECT privileges
+                FROM users
+                WHERE (user_id = {user_id})"
+    data <- db_get_query(query, user_id = user_id)
     return(data$privileges)
 }
 
 user_get_from_privileges <- function(privileges) {
-    con <- db_connect()
-    query <- glue::glue_sql("SELECT user_id
-                            FROM users
-                            WHERE (privileges IN ({vals*}))",
-                            vals = privileges,
-                            .con = con)
-    data <- DBI::dbGetQuery(con, query)
-    DBI::dbDisconnect(con)
+    query <-    "SELECT user_id
+                FROM users
+                WHERE (privileges IN ({vals*}))"
+    data <- db_get_query(query, vals = privileges)
     return(data$user_id |> sort())
 }
 
-user_get_names <- function(user_id, show_query = FALSE) {
+user_get_names <- function(user_id) {
     if (grepl("^team", user_id)) return(group_get_description(user_id))
-    con <- db_connect()
-    query <- glue::glue_sql("SELECT name, last_name
+    query <- "SELECT name, last_name
                             FROM users
                             WHERE (user_id IN ({vals*}))
-                            ORDER BY user_id",
-                            vals = user_id,
-                            .con = con)
-    data <- DBI::dbGetQuery(con, query)
-    DBI::dbDisconnect(con)
-    if (show_query) return(query)
+                            ORDER BY user_id"
+    data <- db_get_query(query, vals = user_id)
     return(paste(data$last_name, data$name, sep = ", "))
 }
 
 user_update <- function(user_id) {
-    con <- db_connect()
-    DBI::dbExecute(con, "")
+
 }
 
 user_create <- function(user_data, group_id = "team-dgco") {
