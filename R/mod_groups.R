@@ -236,10 +236,10 @@ mod_groups_testapp <- function(id = "test") {
 
 
   server <- function(input, output, session) {
-    mod_groups_server(id, user_iniciado = reactive("dgco93@mininter.gob.pe"))
+    mod_groups_server(id, user_iniciado = "dgco93@mininter.gob.pe")
   }
 
-  shinyApp(ui, server, options = list(autoreload = TRUE))
+  shinyApp(ui, server)
 }
 
 ## To be copied in the UI

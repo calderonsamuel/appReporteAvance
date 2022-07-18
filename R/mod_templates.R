@@ -36,9 +36,8 @@ mod_templates_server <- function(id, user_iniciado){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
 
-    user_id <- user_iniciado
-    group_id <- gruser_get_groups(user_id)
-    all_owners <- union(user_id, group_id)
+    group_id <- gruser_get_groups(user_iniciado)
+    all_owners <- union(user_iniciado, group_id)
 
     step_count <- reactiveVal(1L)
     step_list_numbers <- reactive(seq_len(step_count()))
@@ -66,7 +65,7 @@ mod_templates_server <- function(id, user_iniciado){
       data.frame(
         template_id = template_id(),
         template_description = input$temp_description,
-        user_id = user_id
+        user_id = user_iniciado
       )
     })
 
@@ -74,7 +73,7 @@ mod_templates_server <- function(id, user_iniciado){
       step_list_numbers() |>
         lapply(function(x) {
           data.frame(
-            user_id = user_id,
+            user_id = user_iniciado,
             template_id = template_id(),
             step_id = sprintf("step_%02i", x),
             step_description = input[[sprintf("step_%02i", x)]]
