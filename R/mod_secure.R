@@ -24,12 +24,12 @@ mod_secure_ui <- function(id, privileges){
             icon = icon("tasks"),
             selected = TRUE
           ),
+          bs4Dash::menuItem("Asignar tareas", tabName = "tasks", icon = icon("calendar-plus")),
           bs4Dash::menuItem(
               text = "Plantillas",
               icon = icon("book"),
               tabName = "admin_templates"
           ),
-          if (privileges != "user1") bs4Dash::menuItem("Asignar tareas", tabName = "tasks", icon = icon("calendar-plus")),
           if (privileges == "admin") {
             tagList(
               bs4Dash::menuItem(

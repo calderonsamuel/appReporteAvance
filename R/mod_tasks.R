@@ -32,23 +32,34 @@ mod_tasks_server <- function(id, user_iniciado){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
+    privileges <- user_get_privileges(user_iniciado)
+    groups <- gruser_get_groups(user_iniciado)
+    glue::glue("privileges: {privileges}") |> message()
+
+    users_for_tasks <- if (privileges == "user1") user_iniciado else user_get_from_privileges(c("user1", "user2"))
+
+    task_owners <- union(users_for_tasks, groups)
+
+    glue::glue("task_owners: {vals}", vals = glue::glue_collapse(task_owners, sep = ", ")) |> message()
+
     vals <- reactiveValues(
-      data_tasks = task_get_all(),
-      users = user_get_from_privileges(c("user1", "user2")),
-      groups = group_get_all()$group_id
+      data_tasks = task_get_from_user(task_owners),
+      # data_tasks = task_get_all(),
+      users = users_for_tasks,
+      groups = gruser_get_groups(user_iniciado)
     )
 
     user_choices <- reactive({
         setNames(
             object = vals$users,
-            nm = vals$users |> lapply(user_get_names) |> unlist()
+            nm = vals$users |> purrr::map_chr(user_get_names)
         )
     })
 
     group_choices <- reactive({
         setNames(
             object = vals$groups,
-            nm = vals$groups |> lapply(group_get_description) |> unlist()
+            nm = vals$groups |> purrr::map_chr(group_get_description)
         )
     })
 
@@ -75,8 +86,11 @@ mod_tasks_server <- function(id, user_iniciado){
     })
 
     current_tasks <- reactive({
-        vals$data_tasks |>
-            subset(select = c(user_id, template_id, task_description, status)) |>
+        data <- vals$data_tasks |>
+            subset(select = c(user_id, template_id, task_description, status))
+        data$user_id <- purrr::map_chr(data$user_id, user_get_names)
+
+        data |>
             setNames(c("Encargado", "Plantilla", "Descripción de tarea", "Estado actual"))
     })
 
@@ -165,7 +179,7 @@ mod_tasks_server <- function(id, user_iniciado){
       } else {
         task_insert(new_task_data())
         progress_insert(new_progress_data())
-        vals$data_tasks <- task_get_all()
+        vals$data_tasks <- task_get_from_user(task_owners)
         updateTextAreaInput(session, "description", value = "")
 
         removeModal()
@@ -174,15 +188,16 @@ mod_tasks_server <- function(id, user_iniciado){
       }
     })
 
-    observeEvent(input$remove,{
-
-      if (!isTruthy(task_for_deleting())) {
-        alert_error(session, "Debe seleccionar una tarea a eliminar")
-      } else {
-        task_remove(task_for_deleting())
-        vals$data_tasks <- task_get_all()
-        alert_info(session, "Tarea eliminada")
-      }
+    observeEvent(input$remove, {
+        if (!isTruthy(task_for_deleting())) {
+            alert_error(session, "Debe seleccionar una tarea a eliminar")
+        } else if (task_is_from_group(task_for_deleting())){
+            alert_error(session, "No puede eliminar tarea de grupo")
+        } else {
+            task_remove(task_for_deleting())
+            vals$data_tasks <- task_get_from_user(task_owners)
+            alert_info(session, "Tarea eliminada")
+        }
 
     })
 
