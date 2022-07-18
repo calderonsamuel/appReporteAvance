@@ -43,27 +43,27 @@ mod_groups_server <- function(id, user_iniciado){
 
     selected_group <- reactive({
         data <- vals$groups$group_id[input$tabla_rows_selected]
-        message("updating selected_group()")
+        glue::glue("selected_group() is {data}") |> message()
         return(data)
     })
 
     selected_user <- reactive({
         data <- grusers_tbl()$user_id[input$tabla_user_rows_selected]
-        message("updating selected_user()")
+        glue::glue("selected_user() is {data}")
         return(data)
     })
 
     grusers_choices <- reactive({
         availables <- setdiff(vals$users, vals$grusers_current) |> sort()
         data <- setNames(object = availables, nm = availables |> purrr::map_chr(user_get_names))
-        message("updating grusers_choices()")
+        glue::glue("grusers_choices() are {vals}", vals = glue::glue_collapse(data, sep = ", "))
         return(data)
     })
 
     grusers_tbl <- reactive({
         data <- data.frame(
             user_id = vals$grusers_current,
-            names = vals$grusers_current |> user_get_names()
+            names = vals$grusers_current |> purrr::map_chr(user_get_names)
         )
         message("updating grusers_tbl()")
         return(data)
