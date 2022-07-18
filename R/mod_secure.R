@@ -25,7 +25,7 @@ mod_secure_ui <- function(id, privileges){
             selected = TRUE
           ),
           bs4Dash::menuItem(
-              text = "Plantillas admin",
+              text = "Plantillas",
               icon = icon("book"),
               tabName = "admin_templates"
           ),
