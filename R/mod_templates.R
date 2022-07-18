@@ -94,7 +94,7 @@ mod_templates_server <- function(id, user_iniciado){
             inputId = ns("template_owner"),
             label = "Seleccione dueño de plantilla",
             # choices = letters[1:5]
-            choices = all_owners |> purrr::map_chr(user_get_names)
+            choices = setNames(all_owners, all_owners |> purrr::map_chr(user_get_names))
           ),
           checkboxInput(ns("plantilla_mapro"), label = "¿Es proceso MAPRO?"),
           conditionalPanel(
