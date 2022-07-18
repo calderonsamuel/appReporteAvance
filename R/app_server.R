@@ -17,17 +17,25 @@ app_server <- function(input, output, session) {
     )$
     launch()
 
-  s <- firebase::Storage$new()
-
-  user_iniciado <- reactive(f$get_signed_in()$response$email)
-  privileges <- reactive(user_get_privileges(user_iniciado()))
-
+  rv <- reactiveValues(
+      user_iniciado = character(),
+      privileges = character()
+  )
 
   output$my_ui <- renderUI({
     f$req_sign_in()
-    mod_secure_ui(ns("secure_1"), privileges = privileges())
+
+      rv$user_iniciado <- f$get_signed_in()$response$email
+      rv$privileges <- user_get_privileges(rv$user_iniciado)
+
+      glue::glue("sesion iniciada de {user}", user = rv$user_iniciado) |>
+          message()
+
+    mod_secure_ui("secure_1", privileges = rv$privileges)
+    # mod_secure_ui(ns("secure_1"), privileges = rv$privileges)
   })
 
-  mod_secure_server("secure_1", user_iniciado)
+  observe(mod_secure_server("secure_1", user_iniciado = rv$user_iniciado)) |>
+      bindEvent(f$req_sign_in())
 
 }
