@@ -65,7 +65,7 @@ mod_templates_server <- function(id, user_iniciado){
       data.frame(
         template_id = template_id(),
         template_description = input$temp_description,
-        user_id = user_iniciado
+        user_id = input$template_owner
       )
     })
 
@@ -73,7 +73,7 @@ mod_templates_server <- function(id, user_iniciado){
       step_list_numbers() |>
         lapply(function(x) {
           data.frame(
-            user_id = user_iniciado,
+            user_id = input$template_owner,
             template_id = template_id(),
             step_id = sprintf("step_%02i", x),
             step_description = input[[sprintf("step_%02i", x)]]
@@ -87,14 +87,23 @@ mod_templates_server <- function(id, user_iniciado){
 
         showModal(modalDialog(
           title = "Añadir tareas a plantilla",
-          h5("Nombre de plantilla"),
           textInput(inputId = ns("temp_description"),
-                    label = NULL,
+                    label = "Nombre de plantilla",
                     placeholder = "Ingresar nombre de plantilla"),
-          h5("ID de plantilla (opcional)"),
-          textInput(inputId = ns("template_id"),
-                    label = NULL,
-                    placeholder = "Opcional"),
+          selectInput(
+            inputId = ns("template_owner"),
+            label = "Seleccione dueño de plantilla",
+            # choices = letters[1:5]
+            choices = all_owners |> purrr::map_chr(user_get_names)
+          ),
+          checkboxInput(ns("plantilla_mapro"), label = "¿Es proceso MAPRO?"),
+          conditionalPanel(
+              condition = "input.plantilla_mapro",
+              ns = ns,
+              textInput(inputId = ns("template_id"),
+                        label = "ID de proceso",
+                        placeholder = "Solo llenar en procesos MAPRO")
+          ),
           # h2("Plantilla nueva:"),
           h5("Ingresar tareas"),
           fluidRow(

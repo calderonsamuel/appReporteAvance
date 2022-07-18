@@ -24,6 +24,11 @@ mod_secure_ui <- function(id, privileges){
             icon = icon("tasks"),
             selected = TRUE
           ),
+          bs4Dash::menuItem(
+              text = "Plantillas admin",
+              icon = icon("book"),
+              tabName = "admin_templates"
+          ),
           if (privileges != "user1") bs4Dash::menuItem("Asignar tareas", tabName = "tasks", icon = icon("calendar-plus")),
           if (privileges == "admin") {
             tagList(
@@ -31,11 +36,6 @@ mod_secure_ui <- function(id, privileges){
                 text = "User admin",
                 icon = icon("user-shield"),
                 tabName = "admin_users"
-              ),
-              bs4Dash::menuItem(
-                text = "Plantillas admin",
-                icon = icon("book"),
-                tabName = "admin_templates"
               ),
               bs4Dash::menuItem(
                 text = "Grupos admin",
