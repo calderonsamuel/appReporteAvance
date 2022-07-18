@@ -52,6 +52,7 @@ mod_progress_ui <- function(id){
               )
           ) #|> tagAppendAttributes(style = "display: hidden")
       ),
+      verbatimTextOutput(ns("debug")),
     fluidRow(
       bs4Dash::box(
         title = "Pendiente",
@@ -107,11 +108,18 @@ mod_progress_server <- function(id, user_iniciado){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
-    bs4Dash::updateBox(id = "box_reporte", action = "remove")
+    # message("Usando mod_progress_server")
+    # message(ns("id"))
 
-    user_id <- isolate(user_iniciado())
-    user_groups <- gruser_get_groups(user_id)
-    task_owners <- union(user_id, user_groups)
+    # print(output)
+
+    # output$debug <- renderPrint(user_iniciado)
+
+    # bs4Dash::updateBox(id = "box_reporte", action = "remove")
+
+    # message(glue::glue("mod_progress: {user_iniciado}"))
+    user_groups <- gruser_get_groups(user_iniciado)
+    task_owners <- union(user_iniciado, user_groups)
 
     rv <- reactiveValues(
         task_list = task_list_from_user(task_owners),
@@ -119,7 +127,7 @@ mod_progress_server <- function(id, user_iniciado){
         btn_task_id_pressed = 0
     )
 
-    buttons <- reactiveVal()
+    # buttons <- reactiveVal()
 
     desperate_reactive <- reactive(
         task_ids |>
@@ -168,7 +176,7 @@ mod_progress_server <- function(id, user_iniciado){
             task_id = rv$task_to_modify,
             status_id = ids::proquint(use_openssl = TRUE),
             step_id = input$step_id,
-            reported_by = user_iniciado(),
+            reported_by = user_iniciado,
             status = input$status,
             time = lubridate::now("America/Lima"),
             explain = input$step_explain
@@ -194,7 +202,7 @@ mod_progress_server <- function(id, user_iniciado){
 
                     message(paste("task to modify is", x))
 
-                    buttons(buttons() + 1)
+                    # buttons(buttons() + 1)
 
                     updateSelectInput(
                         session = session,
@@ -299,7 +307,7 @@ mod_progress_testapp <- function(id = "test") {
   )
 
   server <- function(input, output, session) {
-    user_iniciado <- reactive("dgco93@mininter.gob.pe")
+    user_iniciado <- "dgco93@mininter.gob.pe"
     mod_progress_server(id, user_iniciado)
   }
 

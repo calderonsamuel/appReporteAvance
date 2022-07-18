@@ -9,9 +9,9 @@
 #' @importFrom shiny NS tagList
 mod_secure_ui <- function(id, privileges){
   ns <- NS(id)
-  # tagList(
+  tagList(
     bs4Dash::dashboardPage(
-        preloader = list(html = tagList(waiter::spin_1(), "Cargando ..."), color = "#3c8dbc"),
+        # preloader = list(html = tagList(waiter::spin_pixel(), "Cargando ..."), color = "#3c8dbc"),
       bs4Dash::dashboardHeader(title = "Reporte"),
       bs4Dash::dashboardSidebar(
         collapsed = TRUE,
@@ -71,7 +71,7 @@ mod_secure_ui <- function(id, privileges){
         )
       )
     )
-  # )
+  )
 }
 
 #' secure Server Functions
@@ -81,21 +81,27 @@ mod_secure_server <- function(id, user_iniciado){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
-    mod_tasks_server("tasks_1", user_iniciado)
+    if (is.null(user_iniciado))  {
+        message("No se ha definido 'user_iniciado()' en 'mod_secure_server'")
+    } else {
+        glue::glue("user_iniciado is '{user_iniciado}'")
+    }
+
     mod_progress_server("progress_1", user_iniciado)
+    mod_tasks_server("tasks_1", user_iniciado)
     mod_users_server("admin_users_1")
-    mod_templates_server("admin_templates_1", isolate(user_iniciado()))
-    mod_groups_server("admin_groups_1")
+    mod_templates_server("admin_templates_1", user_iniciado)
+    mod_groups_server("admin_groups_1", user_iniciado)
 
   })
 }
 
-mod_secure_testapp <- function(id = "test", privileges = "user1") {
+mod_secure_testapp <- function(id = "test", privileges = "admin") {
 
   ui <- mod_secure_ui(id, privileges = privileges)
 
   server <- function(input, output, session) {
-    user_iniciado <- reactive("dgco93@mininter.gob.pe")
+    user_iniciado <- "dgco93@mininter.gob.pe"
     mod_secure_server(id, user_iniciado)
   }
 

@@ -53,8 +53,8 @@ mod_tasks_server <- function(id, user_iniciado){
     })
 
     templates_choices <- reactive({
-        groups <- gruser_get_groups(user_iniciado())
-        template_owners <- union(user_iniciado(), groups)
+        groups <- gruser_get_groups(user_iniciado)
+        template_owners <- union(user_iniciado, groups)
         templates <- template_get_from_user(template_owners)
         setNames(
             object = templates$template_id,
@@ -82,7 +82,7 @@ mod_tasks_server <- function(id, user_iniciado){
 
     new_task_data <- reactive({
       data.frame(
-        reviewer = user_iniciado(),
+        reviewer = user_iniciado,
         user_id = input$user,
         task_id = ids::proquint(use_openssl = TRUE, n_words = 3) ,
         task_description = input$description,
@@ -96,7 +96,7 @@ mod_tasks_server <- function(id, user_iniciado){
             task_id = new_task_data()$task_id,
             status_id = ids::proquint(use_openssl = TRUE),
             step_id = step_id(),
-            reported_by = user_iniciado(),
+            reported_by = user_iniciado,
             status = "Pendiente",
             time = lubridate::now("America/Lima") |> as.character(),
             explain = "Asignado"
@@ -218,7 +218,7 @@ mod_tasks_testapp <- function(id = "test") {
   )
 
   server <- function(input, output, session) {
-    user_iniciado <- reactive("dgco93@mininter.gob.pe")
+    user_iniciado <- "dgco93@mininter.gob.pe"
     mod_tasks_server(id, user_iniciado)
   }
 
