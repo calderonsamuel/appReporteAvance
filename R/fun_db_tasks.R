@@ -89,6 +89,14 @@ task_status_pausado <- mk_task_getter("Pausado")
 task_status_en_revision <- mk_task_getter("En revisión")
 task_status_terminado <- mk_task_getter("Terminado")
 
+task_is_from_group <- function(task_id) {
+    query <- "SELECT user_id
+            FROM tasks
+            WHERE task_id = {task_id}"
+    data <- db_get_query(query, task_id = task_id)
+    return(grepl("^team", data$user_id))
+}
+
 # create_reporte_tasks()
 # db_remove_table("tasks")
 # task_get_all()

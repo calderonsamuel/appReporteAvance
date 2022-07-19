@@ -24,18 +24,18 @@ mod_secure_ui <- function(id, privileges){
             icon = icon("tasks"),
             selected = TRUE
           ),
-          if (privileges != "user1") bs4Dash::menuItem("Asignar tareas", tabName = "tasks", icon = icon("calendar-plus")),
+          bs4Dash::menuItem("Asignar tareas", tabName = "tasks", icon = icon("calendar-plus")),
+          bs4Dash::menuItem(
+              text = "Plantillas",
+              icon = icon("book"),
+              tabName = "admin_templates"
+          ),
           if (privileges == "admin") {
             tagList(
               bs4Dash::menuItem(
                 text = "User admin",
                 icon = icon("user-shield"),
                 tabName = "admin_users"
-              ),
-              bs4Dash::menuItem(
-                text = "Plantillas admin",
-                icon = icon("book"),
-                tabName = "admin_templates"
               ),
               bs4Dash::menuItem(
                 text = "Grupos admin",
@@ -96,13 +96,12 @@ mod_secure_server <- function(id, user_iniciado){
   })
 }
 
-mod_secure_testapp <- function(id = "test", privileges = "admin") {
+mod_secure_testapp <- function(user_iniciado = "dgco93@mininter.gob.pe", privileges = "admin") {
 
-  ui <- mod_secure_ui(id, privileges = privileges)
+  ui <- mod_secure_ui(id = "test", privileges = privileges)
 
   server <- function(input, output, session) {
-    user_iniciado <- "dgco93@mininter.gob.pe"
-    mod_secure_server(id, user_iniciado)
+    mod_secure_server(id = "test", user_iniciado)
   }
 
   shinyApp(ui, server)

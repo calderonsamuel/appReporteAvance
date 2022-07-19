@@ -31,7 +31,8 @@ progress_insert <- function(field_list, with_print = TRUE) {
   DBI::dbDisconnect(con)
   if (with_print) {
       status_id <- field_list$status_id
-      glue::glue("inserted status with id {status_id}") |> message()
+      glue::glue("inserted status with ids {vals}", vals = status_id |> glue::glue_collapse(sep = ", ")) |>
+          message(appendLF = )
   }
 }
 

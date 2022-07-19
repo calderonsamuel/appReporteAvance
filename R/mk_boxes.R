@@ -2,7 +2,7 @@ mk_box <- function(icon = NULL, background = NULL) {
   function(task, ..., label = NULL, dropdownMenu = NULL, ns = NULL) {
       if (!isTruthy(task)) return(NULL)
         id <- if (is.null(ns)) task$task_id else ns(task$task_id)
-      # id <- ns(task$task_id)
+        background <- if (task_is_from_group(task$task_id)) "olive" else background
     bs4Dash::box(
       title = task$task_description,
       h6(paste0("Responsable: ", task$assignee$user_name)),
