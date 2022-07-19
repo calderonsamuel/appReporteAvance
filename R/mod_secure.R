@@ -96,13 +96,12 @@ mod_secure_server <- function(id, user_iniciado){
   })
 }
 
-mod_secure_testapp <- function(id = "test", privileges = "admin") {
+mod_secure_testapp <- function(user_iniciado = "dgco93@mininter.gob.pe", privileges = "admin") {
 
-  ui <- mod_secure_ui(id, privileges = privileges)
+  ui <- mod_secure_ui(id = "test", privileges = privileges)
 
   server <- function(input, output, session) {
-    user_iniciado <- "dgco93@mininter.gob.pe"
-    mod_secure_server(id, user_iniciado)
+    mod_secure_server(id = "test", user_iniciado)
   }
 
   shinyApp(ui, server)
