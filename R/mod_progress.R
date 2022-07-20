@@ -107,8 +107,6 @@ mod_progress_server <- function(id, user_iniciado){
     ns <- session$ns
 
     privileges <- user_get_privileges(user_iniciado)
-    user_groups <- gruser_get_groups(user_iniciado)
-    task_owners <- union(user_iniciado, user_groups)
 
     rv <- reactiveValues(
         task_list = task_list_from_user(user_iniciado),
@@ -116,13 +114,12 @@ mod_progress_server <- function(id, user_iniciado){
         btn_task_id_pressed = 0
     )
 
-    desperate_reactive <- reactive(
+    btn_tracker <- reactive(
         task_ids |>
             lapply(\(x) input[[x]])
     )
 
     task_ids <- task_list_for_board(user_iniciado)
-    # task_ids <- task_get_from_user2(task_owners)
 
     task_in_modal <- reactive({
         task <- rv$task_list[[rv$task_to_modify]]
@@ -239,7 +236,7 @@ mod_progress_server <- function(id, user_iniciado){
             choices = step$status_choices()
         )
     }) |>
-        bindEvent(input$step_id, desperate_reactive())
+        bindEvent(input$step_id, btn_tracker())
 
     observe({
         bs4Dash::updateBox(id = "box_reporte", action = "remove")
