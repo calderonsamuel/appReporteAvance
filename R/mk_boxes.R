@@ -1,20 +1,13 @@
-mk_box <- function(icon = NULL, background = NULL) {
-    function(task, ..., label = NULL, dropdownMenu = NULL, ns = NULL) {
+mk_box <- function(icon = NULL, use_ddMenu = TRUE) {
+    function(task, label = NULL, ns = NULL) {
         if (!isTruthy(task)) return(NULL)
 
         task_id_ns <- ns_safe(task$task_id, ns)
-        background <- if (task_is_from_group(task$task_id)) "olive" else background
+        background <- box_bg_by_assignee(task$task_id)
+        dropdownMenu <- if(use_ddMenu) box_ddMenu(task_id_ns) else NULL
         bs4Dash::box(
             title = task$task_description,
-            dropdownMenu = bs4Dash::boxDropdown(
-              bs4Dash::boxDropdownItem("Modificar", id = task_id_ns)
-            ),
-            box_interior(
-                assignee_name = task$assignee$user_name,
-                reviewer_name = task$reviewer$user_name,
-                template_description = task$template$template_description
-            ),
-            ...,
+            dropdownMenu = dropdownMenu,
             footer = NULL,
             status = NULL,
             solidHeader = FALSE,
@@ -32,13 +25,19 @@ mk_box <- function(icon = NULL, background = NULL) {
             headerBorder = TRUE,
             label = label,
             sidebar = NULL,
-            id = NULL
+            id = NULL,
+
+            box_interior(
+                assignee_name = task$assignee$user_name,
+                reviewer_name = task$reviewer$user_name,
+                template_description = task$template$template_description
+            )
         )
     }
 }
 
 box_bg_by_assignee <- function(task_id) {
-
+    if (task_is_from_group(task_id)) "olive" else "teal"
 }
 
 ns_safe <- function(id, ns = NULL) {
@@ -53,9 +52,11 @@ box_interior <- function(assignee_name, reviewer_name, template_description){
     )
 }
 
-box_pendientes <- mk_box(icon = icon("calendar"))
-box_pendientes_user <- mk_box(background = "olive")
-box_pendientes_group <- mk_box(background = "teal")
+box_ddMenu <- function(item_id) {
+    bs4Dash::boxDropdown(
+        bs4Dash::boxDropdownItem("Modificar", id = item_id)
+    )
+}
 
-box_user <- mk_box(background = "olive")
-box_group <- mk_box(background = "teal")
+box_dd_yes <- mk_box(use_ddMenu = TRUE)
+box_dd_no <- mk_box(use_ddMenu = FALSE)

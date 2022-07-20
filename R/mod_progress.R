@@ -249,19 +249,19 @@ mod_progress_server <- function(id, user_iniciado){
 
 
     output$pendientes <- renderUI(
-        tagList(pendientes() |> lapply(box_group, ns = ns))
+        tagList(pendientes() |> lapply(box_dd_yes, ns = ns))
     )
     output$en_proceso <- renderUI(
-        tagList(en_proceso() |> lapply(box_group, ns = ns))
+        tagList(en_proceso() |> lapply(box_dd_yes, ns = ns))
     )
     output$pausado <- renderUI(
-        tagList(pausado() |> lapply(box_group, ns = ns))
+        tagList(pausado() |> lapply(box_dd_yes, ns = ns))
     )
     output$en_revision <- renderUI(
-        tagList(en_revision() |> lapply(box_group, ns = ns))
+        tagList(en_revision() |> lapply(box_dd_no, ns = ns))
     )
     output$terminado <- renderUI(
-        tagList(terminado() |> lapply(box_group, ns = ns))
+        tagList(terminado() |> lapply(box_dd_no, ns = ns))
     )
 
   })
