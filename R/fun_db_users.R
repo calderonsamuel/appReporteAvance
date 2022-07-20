@@ -78,6 +78,14 @@ user_is_group <- function(user_id) {
     grepl("^team", user_id)
 }
 
+user_is_registered <- function(user_id) {
+    query <- "SELECT user_id
+                FROM users
+                WHERE user_id = {user_id}"
+    data <- db_get_query(query, user_id = user_id)
+    return(isTruthy(data$user_id))
+}
+
 
 # db_remove_table("users")
 # create_reporte_users()

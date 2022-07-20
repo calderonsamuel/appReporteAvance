@@ -31,6 +31,15 @@ app_server <- function(input, output, session) {
       glue::glue("sesion iniciada de {user}", user = rv$user_iniciado) |>
           message()
 
+      if (user_is_registered(rv$user_iniciado)) {
+          mod_secure_ui("secure_1", privileges = rv$privileges)
+      } else {
+          tagList(
+              tags$h3("No tiene permiso para usar esta aplicación"),
+              tags$p("Comuníquese con el administrador para subsanar su registro")
+          )
+      }
+
     mod_secure_ui("secure_1", privileges = rv$privileges)
     # mod_secure_ui(ns("secure_1"), privileges = rv$privileges)
   })
