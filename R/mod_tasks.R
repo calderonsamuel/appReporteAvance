@@ -43,7 +43,7 @@ mod_tasks_server <- function(id, user_iniciado){
     glue::glue("task_owners: {vals}", vals = glue::glue_collapse(task_owners, sep = ", ")) |> message()
 
     vals <- reactiveValues(
-      data_tasks = task_get_from_user(task_owners),
+      data_tasks = task_get_from_user2(task_owners) |> task_get_from_id(),
       # data_tasks = task_get_all(),
       users = users_for_tasks,
       groups = gruser_get_groups(user_iniciado)
@@ -179,7 +179,7 @@ mod_tasks_server <- function(id, user_iniciado){
       } else {
         task_insert(new_task_data())
         progress_insert(new_progress_data())
-        vals$data_tasks <- task_get_from_user(task_owners)
+        vals$data_tasks <- task_get_from_user2(task_owners) |> task_get_from_id()
         updateTextAreaInput(session, "description", value = "")
 
         removeModal()
@@ -195,7 +195,7 @@ mod_tasks_server <- function(id, user_iniciado){
             alert_error(session, "No puede eliminar tarea de grupo")
         } else {
             task_remove(task_for_deleting())
-            vals$data_tasks <- task_get_from_user(task_owners)
+            vals$data_tasks <- task_get_from_user2(task_owners) |> task_get_from_id()
             alert_info(session, "Tarea eliminada")
         }
 
@@ -212,7 +212,7 @@ mod_tasks_server <- function(id, user_iniciado){
   })
 }
 
-mod_tasks_testapp <- function(id = "test") {
+mod_tasks_testapp <- function(user_iniciado = "dgco93@mininter.gob.pe") {
   ui <- tagList(
     tags$head(
       shinyWidgets::useSweetAlert()
@@ -227,14 +227,13 @@ mod_tasks_testapp <- function(id = "test") {
         )
       ),
       body = bs4Dash::dashboardBody(
-        bs4Dash::tabItem(tabName = "tasks", mod_tasks_ui(id))
+        bs4Dash::tabItem(tabName = "tasks", mod_tasks_ui("test"))
       )
     )
   )
 
   server <- function(input, output, session) {
-    user_iniciado <- "dgco93@mininter.gob.pe"
-    mod_tasks_server(id, user_iniciado)
+    mod_tasks_server("test", user_iniciado)
   }
 
   shinyApp(ui, server)

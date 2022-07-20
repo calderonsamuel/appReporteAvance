@@ -74,6 +74,10 @@ user_create <- function(user_data, group_id = "team-dgco") {
     gruser_insert(data)
 }
 
+user_is_group <- function(user_id) {
+    grepl("^team", user_id)
+}
+
 
 # db_remove_table("users")
 # create_reporte_users()

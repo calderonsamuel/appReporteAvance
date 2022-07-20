@@ -106,11 +106,12 @@ mod_progress_server <- function(id, user_iniciado){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
+    privileges <- user_get_privileges(user_iniciado)
     user_groups <- gruser_get_groups(user_iniciado)
     task_owners <- union(user_iniciado, user_groups)
 
     rv <- reactiveValues(
-        task_list = task_list_from_user(task_owners),
+        task_list = task_list_from_user(user_iniciado),
         task_to_modify = NA_character_, # Modificado en observer
         btn_task_id_pressed = 0
     )
@@ -120,7 +121,8 @@ mod_progress_server <- function(id, user_iniciado){
             lapply(\(x) input[[x]])
     )
 
-    task_ids <- task_get_from_user(task_owners)$task_id
+    task_ids <- task_list_for_board(user_iniciado)
+    # task_ids <- task_get_from_user2(task_owners)
 
     task_in_modal <- reactive({
         task <- rv$task_list[[rv$task_to_modify]]
@@ -257,9 +259,10 @@ mod_progress_server <- function(id, user_iniciado){
     output$pausado <- renderUI(
         tagList(pausado() |> lapply(box_dd_yes, ns = ns))
     )
-    output$en_revision <- renderUI(
-        tagList(en_revision() |> lapply(box_dd_no, ns = ns))
-    )
+    output$en_revision <- renderUI({
+        fun_en_revision <- if (privileges == "user1") box_dd_no else box_dd_yes
+        tagList(en_revision() |> lapply(fun_en_revision, ns = ns))
+    })
     output$terminado <- renderUI(
         tagList(terminado() |> lapply(box_dd_no, ns = ns))
     )
@@ -267,7 +270,7 @@ mod_progress_server <- function(id, user_iniciado){
   })
 }
 
-mod_progress_testapp <- function(id = "test") {
+mod_progress_testapp <- function(user_iniciado = "dgco93@mininter.gob.pe") {
   ui <- bs4Dash::dashboardPage(
       preloader = list(html = tagList(waiter::spin_pixel(), HTML("<br/>Cargando ...")), color = "#3c8dbc"),
     header = bs4Dash::dashboardHeader(title = "TEST"),
@@ -279,13 +282,12 @@ mod_progress_testapp <- function(id = "test") {
       )
     ),
     body = bs4Dash::dashboardBody(
-      bs4Dash::tabItem(tabName = "progress", mod_progress_ui(id))
+      bs4Dash::tabItem(tabName = "progress", mod_progress_ui("test"))
     )
   )
 
   server <- function(input, output, session) {
-    user_iniciado <- "dgco93@mininter.gob.pe"
-    mod_progress_server(id, user_iniciado)
+    mod_progress_server("test", user_iniciado)
   }
 
   shinyApp(ui, server)
