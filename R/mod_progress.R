@@ -21,7 +21,6 @@ mod_progress_ui <- function(id){
                       inputId = ns("step_id"),
                       label = "Seleccione actividad",
                       choices = c("step_01")
-                      # choices = task_in_modal()$step_choices
                   ) |> col_4(),
 
                   selectInput(
@@ -50,7 +49,7 @@ mod_progress_ui <- function(id){
                       btn_guardar(ns("modificar"), block = TRUE)
                   )
               )
-          ) #|> tagAppendAttributes(style = "display: hidden")
+          )
       ),
       verbatimTextOutput(ns("debug")),
     fluidRow(
@@ -69,7 +68,6 @@ mod_progress_ui <- function(id){
           collapsible = FALSE,
           width = 12,
           icon = icon("pen"),
-          # verbatimTextOutput(ns("debug")),
           uiOutput(ns("en_proceso"))
         ),
         bs4Dash::box(
@@ -108,16 +106,6 @@ mod_progress_server <- function(id, user_iniciado){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
-    # message("Usando mod_progress_server")
-    # message(ns("id"))
-
-    # print(output)
-
-    # output$debug <- renderPrint(user_iniciado)
-
-    # bs4Dash::updateBox(id = "box_reporte", action = "remove")
-
-    # message(glue::glue("mod_progress: {user_iniciado}"))
     user_groups <- gruser_get_groups(user_iniciado)
     task_owners <- union(user_iniciado, user_groups)
 
@@ -126,8 +114,6 @@ mod_progress_server <- function(id, user_iniciado){
         task_to_modify = NA_character_, # Modificado en observer
         btn_task_id_pressed = 0
     )
-
-    # buttons <- reactiveVal()
 
     desperate_reactive <- reactive(
         task_ids |>
@@ -184,8 +170,6 @@ mod_progress_server <- function(id, user_iniciado){
     ) |>
         bindEvent(input$modificar)
 
-    # output$debug <- renderPrint(new_status_data())
-    # output$debug <- renderPrint(rv$task_to_modify)
 
     # Observer de todos los botones "Modificar" en los boxes.
     # modifica rv$task_to_modify y muestra modal dialog
@@ -202,13 +186,10 @@ mod_progress_server <- function(id, user_iniciado){
 
                     message(paste("task to modify is", x))
 
-                    # buttons(buttons() + 1)
-
                     updateSelectInput(
                         session = session,
                         inputId = "step_id",
                         choices = step$step_choices()
-                        # choices = rnorm(3)
                     )
 
                     updateSelectInput(
@@ -243,17 +224,13 @@ mod_progress_server <- function(id, user_iniciado){
             ) |> suppressMessages()
         }
         rv$task_list[[rv$task_to_modify]]$status <- input$status
-        # rv$task_list[[rv$task_to_modify]]$status |> message()
-        # rv$task_list <- task_list_from_user(task_owners)
         alert_info(session, "Estado de actividad actualizado")
         removeModal()
 
     }) |>
         bindEvent(input$modificar)
-        # bindEvent(rv$btn_modify_pressed)
 
     observe({
-        # message("updating status_choices")
         updateSelectInput(
             session = session,
             inputId = "status",
