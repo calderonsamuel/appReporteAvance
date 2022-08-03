@@ -7,7 +7,7 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-mod_secure_ui <- function(id, privileges){
+mod_secure_ui <- function(id, privileges, user_iniciado){
   ns <- NS(id)
   tagList(
     bs4Dash::dashboardPage(
@@ -54,7 +54,7 @@ mod_secure_ui <- function(id, privileges){
           ),
           bs4Dash::tabItem(
             tabName = "tasks",
-            mod_tasks_ui(ns("tasks_1"))
+            mod_tasks_ui(ns("tasks_1"), user_iniciado)
           ),
           bs4Dash::tabItem(
             tabName = "admin_users",
@@ -98,7 +98,7 @@ mod_secure_server <- function(id, user_iniciado){
 
 mod_secure_testapp <- function(user_iniciado = "dgco93@mininter.gob.pe", privileges = "admin") {
 
-  ui <- mod_secure_ui(id = "test", privileges = privileges)
+  ui <- mod_secure_ui(id = "test", privileges = privileges, user_iniciado)
 
   server <- function(input, output, session) {
     mod_secure_server(id = "test", user_iniciado)

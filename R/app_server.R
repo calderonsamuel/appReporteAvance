@@ -31,7 +31,7 @@ app_server <- function(input, output, session) {
       glue::glue("sesion iniciada de {user}", user = rv$user_iniciado) |>
           message()
 
-    mod_secure_ui("secure_1", privileges = rv$privileges)
+    mod_secure_ui("secure_1", privileges = rv$privileges, user_iniciado)
     # mod_secure_ui(ns("secure_1"), privileges = rv$privileges)
   })
 

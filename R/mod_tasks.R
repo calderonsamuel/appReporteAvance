@@ -24,7 +24,7 @@ mod_tasks_ui <- function(id, user_iniciado){
 
     bs4Dash::box(
         title = "Agregar nueva tarea",
-        background = "gray",
+        # background = "gray",
         width = 12,
         id = ns("box_nueva_tarea"),
         collapsible = FALSE,
