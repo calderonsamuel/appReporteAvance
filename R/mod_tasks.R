@@ -10,6 +10,25 @@
 mod_tasks_ui <- function(id){
   ns <- NS(id)
   tagList(
+    btn_add(ns("add")),
+    bs4Dash::box(
+        title = "Agregar nueva tarea",
+        width = 12,
+        id = ns("box_nueva_tarea"),
+        collapsible = FALSE,
+
+
+
+        fluidRow(
+            col_2(
+                btn_cancelar(ns("cancelar"), block = TRUE)
+            ),
+            col_2(
+                btn_guardar(ns("guardar"), block = TRUE)
+            )
+        )
+    ),
+
     bs4Dash::box(
       title = "Tareas actuales",
       width = 12,
@@ -17,7 +36,6 @@ mod_tasks_ui <- function(id){
         id = ns("sidebar"),
         width = 25,
         h5("Administrar tareas"),
-        btn_add(ns("add")),
         btn_trash(ns("remove"))
       ),
       DT::DTOutput(ns("tabla"))
@@ -39,39 +57,23 @@ mod_tasks_server <- function(id, user_iniciado){
     users_for_tasks <- if (privileges == "user1") user_iniciado else user_get_from_privileges(c("user1", "user2"))
 
     task_owners <- union(users_for_tasks, groups)
-
     glue::glue("task_owners: {vals}", vals = glue::glue_collapse(task_owners, sep = ", ")) |> message()
 
+    template_owners <- union(user_iniciado, groups)
+    templates <- template_get_from_user(template_owners)
+
     vals <- reactiveValues(
-      data_tasks = task_get_from_user(task_owners),
-      # data_tasks = task_get_all(),
-      users = users_for_tasks,
-      groups = gruser_get_groups(user_iniciado)
+      data_tasks = task_get_from_user(task_owners)
     )
 
-    user_choices <- reactive({
-        setNames(
-            object = vals$users,
-            nm = vals$users |> purrr::map_chr(user_get_names)
-        )
-    })
+    user_choices <- setNames(object = users_for_tasks,
+                             nm = users_for_tasks |> purrr::map_chr(user_get_names))
 
-    group_choices <- reactive({
-        setNames(
-            object = vals$groups,
-            nm = vals$groups |> purrr::map_chr(group_get_description)
-        )
-    })
+    group_choices <- setNames(object = groups,
+                              nm = groups |> purrr::map_chr(group_get_description))
 
-    templates_choices <- reactive({
-        groups <- gruser_get_groups(user_iniciado)
-        template_owners <- union(user_iniciado, groups)
-        templates <- template_get_from_user(template_owners)
-        setNames(
-            object = templates$template_id,
-            nm = templates$template_description
-        )
-    })
+    templates_choices <- setNames(object = templates$template_id,
+                                  nm = templates$template_description)
 
     template_id <- reactive({
         ifelse(isTruthy(input$use_template), input$template, NA_character_)
@@ -132,7 +134,7 @@ mod_tasks_server <- function(id, user_iniciado){
         selectInput(
           inputId = ns("user"),
           label = "Seleccione encargado",
-          choices = user_choices()
+          choices = user_choices
         ),
 
         shinyWidgets::awesomeCheckbox(
@@ -147,7 +149,7 @@ mod_tasks_server <- function(id, user_iniciado){
             selectInput(
                 inputId = ns("template"),
                 label = "Seleccione plantilla",
-                choices = templates_choices()
+                choices = templates_choices
             )
         ),
 
@@ -166,9 +168,9 @@ mod_tasks_server <- function(id, user_iniciado){
 
     observeEvent(input$type,{
       if (input$type == "user") {
-        updateSelectInput(session, "user", choices = user_choices())
+        updateSelectInput(session, "user", choices = user_choices)
       } else {
-        updateSelectInput(session, "user", choices = group_choices())
+        updateSelectInput(session, "user", choices = group_choices)
       }
     })
 
@@ -200,6 +202,10 @@ mod_tasks_server <- function(id, user_iniciado){
         }
 
     })
+
+    observe({
+        bs4Dash::updateBox(id = "box_nueva_tarea", action = "remove")
+    }) |> bindEvent(input$cancelar)
 
 
     output$tabla <- DT::renderDT(
