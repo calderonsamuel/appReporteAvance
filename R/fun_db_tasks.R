@@ -5,7 +5,7 @@ create_reporte_tasks <- function() {
     task_list <- data.frame(
       reviewer = strrep(" ", 64),
       user_id = strrep(" ", 64),
-      task_id = strrep(" ", 64),
+      task_id = strrep(" ", 512),
       task_description = strrep(" ", 64),
       template_id = strrep(" ", 64),
       status = strrep(" ", 64)
