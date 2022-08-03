@@ -122,15 +122,18 @@ mod_templates_server <- function(id, user_iniciado){
     })
 
     observe({
-
-        showModal(modalDialog(
-            title = "Detalle de plantilla",
-            size = "l",
-            h4(selected_template()$template_description),
-            h6(selected_template()$template_id),
-            DT::DTOutput(ns("expanded_template")),
-            footer = modalButton("Cerrar")
-        ))
+        if (!isTruthy(selected_template_id())) {
+            alert_error(session, "Debe seleccionar una plantilla")
+        } else {
+            showModal(modalDialog(
+                title = "Detalle de plantilla",
+                size = "l",
+                h4(selected_template()$template_description),
+                h6(selected_template()$template_id),
+                DT::DTOutput(ns("expanded_template")),
+                footer = modalButton("Cerrar")
+            ))
+        }
 
     }) |> bindEvent(input$expand)
 
