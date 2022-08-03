@@ -60,20 +60,17 @@ mod_tasks_server <- function(id, user_iniciado){
     glue::glue("task_owners: {vals}", vals = glue::glue_collapse(task_owners, sep = ", ")) |> message()
 
     template_owners <- union(user_iniciado, groups)
-    templates <- template_get_from_user(template_owners)
 
     vals <- reactiveValues(
       data_tasks = task_get_from_user(task_owners)
     )
 
-    user_choices <- setNames(object = users_for_tasks,
-                             nm = users_for_tasks |> purrr::map_chr(user_get_names))
+    user_choices <- user_get_choices(users_for_tasks)
+    group_choices <- group_get_choices(groups)
 
-    group_choices <- setNames(object = groups,
-                              nm = groups |> purrr::map_chr(group_get_description))
-
-    templates_choices <- setNames(object = templates$template_id,
-                                  nm = templates$template_description)
+    templates_choices <- template_owners |>
+        template_get_from_user() |>
+        template_get_choices()
 
     template_id <- reactive({
         ifelse(isTruthy(input$use_template), input$template, NA_character_)

@@ -53,6 +53,11 @@ group_get_description <- function(group_id) {
     return(data$group_description)
 }
 
+group_get_choices <- function(group_id){
+    setNames(object = group_id,
+             nm = group_id |> purrr::map_chr(group_get_description))
+}
+
 
 # db_remove_table("groups")
 # create_reporte_groups()
