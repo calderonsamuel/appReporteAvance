@@ -41,7 +41,7 @@ mod_templates_server <- function(id, user_iniciado){
 
     step_count <- reactiveVal(1L)
     step_list_numbers <- reactive(seq_len(step_count()))
-    user_templates <- reactiveVal(template_get_from_user(all_owners))
+    user_templates <- reactiveVal(template_get_from_user(all_owners) |> template_get_data())
 
     selected_template <- reactive({
         data <- user_templates()[input$tabla_rows_selected,]
@@ -166,7 +166,7 @@ mod_templates_server <- function(id, user_iniciado){
 
       alert_success(session, "Plantilla añadida")
 
-      user_templates(template_get_from_user(all_owners))
+      user_templates(template_get_from_user(all_owners) |> template_get_data())
 
 
     })
@@ -177,7 +177,7 @@ mod_templates_server <- function(id, user_iniciado){
 
       alert_info(session = session, "Se eliminó la plantilla")
 
-      user_templates(template_get_from_user(all_owners))
+      user_templates(template_get_from_user(all_owners) |> template_get_data())
     })
 
     output$step_list <- renderUI({

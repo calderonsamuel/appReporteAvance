@@ -86,6 +86,11 @@ user_is_registered <- function(user_id) {
     return(isTruthy(data$user_id))
 }
 
+user_get_choices <- function(user_id) {
+    setNames(object = user_id,
+             nm = user_id |> purrr::map_chr(user_get_names))
+}
+
 
 # db_remove_table("users")
 # create_reporte_users()

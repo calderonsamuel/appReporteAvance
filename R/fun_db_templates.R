@@ -39,11 +39,11 @@ template_remove <- function(template_id) {
 }
 
 template_get_from_user <- function(user_id) {
-    query <-    "SELECT *
+    query <-    "SELECT template_id
                 FROM templates
                 WHERE (user_id IN ({vals*}))"
   data <- db_get_query(query, vals = user_id)
-  return(data)
+  return(data$template_id)
 }
 
 template_get_description <- function(template_id) {
@@ -53,6 +53,21 @@ template_get_description <- function(template_id) {
               WHERE (template_id IN ({vals*}))"
     data <- db_get_query(query, vals = template_id)
     return(data$template_description)
+}
+
+template_get_choices <- function(template_id) {
+    setNames(
+        object = template_id,
+        nm = template_id |> purrr::map_chr(template_get_description)
+    )
+}
+
+template_get_data <- function(template_id) {
+    query <- "SELECT *
+                FROM templates
+                WHERE template_id IN ({vals*})"
+    data <- db_get_query(query, vals = template_id)
+    return(data)
 }
 
 # create_reporte_templates()

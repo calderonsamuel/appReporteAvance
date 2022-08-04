@@ -7,9 +7,75 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-mod_tasks_ui <- function(id){
+mod_tasks_ui <- function(id, user_iniciado){
   ns <- NS(id)
+
+  choices_for_tasks <- user_get_choices_for_tasks(user_iniciado)
+
+  user_choices <- choices_for_tasks$user_choices
+  template_choices <- choices_for_tasks$template_choices
+
   tagList(
+    btn_agregar(ns("add")),
+
+    tags$br(),
+
+    tags$hr(),
+
+    bs4Dash::box(
+        title = "Agregar nueva tarea",
+        # background = "gray",
+        width = 12,
+        id = ns("box_nueva_tarea"),
+        collapsible = FALSE,
+
+        fluidRow(
+            col_2(
+                selectInput(
+                    inputId = ns("type"),
+                    label = "Tipo de asignación",
+                    choices = c("Usuario" = "user", "Grupo" = "team")
+                )
+            ),
+            col_2(
+                selectInput(
+                    inputId = ns("user"),
+                    label = "Seleccione encargado",
+                    choices = user_choices
+                )
+            ),
+            col_2(
+                shinyWidgets::awesomeCheckbox(
+                    inputId = ns("use_template"),
+                    label = "¿Necesita plantilla?",
+                    status = "info"
+                )
+            ),
+            col_6(
+                conditionalPanel(
+                    condition = "input.use_template",
+                    ns = ns,
+                    selectInput(
+                        inputId = ns("template"),
+                        label = "Seleccione plantilla",
+                        choices = template_choices
+                    )
+                )
+            )
+        ),
+
+        textAreaInput(ns("description"), "Descripción de tarea"),
+
+        fluidRow(
+            col_2(
+                btn_cancelar(ns("cancelar"), block = TRUE)
+            ),
+            col_2(
+                btn_guardar(ns("save"), block = TRUE)
+            )
+        )
+    ),
+
     bs4Dash::box(
       title = "Tareas actuales",
       width = 12,
@@ -17,7 +83,6 @@ mod_tasks_ui <- function(id){
         id = ns("sidebar"),
         width = 25,
         h5("Administrar tareas"),
-        btn_add(ns("add")),
         btn_trash(ns("remove"))
       ),
       DT::DTOutput(ns("tabla"))
@@ -32,46 +97,17 @@ mod_tasks_server <- function(id, user_iniciado){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
-    privileges <- user_get_privileges(user_iniciado)
-    groups <- gruser_get_groups(user_iniciado)
-    glue::glue("privileges: {privileges}") |> message()
+    choices_for_tasks <- user_get_choices_for_tasks(user_iniciado)
 
-    users_for_tasks <- if (privileges == "user1") user_iniciado else user_get_from_privileges(c("user1", "user2"))
-
-    task_owners <- union(users_for_tasks, groups)
-
-    glue::glue("task_owners: {vals}", vals = glue::glue_collapse(task_owners, sep = ", ")) |> message()
+    task_owners <- user_get_task_owners(user_iniciado)
 
     vals <- reactiveValues(
-      data_tasks = task_get_from_user2(task_owners) |> task_get_from_id(),
-      # data_tasks = task_get_all(),
-      users = users_for_tasks,
-      groups = gruser_get_groups(user_iniciado)
+      data_tasks = task_get_from_user(task_owners)
     )
 
-    user_choices <- reactive({
-        setNames(
-            object = vals$users,
-            nm = vals$users |> purrr::map_chr(user_get_names)
-        )
-    })
-
-    group_choices <- reactive({
-        setNames(
-            object = vals$groups,
-            nm = vals$groups |> purrr::map_chr(group_get_description)
-        )
-    })
-
-    templates_choices <- reactive({
-        groups <- gruser_get_groups(user_iniciado)
-        template_owners <- union(user_iniciado, groups)
-        templates <- template_get_from_user(template_owners)
-        setNames(
-            object = templates$template_id,
-            nm = templates$template_description
-        )
-    })
+    user_choices <- choices_for_tasks$user_choices
+    group_choices <- choices_for_tasks$group_choices
+    template_choices <- choices_for_tasks$template_choices
 
     template_id <- reactive({
         ifelse(isTruthy(input$use_template), input$template, NA_character_)
@@ -119,56 +155,17 @@ mod_tasks_server <- function(id, user_iniciado){
 
     task_for_deleting <- reactive(vals$data_tasks$task_id[input$tabla_rows_selected])
 
-    observeEvent(input$add, {
-      showModal(modalDialog(
-        title = "Nueva tarea",
-
-        selectInput(
-          inputId = ns("type"),
-          label = "Tipo de asignación",
-          choices = c("Usuario" = "user", "Grupo" = "team")
-        ),
-
-        selectInput(
-          inputId = ns("user"),
-          label = "Seleccione encargado",
-          choices = user_choices()
-        ),
-
-        shinyWidgets::awesomeCheckbox(
-            inputId = ns("use_template"),
-            label = "¿Necesita plantilla?",
-            status = "info"
-        ),
-
-        conditionalPanel(
-            condition = "input.use_template",
-            ns = ns,
-            selectInput(
-                inputId = ns("template"),
-                label = "Seleccione plantilla",
-                choices = templates_choices()
-            )
-        ),
-
-        textAreaInput(ns("description"), "Descripción de tarea"),
-
-        # verbatimTextOutput(ns("debug")),
-
-        footer = tagList(
-          modalButton("Cancelar"),
-          btn_agregar(ns("save"))
-        )
-      ))
-    })
+    observe({
+        bs4Dash::updateBox(id = "box_nueva_tarea", action = "restore")
+    }) |> bindEvent(input$add)
 
     # output$debug <- renderPrint(list(template_id(), step_id(), step_get_from_template(input$template)))
 
     observeEvent(input$type,{
       if (input$type == "user") {
-        updateSelectInput(session, "user", choices = user_choices())
+        updateSelectInput(session, "user", choices = user_choices)
       } else {
-        updateSelectInput(session, "user", choices = group_choices())
+        updateSelectInput(session, "user", choices = group_choices)
       }
     })
 
@@ -182,7 +179,7 @@ mod_tasks_server <- function(id, user_iniciado){
         vals$data_tasks <- task_get_from_user2(task_owners) |> task_get_from_id()
         updateTextAreaInput(session, "description", value = "")
 
-        removeModal()
+        bs4Dash::updateBox(id = "box_nueva_tarea", action = "remove")
 
         alert_success(session = session, text = "La tarea se añadió correctamente")
       }
@@ -201,6 +198,10 @@ mod_tasks_server <- function(id, user_iniciado){
 
     })
 
+    observe({
+        bs4Dash::updateBox(id = "box_nueva_tarea", action = "remove")
+    }) |> bindEvent(input$cancelar)
+
 
     output$tabla <- DT::renderDT(
       expr = current_tasks(),
@@ -212,7 +213,12 @@ mod_tasks_server <- function(id, user_iniciado){
   })
 }
 
+<<<<<<< HEAD
 mod_tasks_testapp <- function(user_iniciado = "dgco93@mininter.gob.pe") {
+=======
+mod_tasks_testapp <- function(id = "test") {
+    user_iniciado <- "dgco93@mininter.gob.pe"
+>>>>>>> ae9d262a4c80d84cda78213a167423d923c7b4f6
   ui <- tagList(
     tags$head(
       shinyWidgets::useSweetAlert()
@@ -227,13 +233,21 @@ mod_tasks_testapp <- function(user_iniciado = "dgco93@mininter.gob.pe") {
         )
       ),
       body = bs4Dash::dashboardBody(
+<<<<<<< HEAD
         bs4Dash::tabItem(tabName = "tasks", mod_tasks_ui("test"))
+=======
+        bs4Dash::tabItem(tabName = "tasks", mod_tasks_ui(id, user_iniciado))
+>>>>>>> ae9d262a4c80d84cda78213a167423d923c7b4f6
       )
     )
   )
 
   server <- function(input, output, session) {
+<<<<<<< HEAD
     mod_tasks_server("test", user_iniciado)
+=======
+    mod_tasks_server(id, user_iniciado)
+>>>>>>> ae9d262a4c80d84cda78213a167423d923c7b4f6
   }
 
   shinyApp(ui, server)

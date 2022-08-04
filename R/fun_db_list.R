@@ -81,3 +81,39 @@ task_list_for_board <- function(user_id) {
 
     return(task_ids)
 }
+
+user_get_choices_for_tasks <- function(user_id) {
+    privileges <- user_get_privileges(user_id)
+    groups <- gruser_get_groups(user_id)
+    glue::glue("privileges: {privileges}") |> message()
+
+    users_for_tasks <- if (privileges == "user1") user_id else user_get_from_privileges(c("user1", "user2"))
+
+    template_owners <- union(user_id, groups)
+
+    user_choices <- user_get_choices(users_for_tasks)
+    group_choices <- group_get_choices(groups)
+
+    template_choices <- template_owners |>
+        template_get_from_user() |>
+        template_get_choices()
+
+    list(
+        user_choices = user_choices,
+        group_choices = group_choices,
+        template_choices = template_choices
+    )
+}
+
+user_get_task_owners <- function(user_id) {
+    privileges <- user_get_privileges(user_id)
+    groups <- gruser_get_groups(user_id)
+
+    users_for_tasks <- if (privileges == "user1") user_id else user_get_from_privileges(c("user1", "user2"))
+
+    task_owners <- union(users_for_tasks, groups)
+
+    glue::glue("task_owners: {vals}", vals = glue::glue_collapse(task_owners, sep = ", ")) |> message()
+
+    return(task_owners)
+}
