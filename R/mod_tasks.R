@@ -12,6 +12,7 @@ mod_tasks_ui <- function(id, user_iniciado){
 
   choices_for_tasks <- user_get_choices_for_tasks(user_iniciado)
 
+
   user_choices <- choices_for_tasks$user_choices
   template_choices <- choices_for_tasks$template_choices
 
@@ -96,6 +97,8 @@ mod_tasks_ui <- function(id, user_iniciado){
 mod_tasks_server <- function(id, user_iniciado){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
+
+    bs4Dash::updateBox("box_nueva_tarea", "remove")
 
     choices_for_tasks <- user_get_choices_for_tasks(user_iniciado)
 
@@ -213,12 +216,7 @@ mod_tasks_server <- function(id, user_iniciado){
   })
 }
 
-<<<<<<< HEAD
 mod_tasks_testapp <- function(user_iniciado = "dgco93@mininter.gob.pe") {
-=======
-mod_tasks_testapp <- function(id = "test") {
-    user_iniciado <- "dgco93@mininter.gob.pe"
->>>>>>> ae9d262a4c80d84cda78213a167423d923c7b4f6
   ui <- tagList(
     tags$head(
       shinyWidgets::useSweetAlert()
@@ -233,21 +231,13 @@ mod_tasks_testapp <- function(id = "test") {
         )
       ),
       body = bs4Dash::dashboardBody(
-<<<<<<< HEAD
-        bs4Dash::tabItem(tabName = "tasks", mod_tasks_ui("test"))
-=======
-        bs4Dash::tabItem(tabName = "tasks", mod_tasks_ui(id, user_iniciado))
->>>>>>> ae9d262a4c80d84cda78213a167423d923c7b4f6
+        bs4Dash::tabItem(tabName = "tasks", mod_tasks_ui("test", user_iniciado))
       )
     )
   )
 
   server <- function(input, output, session) {
-<<<<<<< HEAD
     mod_tasks_server("test", user_iniciado)
-=======
-    mod_tasks_server(id, user_iniciado)
->>>>>>> ae9d262a4c80d84cda78213a167423d923c7b4f6
   }
 
   shinyApp(ui, server)
