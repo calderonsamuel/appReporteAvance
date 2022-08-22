@@ -101,7 +101,7 @@ mod_task_man_server <- function(id, user_iniciado) {
         template_choices <- choices_for_tasks$template_choices
 
         template_id <- reactive({
-            ifelse(isTruthy(input$use_template), input$template, NA_character_)
+            ifelse(isTruthy(as.logical(input$use_template)), input$template, NA_character_)
         })
 
         observeEvent(input$use_template, print(as.logical(input$use_template)))
@@ -156,7 +156,7 @@ mod_task_man_server <- function(id, user_iniciado) {
             } else {
                 task_insert(new_task_data())
                 progress_insert(new_progress_data())
-                vals$data_tasks <- task_get_from_user2(task_owners) |> task_get_from_id()
+
                 updateTextAreaInput(session, "description", value = "")
 
                 bs4Dash::updateBox(id = "box_nueva_tarea", action = "remove")
@@ -168,6 +168,9 @@ mod_task_man_server <- function(id, user_iniciado) {
         observe({
             bs4Dash::updateBox(id = "box_nueva_tarea", action = "remove")
         }) |> bindEvent(input$cancelar)
+
+        # return
+        reactive(input$save)
 
     })
 }
