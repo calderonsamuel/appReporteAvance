@@ -7,17 +7,19 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-mod_tasks_ui <- function(id, user_iniciado){
-  ns <- NS(id)
+mod_tasks_ui <- function(id, user_iniciado) {
+    ns <- NS(id)
 
-  tagList(
-      mod_task_man_ui(ns("task_manager")),
-      btn_eliminar(ns("remove"), icon = icon("trash")),
+    tagList(
+        mod_task_man_ui(ns("task_manager")),
+        btn_eliminar(ns("remove"), icon = icon("trash")),
 
-      tags$hr(),
+        tags$hr(),
 
-      mod_task_man_output(ns("task_manager", user_iniciado))
-  )
+        mod_task_man_output(ns("task_manager"), user_iniciado)
+
+
+    )
 }
 
 #' tasks Server Functions
@@ -27,52 +29,52 @@ mod_tasks_server <- function(id, user_iniciado){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
-    mod_tasks_server("task_manager", user_iniciado)
+    mod_task_man_server("task_manager", user_iniciado)
 
-    choices_for_tasks <- user_get_choices_for_tasks(user_iniciado)
-
-    task_owners <- user_get_task_owners(user_iniciado)
-
-    vals <- reactiveValues(
-      data_tasks = task_get_from_user(task_owners)
-    )
-
-    user_choices <- choices_for_tasks$user_choices
-    group_choices <- choices_for_tasks$group_choices
-    template_choices <- choices_for_tasks$template_choices
-
-    observeEvent(input$use_template, print(as.logical(input$use_template)))
-
-    current_tasks <- reactive({
-        data <- vals$data_tasks |>
-            subset(select = c(user_id, template_id, task_description, status))
-        data$user_id <- purrr::map_chr(data$user_id, user_get_names)
-
-        data |>
-            setNames(c("Encargado", "Plantilla", "Descripción de tarea", "Estado actual"))
-    })
-
-    task_for_deleting <- reactive(vals$data_tasks$task_id[input$tabla_rows_selected])
-
-    observeEvent(input$remove, {
-        if (!isTruthy(task_for_deleting())) {
-            alert_error(session, "Debe seleccionar una tarea a eliminar")
-        } else if (task_is_from_group(task_for_deleting())){
-            alert_error(session, "No puede eliminar tarea de grupo")
-        } else {
-            task_remove(task_for_deleting())
-            vals$data_tasks <- task_get_from_user2(task_owners) |> task_get_from_id()
-            alert_info(session, "Tarea eliminada")
-        }
-
-    })
-
-    output$tabla <- DT::renderDT(
-      expr = current_tasks(),
-      options = options_DT(),
-      selection = 'single',
-      style = "bootstrap4"
-    )
+    # choices_for_tasks <- user_get_choices_for_tasks(user_iniciado)
+    #
+    # task_owners <- user_get_task_owners(user_iniciado)
+    #
+    # vals <- reactiveValues(
+    #   data_tasks = task_get_from_user(task_owners)
+    # )
+    #
+    # user_choices <- choices_for_tasks$user_choices
+    # group_choices <- choices_for_tasks$group_choices
+    # template_choices <- choices_for_tasks$template_choices
+    #
+    # observeEvent(input$use_template, print(as.logical(input$use_template)))
+    #
+    # current_tasks <- reactive({
+    #     data <- vals$data_tasks |>
+    #         subset(select = c(user_id, template_id, task_description, status))
+    #     data$user_id <- purrr::map_chr(data$user_id, user_get_names)
+    #
+    #     data |>
+    #         setNames(c("Encargado", "Plantilla", "Descripción de tarea", "Estado actual"))
+    # })
+    #
+    # task_for_deleting <- reactive(vals$data_tasks$task_id[input$tabla_rows_selected])
+    #
+    # observeEvent(input$remove, {
+    #     if (!isTruthy(task_for_deleting())) {
+    #         alert_error(session, "Debe seleccionar una tarea a eliminar")
+    #     } else if (task_is_from_group(task_for_deleting())){
+    #         alert_error(session, "No puede eliminar tarea de grupo")
+    #     } else {
+    #         task_remove(task_for_deleting())
+    #         vals$data_tasks <- task_get_from_user2(task_owners) |> task_get_from_id()
+    #         alert_info(session, "Tarea eliminada")
+    #     }
+    #
+    # })
+    #
+    # output$tabla <- DT::renderDT(
+    #   expr = current_tasks(),
+    #   options = options_DT(),
+    #   selection = 'single',
+    #   style = "bootstrap4"
+    # )
 
   })
 }
@@ -92,7 +94,7 @@ mod_tasks_testapp <- function(user_iniciado = "dgco93@mininter.gob.pe") {
         )
       ),
       body = bs4Dash::dashboardBody(
-        bs4Dash::tabItem(tabName = "tasks", mod_tasks_ui("test", user_iniciado))
+        bs4Dash::tabItem(tabName = "tasks", mod_tasks_ui("test"), user_iniciado)
       )
     )
   )
