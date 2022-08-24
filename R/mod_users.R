@@ -10,10 +10,10 @@
 mod_users_ui <- function(id) {
   ns <- NS(id)
   tagList(
-      mod_user_manager_ui(ns("user_manager"), user_iniciado),
+      mod_user_manager_ui(ns("user_manager")),
       btn_eliminar(ns("delete_user"), icon = icon("trash")),
       tags$hr(),
-      mod_user_manager_output(ns("user_manager"), user_iniciado),
+      mod_user_manager_output(ns("user_manager")),
     bs4Dash::box(
       title = "Usuarios registrados",
       width = 12,

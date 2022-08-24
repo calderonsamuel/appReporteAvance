@@ -7,14 +7,14 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-mod_user_manager_ui <- function(id, user_iniciado) {
+mod_user_manager_ui <- function(id) {
     ns <- NS(id)
     tagList(
         btn_agregar(ns("add"), icon = icon("plus"))
     )
 }
 
-mod_user_manager_output <- function(id, user_iniciado) {
+mod_user_manager_output <- function(id) {
     ns <- NS(id)
     tagList(
         bs4Dash::box(
@@ -34,14 +34,16 @@ mod_user_manager_output <- function(id, user_iniciado) {
             ),
             btn_cancelar(ns("cancelar")),
             btn_guardar(ns("save"))
-        ) |> tagAppendAttributes(.cssSelector = glue::glue("#{ns('box_manager')}"), style = "display: none;")
+        ) |>
+            boxHide()
+            # tagAppendAttributes(.cssSelector = glue::glue("#{ns('box_manager')}"), style = "display: none;")
     )
 }
 
 #' user_manager Server Functions
 #'
 #' @noRd
-mod_user_manager_server <- function(id, user_iniciado) {
+mod_user_manager_server <- function(id) {
     moduleServer(id, function(input, output, session) {
         ns <- session$ns
 
@@ -108,7 +110,7 @@ mod_user_manager_server <- function(id, user_iniciado) {
 # mod_user_manager_server("user_manager_1")
 
 
-mod_user_manager_apptest <- function(user_iniciado = "dgco93@mininter.gob.pe") {
+mod_user_manager_apptest <- function() {
     ui <- tagList(
         bs4Dash::dashboardPage(
             header = bs4Dash::dashboardHeader(title = "TEST"),
@@ -122,16 +124,16 @@ mod_user_manager_apptest <- function(user_iniciado = "dgco93@mininter.gob.pe") {
             body = bs4Dash::dashboardBody(
                 bs4Dash::tabItem(
                     tabName = "tasks",
-                    mod_user_manager_ui("test", user_iniciado),
+                    mod_user_manager_ui("test"),
                     tags$hr(),
-                    mod_user_manager_output("test", user_iniciado)
+                    mod_user_manager_output("test")
                 )
             )
         )
     )
 
     server <- function(input, output, session) {
-        mod_user_manager_server("test", user_iniciado)
+        mod_user_manager_server("test")
     }
 
     shinyApp(ui, server)
