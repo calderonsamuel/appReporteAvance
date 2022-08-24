@@ -34,7 +34,7 @@ mod_user_manager_output <- function(id, user_iniciado) {
             ),
             btn_cancelar(ns("cancelar")),
             btn_guardar(ns("save"))
-        )
+        ) |> tagAppendAttributes(.cssSelector = glue::glue("#{ns('box_manager')}"), style = "display: none;")
     )
 }
 
@@ -45,7 +45,7 @@ mod_user_manager_server <- function(id, user_iniciado) {
     moduleServer(id, function(input, output, session) {
         ns <- session$ns
 
-        bs4Dash::updateBox("box_manager", "remove")
+        # bs4Dash::updateBox("box_manager", "remove")
 
         out <- reactiveValues(
             save_sucess = 0
