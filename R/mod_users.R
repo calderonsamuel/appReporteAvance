@@ -10,15 +10,16 @@
 mod_users_ui <- function(id) {
   ns <- NS(id)
   tagList(
+      mod_user_manager_ui(ns("user_manager")),
+      btn_trash(ns("delete_user")),
     bs4Dash::box(
-      title = "Gestión de usuarios",
+      title = "Usuarios registrados",
       width = 12,
-      sidebar = bs4Dash::boxSidebar(
-        id = ns("sidebar"),
-        width = 25,
-        btn_add(ns("add")),
-        btn_trash(ns("delete_user"))
-      ),
+      # sidebar = bs4Dash::boxSidebar(
+      #   id = ns("sidebar"),
+      #   width = 25,
+      #   btn_add(ns("add"))
+      # ),
       DT::DTOutput(ns("tabla"))
     )
   )
@@ -36,56 +37,56 @@ mod_users_server <- function(id){
       data_users = user_get_all()
     )
 
-    new_user_data <- reactive({
-      data.frame(
-        user_id = input$user_id,
-        name = input$name,
-        last_name = input$last_name,
-        privileges = input$privileges,
-        responds_to = input$responds_to,
-        date_added = as.character(input$date_added)
-      )
-    })
+    # new_user_data <- reactive({
+    #   data.frame(
+    #     user_id = input$user_id,
+    #     name = input$name,
+    #     last_name = input$last_name,
+    #     privileges = input$privileges,
+    #     responds_to = input$responds_to,
+    #     date_added = as.character(input$date_added)
+    #   )
+    # })
 
     user_for_deleting <- reactive({
       vals$data_users$user_id[input$tabla_rows_selected]
     })
 
-    observeEvent(input$add, {
-      showModal(modalDialog(
-        title = "Nuevo usuario",
+    # observeEvent(input$add, {
+    #   showModal(modalDialog(
+    #     title = "Nuevo usuario",
+    #
+    #     textInput(ns("user_id"), "ID"),
+    #     textInput(ns("name"), "Nombres"),
+    #     textInput(ns("last_name"), "Apellidos"),
+    #     selectInput(ns("privileges"), "Privilegios", choices = c("user1", "user2", "admin")),
+    #     selectInput(ns("responds_to"), "Responde a:", choices = user_get_from_privileges("user2")),
+    #     dateInput(ns("date_added"), "Fecha", language = "es", value = lubridate::today("America/Lima")),
+    #
+    #     footer = tagList(
+    #       modalButton("Cancelar"),
+    #       btn_agregar(ns("insert_user"))
+    #     )
+    #   ))
+    # })
 
-        textInput(ns("user_id"), "ID"),
-        textInput(ns("name"), "Nombres"),
-        textInput(ns("last_name"), "Apellidos"),
-        selectInput(ns("privileges"), "Privilegios", choices = c("user1", "user2", "admin")),
-        selectInput(ns("responds_to"), "Responde a:", choices = user_get_from_privileges("user2")),
-        dateInput(ns("date_added"), "Fecha", language = "es", value = lubridate::today("America/Lima")),
-
-        footer = tagList(
-          modalButton("Cancelar"),
-          btn_agregar(ns("insert_user"))
-        )
-      ))
-    })
-
-    observeEvent(input$insert_user, {
-
-      user_insert(new_user_data())
-
-      updateTextInput(session, "user_id", value = "")
-      updateTextInput(session, "name", value = "")
-      updateTextInput(session, "last_name", value = "")
-      updateSelectInput(session, "privileges", selected = "user1")
-      updateSelectInput(session, "responds_to", choices = user_get_from_privileges("user2"))
-
-      vals$data_users <- user_get_all()
-
-      removeModal()
-
-      alert_info(session = session, sprintf("Se añadió al usuario %s", input$user_id))
-
-    })
+    # observeEvent(input$insert_user, {
+    #
+    #   user_insert(new_user_data())
+    #
+    #   updateTextInput(session, "user_id", value = "")
+    #   updateTextInput(session, "name", value = "")
+    #   updateTextInput(session, "last_name", value = "")
+    #   updateSelectInput(session, "privileges", selected = "user1")
+    #   updateSelectInput(session, "responds_to", choices = user_get_from_privileges("user2"))
+    #
+    #   vals$data_users <- user_get_all()
+    #
+    #   removeModal()
+    #
+    #   alert_info(session = session, sprintf("Se añadió al usuario %s", input$user_id))
+    #
+    # })
 
     observeEvent(input$delete_user,{
         if (isTruthy(user_for_deleting())) {
