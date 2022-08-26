@@ -19,7 +19,6 @@ mod_template_manager_output <- function(id, user_iniciado) {
     all_owners <- union(user_iniciado, group_id)
     
     tagList(
-        tags$hr(),
         bs4Dash::box(
             title = "Gestión de plantillas",
             width = 12,

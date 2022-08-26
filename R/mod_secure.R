@@ -56,6 +56,7 @@ mod_secure_ui <- function(id, privileges, user_iniciado){
         )
       ),
       bs4Dash::dashboardBody(
+          golem_add_external_resources(),
         bs4Dash::tabItems(
           bs4Dash::tabItem(
             tabName = "progress",
