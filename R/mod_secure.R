@@ -13,14 +13,14 @@ mod_secure_ui <- function(id, privileges, user_iniciado){
     bs4Dash::dashboardPage(
         # preloader = list(html = tagList(waiter::spin_pixel(), "Cargando ..."), color = "#3c8dbc"),
       bs4Dash::dashboardHeader(
-          title = "Reporte",
-          rightUi = tagList(
-              bs4Dash::dropdownMenu(
-                  icon = icon("gear"),
-                  type = "messages",
-                  bs4Dash::notificationItem(inputId = ns("refresh"), text = icon("refresh"), status = "primary")
-              )
-          )
+          title = "Reporte"
+          # rightUi = tagList(
+          #     bs4Dash::dropdownMenu(
+          #         icon = icon("gear"),
+          #         type = "messages",
+          #         bs4Dash::notificationItem(inputId = ns("refresh"), text = icon("refresh"), status = "primary")
+          #     )
+          # )
       ),
       bs4Dash::dashboardSidebar(
         collapsed = TRUE,
@@ -71,7 +71,7 @@ mod_secure_ui <- function(id, privileges, user_iniciado){
           ),
           bs4Dash::tabItem(
             tabName = "templates",
-            mod_templates_ui(ns("templates_1"))
+            mod_templates_ui(ns("templates_1"), user_iniciado)
           ),
           bs4Dash::tabItem(
             tabName = "admin_groups",
