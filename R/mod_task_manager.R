@@ -49,7 +49,6 @@ mod_task_man_output <- function(id, user_iniciado) {
                         label = "¿Necesita plantilla?",
                         choices = c("No" = "false",
                                     "Sí" = "true")
-                        # status = "info"
                     )
                 ),
                 col_6(
@@ -75,7 +74,7 @@ mod_task_man_output <- function(id, user_iniciado) {
                     btn_guardar(ns("save"), block = TRUE)
                 )
             )
-        )
+        ) |> boxHide()
     )
 }
 
@@ -86,7 +85,7 @@ mod_task_man_server <- function(id, user_iniciado) {
     moduleServer(id, function(input, output, session) {
         ns <- session$ns
 
-        bs4Dash::updateBox("box_nueva_tarea", "remove")
+        # bs4Dash::updateBox("box_nueva_tarea", "remove")
 
         choices_for_tasks <- user_get_choices_for_tasks(user_iniciado)
 
@@ -138,7 +137,7 @@ mod_task_man_server <- function(id, user_iniciado) {
         })
 
         observe({
-            bs4Dash::updateBox(id = "box_nueva_tarea", action = "restore")
+            bs4Dash::updateBox(id = "box_nueva_tarea", action = "restore", session = session)
         }) |> bindEvent(input$add)
 
         observeEvent(input$type,{
@@ -159,14 +158,14 @@ mod_task_man_server <- function(id, user_iniciado) {
 
                 updateTextAreaInput(session, "description", value = "")
 
-                bs4Dash::updateBox(id = "box_nueva_tarea", action = "remove")
+                bs4Dash::updateBox(id = "box_nueva_tarea", action = "remove", session = session)
 
                 alert_success(session = session, text = "La tarea se añadió correctamente")
             }
         })
 
         observe({
-            bs4Dash::updateBox(id = "box_nueva_tarea", action = "remove")
+            bs4Dash::updateBox(id = "box_nueva_tarea", action = "remove", session = session)
         }) |> bindEvent(input$cancelar)
 
         # return
