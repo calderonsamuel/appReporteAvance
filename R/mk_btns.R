@@ -61,7 +61,7 @@ btn_minus <- mk_btn(color = "danger", label = icon("minus"))
 btn_refresh <- mk_btn(color = "royal", label = icon("redo"))
 
 #' @rdname buttons
-btn_expand <- mk_btn(color = "royal", label = icon("expand-arrows-alt"))
+btn_expand <- mk_btn(color = "royal", label = "Expandir")
 
 #' @rdname buttons
 btn_user_add <- mk_btn(color = "success", label = icon("user-plus"))

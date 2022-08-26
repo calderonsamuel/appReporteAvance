@@ -12,8 +12,8 @@ mod_templates_ui <- function(id, user_iniciado) {
     tagList(
         fluidRow(
             mod_template_manager_ui(ns("template_manager")),
-            btn_eliminar(ns("rm_template")),
-            btn_expand(ns("expand"))
+            btn_eliminar(ns("rm_template"), icon = icon("trash")),
+            btn_expand(ns("expand"), icon("expand-arrows-alt"))
         ),
         tags$hr(),
         
