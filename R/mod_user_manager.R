@@ -34,9 +34,7 @@ mod_user_manager_output <- function(id) {
             ),
             btn_cancelar(ns("cancelar")),
             btn_guardar(ns("save"))
-        ) |>
-            boxHide()
-            # tagAppendAttributes(.cssSelector = glue::glue("#{ns('box_manager')}"), style = "display: none;")
+        ) |> boxHide()
     )
 }
 
@@ -82,18 +80,18 @@ mod_user_manager_server <- function(id) {
 
                 out$save_success <- out$save_success + 1
 
-                bs4Dash::updateBox(id = "box_manager", action = "remove")
+                bs4Dash::updateBox(id = "box_manager", action = "remove", session = session)
                 alert_info(session = session, sprintf("Se añadió al usuario %s", input$user_id))
             }
         }) |> bindEvent(input$save)
 
         observe({
-            bs4Dash::updateBox(id = "box_manager", action = "restore")
+            bs4Dash::updateBox(id = "box_manager", action = "restore", session = session)
         }) |> bindEvent(input$add)
 
         observe({
             reset_ui()
-            bs4Dash::updateBox(id = "box_manager", action = "remove")
+            bs4Dash::updateBox(id = "box_manager", action = "remove", session = session)
 
         }) |> bindEvent(input$cancelar)
 

@@ -54,8 +54,6 @@ mod_users_server <- function(id){
         vals$data_users <- user_get_all()
     }) |> bindEvent(btn_usuario_agregado())
 
-    observe(print(user_for_deleting())) |> bindEvent(input$tabla_rows_selected)
-
     output$tabla <- DT::renderDT(
       expr = vals$data_users,
       options = options_DT(),
