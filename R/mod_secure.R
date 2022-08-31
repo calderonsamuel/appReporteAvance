@@ -110,6 +110,8 @@ mod_secure_server <- function(id, rv){
 
 mod_secure_testapp <-
     function(user_iniciado = "dgco93@mininter.gob.pe") {
+        
+        # session_data <- SessionData$new(user_iniciado)
         rv <- reactiveValues(
             user_iniciado = user_iniciado,
             privileges = user_get_privileges(user_iniciado)
