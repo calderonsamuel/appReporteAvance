@@ -97,12 +97,12 @@ mod_secure_server <- function(id, rv){
     }
 
     mod_progress_server("progress_1", rv)
-    mod_tasks_server("tasks_1", user_iniciado)
-    mod_templates_server("templates_1", user_iniciado)
+    mod_tasks_server("tasks_1", rv)
+    mod_templates_server("templates_1", rv)
 
     if (privileges == "admin") {
         mod_users_server("admin_users_1")
-        mod_groups_server("admin_groups_1", user_iniciado)
+        mod_groups_server("admin_groups_1", rv)
     }
 
   })

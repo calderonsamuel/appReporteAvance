@@ -32,9 +32,11 @@ mod_templates_ui <- function(id, user_iniciado) {
 #' admin_templates Server Functions
 #'
 #' @noRd
-mod_templates_server <- function(id, user_iniciado){
+mod_templates_server <- function(id, rv){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
+    
+    user_iniciado <- isolate(rv$user_iniciado)
     
     btn_template_added <- mod_template_manager_server("template_manager", user_iniciado)
 
@@ -120,7 +122,10 @@ mod_templates_testapp <- function(id = "test") {
   )
 
   server <- function(input, output, session) {
-    mod_templates_server(id, user_iniciado)
+      rv <- reactiveValues(
+          user_iniciado = user_iniciado
+      )
+    mod_templates_server(id, rv)
   }
 
   shinyApp(ui, server)

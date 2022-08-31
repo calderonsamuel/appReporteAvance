@@ -31,9 +31,11 @@ mod_tasks_ui <- function(id, user_iniciado) {
 #' tasks Server Functions
 #'
 #' @noRd
-mod_tasks_server <- function(id, user_iniciado){
+mod_tasks_server <- function(id, rv){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
+    
+    user_iniciado <- isolate(rv$user_iniciado)
 
     task_added <- mod_task_man_server("task_manager", user_iniciado)
 
@@ -109,7 +111,10 @@ mod_tasks_testapp <- function(user_iniciado = "dgco93@mininter.gob.pe") {
   )
 
   server <- function(input, output, session) {
-    mod_tasks_server("test", user_iniciado)
+      rv <- reactiveValues(
+          user_iniciado = user_iniciado
+      )
+    mod_tasks_server("test", rv)
   }
 
   shinyApp(ui, server)
