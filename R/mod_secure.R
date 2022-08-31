@@ -105,11 +105,6 @@ mod_secure_server <- function(id, rv){
         mod_groups_server("admin_groups_1", user_iniciado)
     }
 
-    observeEvent(input$refresh, {
-        session$reload()
-        bs4Dash::updateTabItems(session = session, inputId = "sidebar", selected = "progress")
-    })
-
   })
 }
 
