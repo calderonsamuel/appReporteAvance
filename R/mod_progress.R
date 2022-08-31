@@ -49,9 +49,8 @@ mod_progress_ui <- function(id){
                       btn_guardar(ns("modificar"), block = TRUE)
                   )
               )
-          )
+          ) |> boxHide()
       ),
-      verbatimTextOutput(ns("debug")),
     fluidRow(
       bs4Dash::box(
         title = "Pendiente",
