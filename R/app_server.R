@@ -41,7 +41,7 @@ app_server <- function(input, output, session) {
         glue::glue("sesion iniciada de {user}", user = rv$user_iniciado) |>
           message()
 
-        mod_secure_ui("secure_1", privileges = rv$privileges, user_iniciado = rv$user_iniciado)
+        mod_secure_ui("secure_1", rv)
       }
 
     # mod_secure_ui("secure_1", privileges = rv$privileges)
@@ -52,7 +52,7 @@ app_server <- function(input, output, session) {
       if (!user_is_registered(rv$user_iniciado)) {
           NULL
       } else {
-          mod_secure_server("secure_1", user_iniciado = rv$user_iniciado)
+          mod_secure_server("secure_1", rv)
       }
 
   }) |>

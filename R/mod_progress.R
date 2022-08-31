@@ -102,17 +102,15 @@ mod_progress_ui <- function(id){
 #' progress Server Functions
 #'
 #' @noRd
-mod_progress_server <- function(id, user_iniciado){
+mod_progress_server <- function(id, rv){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
-
-    privileges <- user_get_privileges(user_iniciado)
-
-    rv <- reactiveValues(
-        task_list = task_list_from_user(user_iniciado),
-        task_to_modify = NA_character_, # Modificado en observer
-        btn_task_id_pressed = 0
-    )
+    user_iniciado <- isolate(rv$user_iniciado)
+    privileges <- isolate(rv$privileges)
+    
+    rv$task_list <- task_list_from_user(user_iniciado)
+    rv$task_to_modify <- NA_character_ # Modificado en observer
+    rv$btn_task_id_pressed <- 0
 
     btn_tracker <- reactive(
         task_ids |>
@@ -268,6 +266,11 @@ mod_progress_server <- function(id, user_iniciado){
 }
 
 mod_progress_testapp <- function(user_iniciado = "dgco93@mininter.gob.pe") {
+    rv <- reactiveValues(
+        user_iniciado = user_iniciado,
+        privileges = user_get_privileges(user_iniciado)
+    )
+    
   ui <- bs4Dash::dashboardPage(
       preloader = list(html = tagList(waiter::spin_pixel(), HTML("<br/>Cargando ...")), color = "#3c8dbc"),
     header = bs4Dash::dashboardHeader(title = "TEST"),
@@ -284,7 +287,7 @@ mod_progress_testapp <- function(user_iniciado = "dgco93@mininter.gob.pe") {
   )
 
   server <- function(input, output, session) {
-    mod_progress_server("test", user_iniciado)
+    mod_progress_server("test", rv)
   }
 
   shinyApp(ui, server)
