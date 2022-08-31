@@ -91,9 +91,6 @@ mod_tasks_server <- function(id, rv){
 
 mod_tasks_testapp <- function(user_iniciado = "dgco93@mininter.gob.pe") {
   ui <- tagList(
-    tags$head(
-      shinyWidgets::useSweetAlert()
-    ),
     bs4Dash::dashboardPage(
       header = bs4Dash::dashboardHeader(title = "TEST"),
       sidebar = bs4Dash::dashboardSidebar(
