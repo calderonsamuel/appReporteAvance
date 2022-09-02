@@ -1,22 +1,22 @@
 SessionData$set("public", "user_get_all", function() {
-    self$db_get_query("SELECT * FROM users")
+    private$db_get_query("SELECT * FROM users")
 })
 
 SessionData$set("public", "user_insert", function(user_data) {
-    DBI::dbWriteTable(self$con, "users", user_data, append = TRUE)
+    DBI::dbWriteTable(private$con, "users", user_data, append = TRUE)
     glue::glue("inserted user with id '{user_data$user_id}'") |> message()
 })
 
 SessionData$set("public", "user_remove", function(user_id) {
     statement <- "DELETE FROM users WHERE (user_id = {user_id})"
-    self$db_execute_statement(statement, user_id = user_id)
+    private$db_execute_statement(statement, user_id = user_id)
     message(glue::glue("deleted user with id {user_id}"))
 })
 
 SessionData$set("public", "user_get_privileges", function() {
-    data <- self$db_get_query("SELECT privileges 
+    data <- private$db_get_query("SELECT privileges 
                               FROM users
-                              WHERE (user_id = {self$user_iniciado})")
+                              WHERE (user_id = {self$user_id})")
     data$privileges
 })
 
@@ -34,7 +34,7 @@ SessionData$set("public", "user_get_names", function(user_id) {
                             FROM users
                             WHERE (user_id IN ({vals*}))
                             ORDER BY user_id"
-    data <- self$db_get_query(query, vals = user_id)
+    data <- private$db_get_query(query, vals = user_id)
     return(paste(data$last_name, data$name, sep = ", "))
 })
 
@@ -42,7 +42,7 @@ SessionData$set("public", "user_is_registered", function(user_id) {
     query <- "SELECT user_id
                 FROM users
                 WHERE user_id = {user_id}"
-    data <- self$db_get_query(query, user_id = user_id)
+    data <- private$db_get_query(query, user_id = user_id)
     return(shiny::isTruthy(data$user_id))
 })
 

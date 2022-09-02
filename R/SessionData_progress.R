@@ -1,9 +1,9 @@
 SessionData$set("public", "progress_get_all", function() {
-    self$db_get_query("SELECT * FROM progress")
+    private$db_get_query("SELECT * FROM progress")
 })
 
 SessionData$set("public", "progress_insert", function(field_list, with_print = TRUE) {
-    DBI::dbWriteTable(self$con, "progress", field_list, append = TRUE)
+    DBI::dbWriteTable(private$con, "progress", field_list, append = TRUE)
     if (with_print) {
         status_id <- field_list$status_id
         glue::glue("inserted status with ids {vals}", vals = status_id |> glue::glue_collapse(sep = ", ")) |>
@@ -16,7 +16,7 @@ SessionData$set("public", "progress_remove", function(task_id, status_id, with_p
         "DELETE
         FROM progress
         WHERE (status_id = {status_id} AND task_id = {task_id})"
-    self$db_execute_statement(statement, status_id = status_id, task_id = task_id)
+    private$db_execute_statement(statement, status_id = status_id, task_id = task_id)
     
     glue::glue("deleted status with id '{status_id}' from '{task_id}'") |> message()
 })
@@ -30,7 +30,7 @@ SessionData$set("public", "progress_get_step_status", function(task_id, step_id)
         AND step_id = {step_id})
         ORDER BY time DESC
         LIMIT 1"
-    data <- self$db_get_query(query, task_id = task_id, step_id = step_id)
+    data <- private$db_get_query(query, task_id = task_id, step_id = step_id)
     return(data$status)
 })
 
