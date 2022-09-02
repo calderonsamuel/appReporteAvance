@@ -108,7 +108,7 @@ mod_secure_server <- function(id, rv){
   })
 }
 
-mod_secure_testapp <-
+mod_secure_apptest <-
     function(user_iniciado = "dgco93@mininter.gob.pe") {
         
         # session_data <- SessionData$new(user_iniciado)

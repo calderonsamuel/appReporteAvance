@@ -89,7 +89,7 @@ mod_tasks_server <- function(id, rv){
   })
 }
 
-mod_tasks_testapp <- function(user_iniciado = "dgco93@mininter.gob.pe") {
+mod_tasks_apptest <- function(user_iniciado = "dgco93@mininter.gob.pe") {
   ui <- tagList(
     bs4Dash::dashboardPage(
       header = bs4Dash::dashboardHeader(title = "TEST"),

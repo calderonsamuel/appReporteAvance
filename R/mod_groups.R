@@ -217,7 +217,7 @@ mod_groups_server <- function(id, rv){
   })
 }
 
-mod_groups_testapp <- function(user_iniciado = "dgco93@mininter.gob.pe") {
+mod_groups_apptest <- function(user_iniciado = "dgco93@mininter.gob.pe") {
   ui <- tagList(
     bs4Dash::dashboardPage(
       header = bs4Dash::dashboardHeader(title = "TEST"),

@@ -105,7 +105,7 @@ mod_templates_server <- function(id, rv){
   })
 }
 
-mod_templates_testapp <- function(id = "test") {
+mod_templates_apptest <- function(id = "test") {
     user_iniciado <- "dgco93@mininter.gob.pe"
   ui <- bs4Dash::dashboardPage(
     header = bs4Dash::dashboardHeader(title = "TEST"),

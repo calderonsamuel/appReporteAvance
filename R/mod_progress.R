@@ -264,7 +264,7 @@ mod_progress_server <- function(id, rv){
   })
 }
 
-mod_progress_testapp <- function(user_iniciado = "dgco93@mininter.gob.pe") {
+mod_progress_apptest <- function(user_iniciado = "dgco93@mininter.gob.pe") {
     rv <- reactiveValues(
         user_iniciado = user_iniciado,
         privileges = user_get_privileges(user_iniciado)

@@ -64,7 +64,7 @@ mod_users_server <- function(id){
   })
 }
 
-mod_users_testapp <- function(id = "test") {
+mod_users_apptest <- function(id = "test") {
   ui <- bs4Dash::dashboardPage(
     header = bs4Dash::dashboardHeader(title = "TEST"),
     sidebar = bs4Dash::dashboardSidebar(
