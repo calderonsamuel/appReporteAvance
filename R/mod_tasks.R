@@ -35,7 +35,7 @@ mod_tasks_server <- function(id, rv){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
-    user_iniciado <- isolate(rv$user_iniciado)
+    user_iniciado <- isolate(rv$user_id)
 
     task_added <- mod_task_man_server("task_manager", user_iniciado)
 

@@ -10,7 +10,7 @@
 mod_secure_ui <- function(id, rv){
   ns <- NS(id)
   privileges <- isolate(rv$privileges)
-  user_iniciado <- isolate(rv$user_iniciado)
+  user_iniciado <- isolate(rv$user_id)
   
   tagList(
     bs4Dash::dashboardPage(
@@ -52,7 +52,7 @@ mod_secure_ui <- function(id, rv){
         )
       ),
       bs4Dash::dashboardBody(
-          golem_add_external_resources(),
+          shinyWidgets::useSweetAlert(),
         bs4Dash::tabItems(
           bs4Dash::tabItem(
             tabName = "progress",
@@ -87,7 +87,7 @@ mod_secure_server <- function(id, rv){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
-    user_iniciado <- isolate(rv$user_iniciado)
+    user_iniciado <- isolate(rv$user_id)
     privileges <- isolate(rv$privileges)
     
     if (is.null(user_iniciado))  {
@@ -111,11 +111,12 @@ mod_secure_server <- function(id, rv){
 mod_secure_apptest <-
     function(user_iniciado = "dgco93@mininter.gob.pe") {
         
-        # session_data <- SessionData$new(user_iniciado)
-        rv <- reactiveValues(
-            user_iniciado = user_iniciado,
-            privileges = user_get_privileges(user_iniciado)
-        )
+        rv <- SessionData$new(user_iniciado)
+        
+        # rv <- reactiveValues(
+        #     user_iniciado = user_iniciado,
+        #     privileges = user_get_privileges(user_iniciado)
+        # )
         
         ui <- mod_secure_ui(id = "test", rv)
         

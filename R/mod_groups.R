@@ -35,7 +35,7 @@ mod_groups_server <- function(id, rv){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
-    user_iniciado <- isolate(rv$user_iniciado)
+    user_iniciado <- isolate(rv$user_id)
 
     vals <- reactiveValues(
       users = user_get_from_privileges(c("user1", "user2")),

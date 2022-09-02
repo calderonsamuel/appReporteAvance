@@ -26,12 +26,12 @@ app_server <- function(input, output, session) {
   output$my_ui <- renderUI({
     # f$req_sign_in() # https://firebase.google.com/docs/reference/rest/auth#section-sign-in-with-oauth-credential
 
-      rv$user_iniciado <- f$get_signed_in()$response$email
+      rv$user_id <- f$get_signed_in()$response$email
       rv$user_display_name <- f$get_signed_in()$response$displayName
       # 
       # print(f$get_signed_in()$response)
 
-      if (!user_is_registered(rv$user_iniciado)) {
+      if (!user_is_registered(rv$user_id)) {
 
         tagList(
             fluidPage(
@@ -41,8 +41,8 @@ app_server <- function(input, output, session) {
         )
       } else {
 
-        rv$privileges <- user_get_privileges(rv$user_iniciado)
-        glue::glue("sesion iniciada de {user}", user = rv$user_iniciado) |>
+        rv$privileges <- user_get_privileges(rv$user_id)
+        glue::glue("sesion iniciada de {user}", user = rv$user_id) |>
           message()
 
         mod_secure_ui("secure_1", rv)
@@ -54,7 +54,7 @@ app_server <- function(input, output, session) {
       bindEvent(f$req_sign_in())
 
   observe({
-      if (!user_is_registered(rv$user_iniciado)) {
+      if (!user_is_registered(rv$user_id)) {
           NULL
       } else {
           mod_secure_server("secure_1", rv)

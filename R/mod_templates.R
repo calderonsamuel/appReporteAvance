@@ -36,7 +36,7 @@ mod_templates_server <- function(id, rv){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
     
-    user_iniciado <- isolate(rv$user_iniciado)
+    user_iniciado <- isolate(rv$user_id)
     
     btn_template_added <- mod_template_manager_server("template_manager", user_iniciado)
 

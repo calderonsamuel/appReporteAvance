@@ -104,7 +104,7 @@ mod_progress_ui <- function(id){
 mod_progress_server <- function(id, rv){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
-    user_iniciado <- isolate(rv$user_iniciado)
+    user_iniciado <- isolate(rv$user_id)
     privileges <- isolate(rv$privileges)
     
     rv$task_list <- task_list_from_user(user_iniciado)
