@@ -1,9 +1,13 @@
 SessionData <- R6::R6Class(
     classname = "SessionData",
     public = list(
-        user_iniciado = NULL,
-        privileges= NULL,
         con = NULL,
+        user_iniciado = NULL,
+        user_names = NULL,
+        privileges = NULL,
+        groups = NULL,
+        tasks = NULL,
+        templates = NULL,
         db_get_query = function(...) {
             dots <- list(...)
             dots[[".con"]] <- self$con
@@ -11,7 +15,7 @@ SessionData <- R6::R6Class(
             
             DBI::dbGetQuery(self$con, query)
         },
-        db_execute_statement = function(...){
+        db_execute_statement = function(...) {
             dots <- list(...)
             dots[[".con"]] <- self$con
             
@@ -22,9 +26,8 @@ SessionData <- R6::R6Class(
     )
 )
 
-SessionData$set("public", "initialize", function(
-        user_iniciado,
-        remote = getOption("reporte_avance.remote")) {
+SessionData$set("public", "initialize", function(user_iniciado,
+                                                 remote = getOption("reporte_avance.remote")) {
     message("Starting SessionData")
     self$user_iniciado <- user_iniciado
     self$con <- if (remote) {
@@ -37,12 +40,10 @@ SessionData$set("public", "initialize", function(
             port = Sys.getenv("DB_PORT")
         )
     } else {
-        DBI::dbConnect(
-            drv = RSQLite::SQLite(), 
-            dbname = Sys.getenv("DB_NAME")
-        )
+        DBI::dbConnect(drv = RSQLite::SQLite(),
+                       dbname = Sys.getenv("DB_NAME"))
     }
-    self$privileges <- self$db_get_query("SELECT privileges 
+    self$privileges <- self$db_get_query("SELECT privileges
                               FROM users
                               WHERE (user_id = {self$user_iniciado})")$privileges
 })
