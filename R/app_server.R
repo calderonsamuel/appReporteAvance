@@ -19,13 +19,17 @@ app_server <- function(input, output, session) {
 
   rv <- reactiveValues(
       user_iniciado = character(),
+      user_display_name = character(),
       privileges = character()
   )
 
   output$my_ui <- renderUI({
-    f$req_sign_in()
+    # f$req_sign_in() # https://firebase.google.com/docs/reference/rest/auth#section-sign-in-with-oauth-credential
 
       rv$user_iniciado <- f$get_signed_in()$response$email
+      rv$user_display_name <- f$get_signed_in()$response$displayName
+      # 
+      # print(f$get_signed_in()$response)
 
       if (!user_is_registered(rv$user_iniciado)) {
 
@@ -46,7 +50,8 @@ app_server <- function(input, output, session) {
 
     # mod_secure_ui("secure_1", privileges = rv$privileges)
     # mod_secure_ui(ns("secure_1"), privileges = rv$privileges)
-  })
+  }) |> 
+      bindEvent(f$req_sign_in())
 
   observe({
       if (!user_is_registered(rv$user_iniciado)) {
