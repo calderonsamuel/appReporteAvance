@@ -65,7 +65,7 @@ SessionData$set("public", "initialize", function(user_id,
     self$user_id <- user_id
     self$privileges <- private$get_privileges()
     self$groups <- self$groups_compute()
-    self$tasks <- NULL
+    self$tasks <- self$tasks_compute()
     self$templates <- NULL
 })
 
