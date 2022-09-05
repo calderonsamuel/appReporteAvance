@@ -19,16 +19,15 @@ app_server <- function(input, output, session) {
 
   rv <- reactiveValues(
       user_iniciado = character(),
-      user_display_name = character(),
-      privileges = character()
+      privileges = character(),
+      session_data = NULL
   )
 
   output$my_ui <- renderUI({
     # f$req_sign_in() # https://firebase.google.com/docs/reference/rest/auth#section-sign-in-with-oauth-credential
 
       rv$user_id <- f$get_signed_in()$response$email
-      rv$user_display_name <- f$get_signed_in()$response$displayName
-      # 
+      
       # print(f$get_signed_in()$response)
 
       if (!user_is_registered(rv$user_id)) {
@@ -40,12 +39,13 @@ app_server <- function(input, output, session) {
             )
         )
       } else {
+          
+          rv$session_data <- SessionData$new(rv$user_id)
 
-        rv$privileges <- user_get_privileges(rv$user_id)
         glue::glue("sesion iniciada de {user}", user = rv$user_id) |>
           message()
 
-        mod_secure_ui("secure_1", rv)
+        mod_secure_ui("secure_1", rv$session_data)
       }
 
     # mod_secure_ui("secure_1", privileges = rv$privileges)
@@ -57,7 +57,7 @@ app_server <- function(input, output, session) {
       if (!user_is_registered(rv$user_id)) {
           NULL
       } else {
-          mod_secure_server("secure_1", rv)
+          mod_secure_server("secure_1", rv$session_data)
       }
 
   }) |>
