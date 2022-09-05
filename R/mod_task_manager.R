@@ -15,7 +15,7 @@ mod_task_man_ui <- function(id) {
 mod_task_man_output <- function(id, user_iniciado) {
     ns <- NS(id)
 
-    choices_for_tasks <- user_get_choices_for_tasks(user_iniciado)
+    choices_for_tasks <- task_get_choices(user_iniciado)
 
     user_choices <- choices_for_tasks$user_choices
     template_choices <- choices_for_tasks$template_choices
@@ -81,13 +81,13 @@ mod_task_man_output <- function(id, user_iniciado) {
 #' task_manager Server Functions
 #'
 #' @noRd
-mod_task_man_server <- function(id, user_iniciado) {
+mod_task_man_server <- function(id, SessionData) {
     moduleServer(id, function(input, output, session) {
         ns <- session$ns
 
-        # bs4Dash::updateBox("box_nueva_tarea", "remove")
+        user_iniciado <- SessionData$user_id
 
-        choices_for_tasks <- user_get_choices_for_tasks(user_iniciado)
+        choices_for_tasks <- SessionData$task_get_choices()
 
         task_owners <- user_get_task_owners(user_iniciado)
 
@@ -102,8 +102,6 @@ mod_task_man_server <- function(id, user_iniciado) {
         template_id <- reactive({
             ifelse(isTruthy(as.logical(input$use_template)), input$template, NA_character_)
         })
-
-        observeEvent(input$use_template, print(as.logical(input$use_template)))
 
         step_id <- reactive({
             if (isTruthy(as.logical(input$use_template))) {
@@ -155,6 +153,7 @@ mod_task_man_server <- function(id, user_iniciado) {
             } else {
                 task_insert(new_task_data())
                 progress_insert(new_progress_data())
+                SessionData$update_tasks()
 
                 updateTextAreaInput(session, "description", value = "")
 
@@ -181,6 +180,7 @@ mod_task_man_server <- function(id, user_iniciado) {
 # mod_task_manager_server("task_manager_1")
 
 mod_task_man_apptest <- function(user_iniciado = "dgco93@mininter.gob.pe") {
+    session_data <- SessionData$new(user_iniciado)
     ui <- tagList(
         tags$head(
             shinyWidgets::useSweetAlert()
@@ -206,7 +206,7 @@ mod_task_man_apptest <- function(user_iniciado = "dgco93@mininter.gob.pe") {
     )
 
     server <- function(input, output, session) {
-        mod_task_man_server("test", user_iniciado)
+        mod_task_man_server("test", session_data)
     }
 
     shinyApp(ui, server)

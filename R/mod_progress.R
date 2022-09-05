@@ -101,27 +101,33 @@ mod_progress_ui <- function(id){
 #' progress Server Functions
 #'
 #' @noRd
-mod_progress_server <- function(id, rv){
+mod_progress_server <- function(id, SessionData){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
-    user_iniciado <- isolate(rv$user_id)
-    privileges <- isolate(rv$privileges)
+    user_iniciado <- isolate(SessionData$user_id)
+    privileges <- isolate(SessionData$privileges)
     
-    rv$task_list <- task_list_from_user(user_iniciado)
-    rv$task_to_modify <- NA_character_ # Modificado en observer
-    rv$btn_task_id_pressed <- 0
-
+    rv <- reactiveValues(
+        task_to_modify = NA_character_ # Modificado en observer
+    )
+    
     btn_tracker <- reactive(
-        task_ids |>
+        task_ids() |>
             lapply(\(x) input[[x]])
     )
 
-    task_ids <- task_list_for_board(user_iniciado)
+    task_ids <- reactivePoll(
+        intervalMillis = 1000,
+        session = session,
+        checkFunc = function() SessionData$task_update_getter(),
+        valueFunc = \() names(SessionData$tasks)
+    )
+        
 
     task_in_modal <- reactive({
-        task <- rv$task_list[[rv$task_to_modify]]
-        template_id <- task$template$template_id
-        template_description <- task$template$template_description
+        task <- SessionData$tasks[[rv$task_to_modify]]
+        template_id <- task$template_id
+        template_description <- task$template_description
         steps <- step_get_from_template(template_id)
 
         list(
@@ -147,12 +153,6 @@ mod_progress_server <- function(id, rv){
         )
     )
 
-    pendientes <- reactive(task_list_subset_by_status(rv$task_list, "Pendiente"))
-    en_proceso <- reactive(task_list_subset_by_status(rv$task_list, "En proceso"))
-    pausado <- reactive(task_list_subset_by_status(rv$task_list, "Pausado"))
-    en_revision <- reactive(task_list_subset_by_status(rv$task_list, "En revisión"))
-    terminado <- reactive(task_list_subset_by_status(rv$task_list, "Terminado"))
-
     new_progress_data <- reactive(
         data.frame(
             task_id = rv$task_to_modify,
@@ -170,7 +170,7 @@ mod_progress_server <- function(id, rv){
     # Observer de todos los botones "Modificar" en los boxes.
     # modifica rv$task_to_modify y muestra modal dialog
     observe({
-        task_ids |>
+        task_ids() |>
             lapply(function(x) {
                 observe({
                     rv$task_to_modify <- x # set new value
@@ -200,29 +200,27 @@ mod_progress_server <- function(id, rv){
                         value = ""
                     )
 
-                    bs4Dash::updateBox(id = "box_reporte", action = "restore")
+                    if (!is.null(x)) bs4Dash::updateBox(id = "box_reporte", action = "restore")
 
                 }) |>
                     bindEvent(input[[x]])
             })
     })
-
+    
     observe({
 
         if (input$step_explain == "") return(alert_error(session, "Debe explicar cambios"))
 
-        progress_insert(new_progress_data()) |> suppressMessages()
+        SessionData$progress_insert(new_progress_data()) |> suppressMessages()
+        SessionData$task_modify_status(rv$task_to_modify)
+        SessionData$update_tasks()
 
-        if (is.na(task_in_modal()$template_id)) {
-            task_modify_status(
-                task_id = rv$task_to_modify,
-                new_status = task_compute_status(rv$task_to_modify)
-            ) |> suppressMessages()
-        }
-        rv$task_list[[rv$task_to_modify]]$status <- input$status
+        # if (is.na(task_in_modal()$template_id)) {
+        #     SessionData$task_modify_status(
+        #         task_id = rv$task_to_modify
+        #     ) |> suppressMessages()
+        # }
         alert_info(session, "Estado de actividad actualizado")
-        removeModal()
-
     }) |>
         bindEvent(input$modificar)
 
@@ -241,34 +239,53 @@ mod_progress_server <- function(id, rv){
         bindEvent(input$cancelar, input$modificar)
 
 
+    pendientes <- reactivePoll(
+        intervalMillis = 1000, 
+        session = session, 
+        checkFunc = SessionData$task_update_getter,
+        valueFunc = \() SessionData$task_by_status("Pendiente"))
 
 
-
-    output$pendientes <- renderUI(
-        tagList(pendientes() |> lapply(box_dd_yes, ns = ns))
-    )
-    output$en_proceso <- renderUI(
-        tagList(en_proceso() |> lapply(box_dd_yes, ns = ns))
-    )
-    output$pausado <- renderUI(
-        tagList(pausado() |> lapply(box_dd_yes, ns = ns))
-    )
-    output$en_revision <- renderUI({
-        fun_en_revision <- if (privileges == "user1") box_dd_no else box_dd_yes
-        tagList(en_revision() |> lapply(fun_en_revision, ns = ns))
+    output$pendientes <- renderUI({
+        pendientes() |>
+            lapply(box_dd_yes, ns = ns) |>
+            tagList()
+    }) 
+    
+    output$en_proceso <- renderUI({
+        input$modificar
+        SessionData$task_by_status("En proceso") |> 
+            lapply(box_dd_yes, ns = ns) |> 
+            tagList()
+    }) 
+    
+    output$pausado <- renderUI({
+        input$modificar
+        SessionData$task_by_status("Pausado") |> 
+            lapply(box_dd_yes, ns = ns) |> 
+            tagList()
     })
-    output$terminado <- renderUI(
-        tagList(terminado() |> lapply(box_dd_no, ns = ns))
-    )
+    
+    output$en_revision <- renderUI({
+        input$modificar
+        fun_en_revision <- if (privileges == "user1") box_dd_no else box_dd_yes
+        SessionData$task_by_status("En revisión") |> 
+            lapply(fun_en_revision, ns = ns) |> 
+            tagList()
+    })
+    
+    output$terminado <- renderUI({
+        input$modificar
+        SessionData$task_by_status("Terminado") |> 
+            lapply(box_dd_no, ns = ns) |> 
+            tagList()
+    }) 
 
   })
 }
 
 mod_progress_apptest <- function(user_iniciado = "dgco93@mininter.gob.pe") {
-    rv <- reactiveValues(
-        user_iniciado = user_iniciado,
-        privileges = user_get_privileges(user_iniciado)
-    )
+    session_data <- SessionData$new(user_iniciado)
     
   ui <- bs4Dash::dashboardPage(
       preloader = list(html = tagList(waiter::spin_pixel(), HTML("<br/>Cargando ...")), color = "#3c8dbc"),
@@ -286,7 +303,7 @@ mod_progress_apptest <- function(user_iniciado = "dgco93@mininter.gob.pe") {
   )
 
   server <- function(input, output, session) {
-    mod_progress_server("test", rv)
+    mod_progress_server("test", session_data)
   }
 
   shinyApp(ui, server)
