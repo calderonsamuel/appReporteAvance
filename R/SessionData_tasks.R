@@ -1,8 +1,29 @@
 SessionData$set("public", "tasks_compute", function() {
-    own_ids <- self$task_get_ids()
+    ids <- self$task_get_ids(self$user_id)
+    metadata <- self$task_get_from_id(ids)
+    
+    # self$task_list_from_user()
+    
+    params <- list(
+        task_id = metadata$task_id,
+        task_description = metadata$task_description,
+        task_status = metadata$status,
+        task_creator_id = metadata$reviewer,
+        task_creator_names = metadata$reviewer,
+        task_assignee_id = metadata$user_id,
+        task_assignee_names = metadata$user_id,
+        template_id = metadata$template_id
+    )
+    
+    purrr::pmap(params, list)
+    # params
 })
 
-SessionData$set("public", "task_get_ids", function() {
+SessionData$set("public", "update_tasks", function() {
+    self$tasks <- self$tasks_compute()
+})
+
+SessionData$set("public", "task_get_ids", function(user_id) {
     query <- "SELECT task_id
               FROM tasks
               WHERE (user_id IN ({vals*}))"
