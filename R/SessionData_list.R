@@ -67,8 +67,8 @@ SessionData$set("public", "task_metadata", function(task_id) {
 })
 
 SessionData$set("public", "task_list_for_board", function(user_id) {
-    privileges <- self$user_get_privileges(user_id)
-    groups <- self$groups
+    privileges <- self$privileges
+    groups <- self$groups |> purrr::map_chr(~.x$group_id)
     user_and_groups <- union(user_id, groups)
     task_users <- self$task_get_from_user2(user_and_groups)
     task_reviewers <- character()
@@ -84,7 +84,7 @@ SessionData$set("public", "task_list_for_board", function(user_id) {
 
 SessionData$set("public", "user_get_choices_for_tasks", function(user_id) {
     privileges <- self$user_get_privileges(user_id)
-    groups <- self$groups
+    groups <- self$groups |> purrr::map_chr(~.x$group_id)
     glue::glue("privileges: {privileges}") |> message()
     
     users_for_tasks <- if (privileges == "user1") user_id else self$user_get_from_privileges(c("user1", "user2"))
