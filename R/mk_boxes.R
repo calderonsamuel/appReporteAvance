@@ -3,7 +3,7 @@ mk_box <- function(icon = NULL, use_ddMenu = TRUE) {
         if (!isTruthy(task)) return(NULL)
 
         task_id_ns <- ns_safe(task$task_id, ns)
-        background <- box_bg_by_assignee(task$task_id)
+        background <- box_bg_by_assignee(task$task_assignee_id)
         dropdownMenu <- if(use_ddMenu) box_ddMenu(task_id_ns) else NULL
         bs4Dash::box(
             title = task$task_description,
@@ -28,16 +28,16 @@ mk_box <- function(icon = NULL, use_ddMenu = TRUE) {
             id = NULL,
 
             box_interior(
-                assignee_name = task$assignee$user_name,
-                reviewer_name = task$reviewer$user_name,
-                template_description = task$template$template_description
+                assignee_name = task$task_assignee_names,
+                reviewer_name = task$task_creator_names,
+                template_description = task$template_description
             )
         )
     }
 }
 
-box_bg_by_assignee <- function(task_id) {
-    if (task_is_from_group(task_id)) "olive" else "teal"
+box_bg_by_assignee <- function(user_id) {
+    if (grepl("^team", user_id)) "olive" else "teal"
 }
 
 ns_safe <- function(id, ns = NULL) {
