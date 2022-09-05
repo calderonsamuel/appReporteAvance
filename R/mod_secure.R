@@ -7,10 +7,10 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-mod_secure_ui <- function(id, rv){
+mod_secure_ui <- function(id, SessionData){
   ns <- NS(id)
-  privileges <- isolate(rv$privileges)
-  user_iniciado <- isolate(rv$user_id)
+  privileges <- isolate(SessionData$privileges)
+  user_iniciado <- isolate(SessionData$user_id)
   
   tagList(
     bs4Dash::dashboardPage(
@@ -83,12 +83,13 @@ mod_secure_ui <- function(id, rv){
 #' secure Server Functions
 #'
 #' @noRd
-mod_secure_server <- function(id, rv){
+mod_secure_server <- function(id, SessionData){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
-    user_iniciado <- isolate(rv$user_id)
-    privileges <- isolate(rv$privileges)
+    user_iniciado <- isolate(SessionData$user_id)
+    
+    privileges <- isolate(SessionData$privileges)
     
     if (is.null(user_iniciado))  {
         message("No se ha definido 'user_iniciado()' en 'mod_secure_server'")
@@ -96,13 +97,13 @@ mod_secure_server <- function(id, rv){
         glue::glue("user_iniciado is '{user_iniciado}'")
     }
 
-    mod_progress_server("progress_1", rv)
-    mod_tasks_server("tasks_1", rv)
-    mod_templates_server("templates_1", rv)
+    mod_progress_server("progress_1", SessionData)
+    mod_tasks_server("tasks_1", SessionData)
+    mod_templates_server("templates_1", SessionData)
 
     if (privileges == "admin") {
         mod_users_server("admin_users_1")
-        mod_groups_server("admin_groups_1", rv)
+        mod_groups_server("admin_groups_1", SessionData)
     }
 
   })
@@ -111,17 +112,12 @@ mod_secure_server <- function(id, rv){
 mod_secure_apptest <-
     function(user_iniciado = "dgco93@mininter.gob.pe") {
         
-        rv <- SessionData$new(user_iniciado)
+        SessionData <- SessionData$new(user_iniciado)
         
-        # rv <- reactiveValues(
-        #     user_iniciado = user_iniciado,
-        #     privileges = user_get_privileges(user_iniciado)
-        # )
-        
-        ui <- mod_secure_ui(id = "test", rv)
+        ui <- mod_secure_ui(id = "test", SessionData)
         
         server <- function(input, output, session) {
-            mod_secure_server(id = "test", rv)
+            mod_secure_server(id = "test", SessionData)
         }
         
         shinyApp(ui, server)
