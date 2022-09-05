@@ -1,44 +1,46 @@
-SessionData$set("public", "tasks_compute", function() {
-    ids <- self$task_get_ids(self$user_id)
-    metadata <- self$task_get_from_id(ids)
-    
-    # self$task_list_from_user()
+SessionData$set("private", "tasks_compute", function() {
+    ids <- private$task_get_ids(self$user_id)
+    metadata <- private$task_get_from_id(ids)
     
     params <- list(
         task_id = metadata$task_id,
         task_description = metadata$task_description,
         task_status = metadata$status,
         task_creator_id = metadata$reviewer,
-        task_creator_names = metadata$reviewer,
+        task_creator_names = metadata$reviewer |> purrr::map_chr(self$user_get_names),
         task_assignee_id = metadata$user_id,
-        task_assignee_names = metadata$user_id,
-        template_id = metadata$template_id
+        task_assignee_names = metadata$user_id |> purrr::map_chr(self$user_get_names),
+        template_id = metadata$template_id,
+        template_description = purrr::map_chr(metadata$template_id, self$template_get_description),
+        is_from_group = grepl("^team", metadata$user_id)
     )
     
-    purrr::pmap(params, list)
-    # params
+    purrr::pmap(params, list) |> 
+        setNames(metadata$task_id)
 })
 
 SessionData$set("public", "update_tasks", function() {
-    self$tasks <- self$tasks_compute()
+    self$tasks <- private$tasks_compute()
+    private$task_update_tracker <- private$task_update_tracker + 1L
+    invisible(self)
 })
 
-SessionData$set("public", "task_get_ids", function(user_id) {
+SessionData$set("public", "task_update_getter", function() {
+    private$task_update_tracker
+})
+
+SessionData$set("public", "task_by_status", function(status) {
+    self$tasks |> 
+        purrr::keep(~ .x$task_status == status)
+})
+
+SessionData$set("private", "task_get_ids", function(user_id) {
     query <- "SELECT task_id
               FROM tasks
               WHERE (user_id IN ({vals*}))"
     data <- db_get_query(query, vals = user_id)
     return(data$task_id)
 })
-
-SessionData$set("public", "task_get_description", function() {
-    query <- "SELECT task_id
-              FROM tasks
-              WHERE (user_id IN ({vals*}))"
-    data <- db_get_query(query, vals = self$user_id)
-    return(data$task_id)
-})
-
 
 SessionData$set("public", "task_get_all", function() {
     private$db_get_query("SELECT * FROM tasks")
@@ -58,7 +60,7 @@ SessionData$set("public", "task_remove", function(task_id) {
     glue::glue("deleted task with id {task_id}") |> message()
 })
 
-SessionData$set("public", "task_get_from_id", function(task_id) {
+SessionData$set("private", "task_get_from_id", function(task_id) {
     query <- "SELECT task_id, task_description, status,
               user_id, reviewer, template_id
               FROM tasks
@@ -66,7 +68,8 @@ SessionData$set("public", "task_get_from_id", function(task_id) {
     private$db_get_query(query, vals = task_id)
 })
 
-SessionData$set("public", "task_modify_status", function(task_id, new_status) {
+SessionData$set("public", "task_modify_status", function(task_id) {
+    new_status <- self$task_compute_status(task_id)
     statement <- "UPDATE tasks
                 SET status = {new_status}
                 WHERE task_id = {task_id}"
@@ -90,35 +93,12 @@ SessionData$set("public", "task_get_from_user2", function(user_id) {
     return(data$task_id)
 })
 
-SessionData$set("public", "task_get_status", function(task_id) {
-    query <- "SELECT status
-              FROM tasks
-              WHERE (task_id IN ({task_id}))"
-    data <- private$db_get_query(query, task_id = task_id)
-    return(data$status)
-})
-
 SessionData$set("public", "task_get_from_reviewer", function(reviewer) {
     query <- "SELECT task_id
               FROM tasks
               WHERE (reviewer IN ({vals*}))"
     data <- private$db_get_query(query, vals = reviewer)
     return(data$task_id)
-})
-
-SessionData$set("public", "task_is_from_group", function(task_id) {
-    query <- "SELECT user_id
-            FROM tasks
-            WHERE task_id = {task_id}"
-    data <- private$db_get_query(query, task_id = task_id)
-    return(grepl("^team", data$user_id))
-})
-
-SessionData$set("public", "task_get_from_status", function(user_id, status) {
-    query <- "SELECT *
-                FROM tasks
-                WHERE (user_id IN ({vals*}) and status = {status})"
-    private$db_get_query(query, vals = user_id, status = status)
 })
 
 
