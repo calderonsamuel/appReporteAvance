@@ -82,7 +82,7 @@ task_list_for_board <- function(user_id) {
     return(task_ids)
 }
 
-user_get_choices_for_tasks <- function(user_id) {
+task_get_choices <- function(user_id) {
     privileges <- user_get_privileges(user_id)
     groups <- gruser_get_groups(user_id)
     glue::glue("privileges: {privileges}") |> message()
