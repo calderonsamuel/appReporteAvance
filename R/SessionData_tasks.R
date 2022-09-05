@@ -35,10 +35,12 @@ SessionData$set("public", "task_by_status", function(status) {
 })
 
 SessionData$set("private", "task_get_ids", function(user_id) {
+    group_ids <- self$groups |> purrr::map_chr(~.x$group_id)
+    task_owner_ids <- c(user_id, group_ids)
     query <- "SELECT task_id
               FROM tasks
               WHERE (user_id IN ({vals*}))"
-    data <- db_get_query(query, vals = user_id)
+    data <- db_get_query(query, vals = task_owner_ids)
     return(data$task_id)
 })
 
