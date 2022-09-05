@@ -31,36 +31,27 @@ mod_tasks_ui <- function(id, user_iniciado) {
 #' tasks Server Functions
 #'
 #' @noRd
-mod_tasks_server <- function(id, rv){
+mod_tasks_server <- function(id, SessionData){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
-    user_iniciado <- isolate(rv$user_id)
+    task_added <- mod_task_man_server("task_manager", SessionData)
 
-    task_added <- mod_task_man_server("task_manager", user_iniciado)
-
-    choices_for_tasks <- user_get_choices_for_tasks(user_iniciado)
-
-    task_owners <- user_get_task_owners(user_iniciado)
-
-    vals <- reactiveValues(
-      data_tasks = task_get_from_user(task_owners)
-    )
-
-    user_choices <- choices_for_tasks$user_choices
-    group_choices <- choices_for_tasks$group_choices
-    template_choices <- choices_for_tasks$template_choices
-
-    current_tasks <- reactive({
-        data <- vals$data_tasks |>
-            subset(select = c(user_id, template_id, task_description, status))
-        data$user_id <- purrr::map_chr(data$user_id, user_get_names)
-
-        data |>
+    current_tasks <- reactivePoll(
+        intervalMillis = 1000, 
+        session = session, 
+        checkFunc = SessionData$task_update_getter, 
+        valueFunc = \() {
+            SessionData$tasks |> 
+            purrr::map_dfr(~ .x) |> 
+            subset(select = c(task_assignee_names, template_description, task_description, task_status)) |> 
             setNames(c("Encargado", "Plantilla", "Descripción de tarea", "Estado actual"))
     })
 
-    task_for_deleting <- reactive(vals$data_tasks$task_id[input$tabla_rows_selected])
+    task_for_deleting <- reactive({
+        ids <- SessionData$tasks |> names()
+        ids[input$tabla_rows_selected]
+    })
 
     observeEvent(input$remove, {
         if (!isTruthy(task_for_deleting())) {
@@ -69,15 +60,10 @@ mod_tasks_server <- function(id, rv){
             alert_error(session, "No puede eliminar tarea de grupo")
         } else {
             task_remove(task_for_deleting())
-            vals$data_tasks <- task_get_from_user2(task_owners) |> task_get_from_id()
+            SessionData$update_tasks()
             alert_info(session, "Tarea eliminada")
         }
-
     })
-
-    observe({
-        vals$data_tasks <- task_get_from_user2(task_owners) |> task_get_from_id()
-    }) |> bindEvent(task_added())
 
     output$tabla <- DT::renderDT(
       expr = current_tasks(),
@@ -108,10 +94,8 @@ mod_tasks_apptest <- function(user_iniciado = "dgco93@mininter.gob.pe") {
   )
 
   server <- function(input, output, session) {
-      rv <- reactiveValues(
-          user_iniciado = user_iniciado
-      )
-    mod_tasks_server("test", rv)
+      session_data <- SessionData$new(user_iniciado)
+    mod_tasks_server("test", session_data)
   }
 
   shinyApp(ui, server)
