@@ -29,6 +29,7 @@ SessionData$set("public", "user_get_from_privileges", function(privileges) {
 })
 
 SessionData$set("public", "user_get_names", function(user_id) {
+    if (isTruthy(self$user_names) && self$user_id == user_id) return(self$user_names)
     if (grepl("^team", user_id)) return(self$group_get_description(user_id))
     query <- "SELECT name, last_name
                             FROM users
