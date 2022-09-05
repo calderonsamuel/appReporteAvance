@@ -9,9 +9,10 @@ SessionData <- R6::R6Class(
         templates = NULL
     ),
     private = list(
-        con = NULL
+        con = NULL,
         # db_get_query = NULL,
-        # db_execute_statement = NULL
+        # db_execute_statement = NULL,
+        task_update_tracker = NULL
     )
 )
 
@@ -63,9 +64,11 @@ SessionData$set("public", "initialize", function(user_id,
     
     private$con <- if (remote) private$db_connect_remote() else private$db_connect_local()
     self$user_id <- user_id
+    self$user_names <- self$user_get_names(user_id)
     self$privileges <- private$get_privileges()
     self$groups <- self$groups_compute()
-    self$tasks <- self$tasks_compute()
+    self$tasks <- private$tasks_compute()
+    private$task_update_tracker <- 0L
     self$templates <- NULL
 })
 
