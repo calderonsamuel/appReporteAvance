@@ -27,7 +27,7 @@ ui <- dashboardPage(
                         
                         tags$div(
                             id = "sort1",
-                            box(title = "box1", id = "b1"),
+                            box(id = "b1"),
                             box(title = "box2", id = "b2"),
                             box(title = "box3", id = "b3"),
                             # colnames_to_tags(mtcars)
@@ -40,7 +40,8 @@ ui <- dashboardPage(
                         title = "X",
                         width = 12,
                         tags$div(
-                            id = "sort2"
+                            id = "sort2",
+                            box(title = "box4", id = "b4")
                         )
                     ),
                     box(
@@ -75,7 +76,8 @@ ui <- dashboardPage(
             options = sortable_options(
                 group = list(
                     group = "sortGroup1",
-                    put = htmlwidgets::JS("function (to) { return to.el.children.length < 1; }"),
+                    # put = htmlwidgets::JS("function (to) { return to.el.children.length < 1; }"),
+                    put = TRUE,
                     pull = TRUE
                 ),
                 onSort = sortable_js_capture_input("sort_x"),
@@ -87,10 +89,11 @@ ui <- dashboardPage(
             options = sortable_options(
                 group = list(
                     group = "sortGroup1",
-                    put = htmlwidgets::JS("function (to) { return to.el.children.length < 1; }"),
+                    # put = htmlwidgets::JS("function (to) { return to.el.children.length < 2; }"),
+                    put = TRUE,
                     pull = TRUE
                 ),
-                onSort = sortable_js_capture_input("sort_y"), 
+                onSort = sortable_js_capture_input("sort_y"),
                 onLoad = sortable_js_capture_input("sort_y")
             )
         )
