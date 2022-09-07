@@ -1,30 +1,48 @@
-SessionData$set("public", "groups_compute", overwrite = TRUE, function() {
-    ids <- self$group_get_ids()
-    descriptions <- purrr::map_chr(ids, self$group_get_description)
-    members_list <- purrr::map(ids, self$group_get_members_list)
+SessionData$set("public", "groups_compute", function() {
+    ids <- private$group_get_ids()
+    group_df <- private$group_get_metadata(ids)
+    members_list <- purrr::map(group_df$group_id, self$group_get_members_list)
     
     params <- list(
-        group_id = ids,
-        group_description = descriptions,
+        group_id = group_df$group_id,
+        group_description = group_df$group_description,
+        group_admin = group_df$group_admin,
         group_members = members_list
     )
     
-    purrr::pmap(params, \(group_id, group_description, group_members){
-        list(
-            group_id = group_id,
-            group_description = group_description,
-            group_members = group_members
-        )
-    })
+    purrr::pmap(params, list)
 })
 
 
-SessionData$set("public", "group_get_ids", function() {
+SessionData$set("private", "group_get_ids", function() {
     query <- "SELECT *
             FROM group_users
             WHERE (user_id IN ({vals*}))"
     data <- private$db_get_query(query, vals = self$user_id)
-    return(data$group_id) # return a chr vector
+    ids <- data$group_id
+    private$group_ids <- ids
+    return(ids) # return a chr vector
+})
+
+SessionData$set("private", "group_get_metadata", function(group_ids) {
+    query <- "SELECT *
+              FROM groups
+              WHERE (group_id IN ({vals*}))"
+    private$db_get_query(query, vals = group_ids)
+})
+
+SessionData$set("private", "group_admined_members", function() {
+    groups_owned <- self$groups |> 
+        purrr::keep(~ .x$group_admin == self$user_id) 
+    if (length(groups_owned) > 0) {
+        groups_owned |> 
+            purrr::map("group_members") |> 
+            purrr::map(purrr::map_dfr, ~.x) |> 
+            purrr::map_dfr(~.x) |> 
+            (\(x) x$user_id)()
+    } else {
+        character()
+    }
 })
 
 SessionData$set("public", "group_get_description", function(group_id) {
@@ -49,6 +67,14 @@ SessionData$set("public", "group_get_members_list", function(group_id) {
             user_names = .y
         )
     })
+})
+
+SessionData$set("private", "group_get_member_ids", function(group_ids) {
+    query <- "SELECT *
+            FROM group_users
+            WHERE (group_id IN ({vals*}))"
+    data <- db_get_query(query, vals = group_id)
+    unique(data$user_id)
 })
 
 SessionData$set("public", "group_get_all", function() {

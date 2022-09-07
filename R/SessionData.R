@@ -12,7 +12,8 @@ SessionData <- R6::R6Class(
         con = NULL,
         # db_get_query = NULL,
         # db_execute_statement = NULL,
-        task_update_tracker = NULL
+        task_update_tracker = NULL,
+        group_ids = NULL
     )
 )
 
@@ -52,9 +53,12 @@ SessionData$set("private", "db_connect_local", function(){
 })
 
 SessionData$set("private", "get_privileges", function() {
-    private$db_get_query("SELECT privileges
-                              FROM users
-                              WHERE (user_id = {self$user_id})")$privileges
+    
+    data <- private$db_get_query("SELECT group_id
+                              FROM groups
+                              WHERE (group_admin = {self$user_id})")
+    
+    ifelse(nrow(data) > 0, "user2", "user1")
 })
 
 
@@ -68,8 +72,8 @@ SessionData$set("public", "initialize", function(user_id,
     self$privileges <- private$get_privileges()
     self$groups <- self$groups_compute()
     self$tasks <- private$tasks_compute()
-    private$task_update_tracker <- 0L
     self$templates <- NULL
+    private$task_update_tracker <- 0L
 })
 
 SessionData$set("public", "finalize", function() {

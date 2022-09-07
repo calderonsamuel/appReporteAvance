@@ -35,7 +35,7 @@ SessionData$set("public", "task_compute_status", function(task_id) {
 SessionData$set("public", "task_get_choices", function() {
     user_id <- self$user_id
     privileges <- self$privileges
-    group_ids <- self$groups |> purrr::map_chr(~.x$group_id)
+    group_ids <- private$group_ids
     
     users_for_tasks <- if (privileges == "user1") user_id else self$user_get_from_privileges(c("user1", "user2"))
     
@@ -57,7 +57,7 @@ SessionData$set("public", "task_get_choices", function() {
 
 SessionData$set("public", "user_get_task_owners", function(user_id) {
     privileges <- self$privileges
-    group_ids <- self$groups |> purrr::map_chr(~.x$group_id)
+    group_ids <- private$group_ids
     
     users_for_tasks <- if (privileges == "user1") user_id else self$user_get_from_privileges(c("user1", "user2"))
     

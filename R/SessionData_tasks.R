@@ -1,5 +1,5 @@
 SessionData$set("private", "tasks_compute", function() {
-    ids <- private$task_get_ids(self$user_id)
+    ids <- private$task_get_ids()
     metadata <- private$task_get_from_id(ids)
     
     params <- list(
@@ -34,9 +34,10 @@ SessionData$set("public", "task_by_status", function(status) {
         purrr::keep(~ .x$task_status == status)
 })
 
-SessionData$set("private", "task_get_ids", function(user_id) {
-    group_ids <- self$groups |> purrr::map_chr(~.x$group_id)
-    task_owner_ids <- c(user_id, group_ids)
+SessionData$set("private", "task_get_ids", function() {
+    group_ids <- private$group_ids
+    admined_members <- private$group_admined_members()
+    task_owner_ids <- c(self$user_id, group_ids, admined_members) |> unique()
     query <- "SELECT task_id
               FROM tasks
               WHERE (user_id IN ({vals*}))"

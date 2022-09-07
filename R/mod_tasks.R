@@ -56,7 +56,7 @@ mod_tasks_server <- function(id, SessionData){
     observeEvent(input$remove, {
         if (!isTruthy(task_for_deleting())) {
             alert_error(session, "Debe seleccionar una tarea a eliminar")
-        } else if (task_is_from_group(task_for_deleting())){
+        } else if (SessionData$privileges == "user1"){
             alert_error(session, "No puede eliminar tarea de grupo")
         } else {
             task_remove(task_for_deleting())
