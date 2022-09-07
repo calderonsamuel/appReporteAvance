@@ -60,3 +60,53 @@ box_ddMenu <- function(item_id) {
 
 box_dd_yes <- mk_box(use_ddMenu = TRUE)
 box_dd_no <- mk_box(use_ddMenu = FALSE)
+
+boxHidden <- function(
+        ...,
+        title = NULL,
+        footer = NULL,
+        status = NULL,
+        solidHeader = FALSE,
+        background = NULL,
+        width = 6,
+        height = NULL,
+        collapsible = TRUE,
+        collapsed = FALSE,
+        closable = FALSE,
+        maximizable = FALSE,
+        icon = NULL,
+        gradient = FALSE,
+        boxToolSize = "sm",
+        elevation = NULL,
+        headerBorder = TRUE,
+        label = NULL,
+        dropdownMenu = NULL,
+        sidebar = NULL,
+        id = NULL,
+        hidden = TRUE) {
+    
+    myBox <- bs4Dash::box(
+        ...,
+        title = title, 
+        footer = footer, 
+        status = status, 
+        solidHeader = solidHeader, 
+        background = background, 
+        width = width, 
+        height = height, 
+        collapsible = collapsible, 
+        collapsed = collapsed, 
+        closable = closable, 
+        maximizable = maximizable, 
+        icon = icon, 
+        gradient = gradient, 
+        boxToolSize = boxToolSize, 
+        elevation = elevation, 
+        headerBorder = headerBorder, 
+        label = label, 
+        dropdownMenu = dropdownMenu, 
+        sidebar = sidebar, 
+        id = id)
+    
+    if (hidden) boxHide(myBox) else myBox
+}
