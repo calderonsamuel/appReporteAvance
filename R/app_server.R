@@ -48,9 +48,8 @@ app_server <- function(input, output, session) {
         mod_secure_ui("secure_1", rv$session_data)
       }
 
-    # mod_secure_ui("secure_1", privileges = rv$privileges)
-    # mod_secure_ui(ns("secure_1"), privileges = rv$privileges)
-  }) |> 
+
+        }) |> 
       bindEvent(f$req_sign_in())
 
   observe({
