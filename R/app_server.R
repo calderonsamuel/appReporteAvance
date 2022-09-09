@@ -22,7 +22,7 @@ app_server <- function(input, output, session) {
 
 
   f <- firebase::FirebaseUI$
-    new(language_code = "es_419")$ # instantiate
+    new()$ # instantiate
     set_providers( # define providers
       # email = TRUE,
       google = TRUE
@@ -63,7 +63,8 @@ app_server <- function(input, output, session) {
       }
 
 
-        }) 
+        }) |> 
+      bindEvent(f$req_sign_in())
 
   observe({
       if (!user_is_registered(rv$user_id)) {
