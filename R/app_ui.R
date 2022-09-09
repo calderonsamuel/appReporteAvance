@@ -8,12 +8,20 @@ app_ui <- function(request) {
   tagList(
     # Leave this function for adding external resources
     golem_add_external_resources(),
+    
     # Your application UI logic
+    # fluidPage(
+    #     h1("Sistema de reporte de progreso en tareas", id = "apptitle"),
+    #     # see R/fun_firebase.R for function definition
+        # firebase::firebaseUIContainer(),
+        reqSignin(
+            uiOutput("my_ui")
+        )
+    # ),
+    
+    
 
-    # see R/fun_firebase.R for function definition
-    reqSignin(
-      uiOutput("my_ui")
-    )
+    
 
   )
 }
@@ -41,7 +49,6 @@ golem_add_external_resources <- function() {
     # Add here other external resources
     # for example, you can add shinyalert::useShinyalert()
     shinyWidgets::useSweetAlert(),
-    firebase::useFirebase(),
-    firebase::firebaseUIContainer()
+    firebase::useFirebase()
   )
 }

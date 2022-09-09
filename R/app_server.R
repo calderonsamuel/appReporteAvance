@@ -5,12 +5,24 @@
 #' @import shiny
 #' @noRd
 app_server <- function(input, output, session) {
+    
   # Your application server logic
-
   ns <- session$ns
+    
+    shinyWidgets::sendSweetAlert(
+        session = session,
+        title = "Sistema de reportes",
+        text = tags$div(
+            firebase::firebaseUIContainer()
+        ),
+        html = TRUE,
+        btn_labels = NA,
+        closeOnClickOutside = FALSE
+    )
+
 
   f <- firebase::FirebaseUI$
-    new()$ # instantiate
+    new(language_code = "es_419")$ # instantiate
     set_providers( # define providers
       # email = TRUE,
       google = TRUE
@@ -44,13 +56,14 @@ app_server <- function(input, output, session) {
 
         glue::glue("sesion iniciada de {user}", user = rv$user_id) |>
           message()
-
+        
+        shinyWidgets::closeSweetAlert(session)
+        
         mod_secure_ui("secure_1", rv$session_data)
       }
 
 
-        }) |> 
-      bindEvent(f$req_sign_in())
+        }) 
 
   observe({
       if (!user_is_registered(rv$user_id)) {
