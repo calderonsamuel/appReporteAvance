@@ -1,21 +1,25 @@
 create_reporte_groups <- function() {
   con <- db_connect()
+  
+  fields_list <- data.frame(
+      group_id = ids::uuid(n = 2) |> paste0(collapse = ""), # length = 72
+      group_description = strrep(" ", 256),
+      group_admin = strrep(" ", 64)
+  )
 
   if (!DBI::dbExistsTable(con, "groups")) {
-    fields_list <- data.frame(
-      group_id = strrep(" ", 64),
-      group_description = strrep(" ", 256)
-    )
-
     DBI::dbWriteTable(con, "groups", fields_list)
-    group_remove(group_id = strrep(" ", 64))
+    group_remove(group_id = fields_list$group_id)
     message("created table 'groups'")
+  } else {
+    old <- group_get_all()
+    combined <- dplyr::bind_rows(old, fields_list)
+    DBI::dbWriteTable(con, "groups", combined, overwrite = TRUE)
+    group_remove(group_id = fields_list$group_id)
   }
 
   DBI::dbDisconnect(con)
 }
-
-
 
 group_get_all <- function() {
     query <- "SELECT * FROM groups"
@@ -51,6 +55,18 @@ group_get_description <- function(group_id) {
               WHERE (group_id IN ({vals*}))"
     data <- db_get_query(query, vals = group_id)
     return(data$group_description)
+}
+
+group_get_choices <- function(group_id){
+    setNames(object = group_id,
+             nm = group_id |> purrr::map_chr(group_get_description))
+}
+
+group_update_group_admin <- function(group_id, new_admin_id) {
+    statement <- "UPDATE groups
+                SET group_admin = {new_admin_id}
+                WHERE group_id = {group_id}"
+    db_execute_statement(statement, new_admin_id = new_admin_id, group_id = group_id)
 }
 
 

@@ -1,29 +1,7 @@
 task_list_from_user <- function(user_id = "dgco93@mininter.gob.pe"){
-    data <- task_get_from_user(user_id) |>
-        setNames(c("task_id", "task_description", "status", "assignee", "reviewer", "template")) |>
-        split(~task_id) |>
-        lapply(as.list)
-
-    data <- data |>
-        lapply(\(x) {
-            x$assignee <- list(
-                user_id = x$assignee,
-                user_name = user_get_names(x$assignee)
-            )
-            x$reviewer <- list(
-                user_id = x$reviewer,
-                user_name = user_get_names(x$reviewer)
-            )
-            x$template <- list(
-                template_id = x$template,
-                template_description = template_get_description(x$template)
-            )
-            # x$steps <- progress_step_status_list(x$task_id, x$template$template_id)
-            return(x)
-        })
-
-
-    return(data)
+# user_id debe ser character de length = 1
+    task_list_for_board(user_id) |>
+        task_metadata()
 }
 
 task_list_subset_by_status <- function(task_list, status) {
@@ -58,4 +36,84 @@ task_compute_status <- function(task_id) {
     } else {
         "En proceso"
     }
+}
+
+task_metadata <- function(task_id) {
+    data <- task_get_from_id(task_id) |>
+        setNames(c("task_id", "task_description", "status", "assignee", "reviewer", "template")) |>
+        split(~task_id) |>
+        lapply(as.list)
+
+    data <- data |>
+        lapply(\(x) {
+            x$assignee <- list(
+                user_id = x$assignee,
+                user_name = user_get_names(x$assignee)
+            )
+            x$reviewer <- list(
+                user_id = x$reviewer,
+                user_name = user_get_names(x$reviewer)
+            )
+            x$template <- list(
+                template_id = x$template,
+                template_description = template_get_description(x$template)
+            )
+            # x$steps <- progress_step_status_list(x$task_id, x$template$template_id)
+            return(x)
+        })
+
+
+    return(data)
+}
+
+task_list_for_board <- function(user_id) {
+    privileges <- user_get_privileges(user_id)
+    groups <- gruser_get_groups(user_id)
+    user_and_groups <- union(user_id, groups)
+    task_users <- task_get_from_user2(user_and_groups)
+    task_reviewers <- character()
+
+    if (privileges != "user1") {
+        task_reviewers <- task_get_from_reviewer(user_id)
+    }
+
+    task_ids <- union(task_users, task_reviewers)
+
+    return(task_ids)
+}
+
+task_get_choices <- function(user_id) {
+    privileges <- user_get_privileges(user_id)
+    groups <- gruser_get_groups(user_id)
+    glue::glue("privileges: {privileges}") |> message()
+
+    users_for_tasks <- if (privileges == "user1") user_id else user_get_from_privileges(c("user1", "user2"))
+
+    template_owners <- union(user_id, groups)
+
+    user_choices <- user_get_choices(users_for_tasks)
+    group_choices <- group_get_choices(groups)
+
+    template_choices <- template_owners |>
+        template_get_from_user() |>
+        template_get_choices()
+
+    list(
+        user_choices = user_choices,
+        group_choices = group_choices,
+        template_choices = template_choices
+    )
+}
+
+user_get_task_owners <- function(user_id) {
+    privileges <- user_get_privileges(user_id)
+    groups <- gruser_get_groups(user_id)
+
+    users_for_tasks <- if (privileges == "user1") user_id else user_get_from_privileges(c("user1", "user2"))
+
+    task_owners <- union(users_for_tasks, groups)
+
+    glue::glue("task_owners: {vals}", vals = glue::glue_collapse(task_owners, sep = ", ")) |> message()
+
+    return(task_owners)
 }

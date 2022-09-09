@@ -9,7 +9,7 @@ create_reporte_progress <- function() {
       reported_by = strrep(" ", 64),
       status = strrep(" ", 64),
       time = strrep(" ", 64),
-      explain = strrep(" ", 64)
+      explain = strrep(" ", 512)
     )
 
     DBI::dbWriteTable(con, "progress", fields_list)

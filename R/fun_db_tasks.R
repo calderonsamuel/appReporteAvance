@@ -6,7 +6,7 @@ create_reporte_tasks <- function() {
       reviewer = strrep(" ", 64),
       user_id = strrep(" ", 64),
       task_id = strrep(" ", 64),
-      task_description = strrep(" ", 64),
+      task_description = strrep(" ", 512),
       template_id = strrep(" ", 64),
       status = strrep(" ", 64)
     )
@@ -41,7 +41,8 @@ task_remove <- function(task_id) {
 }
 
 task_get_from_id <- function(task_id) {
-    query <- "SELECT *
+    query <- "SELECT task_id, task_description, status,
+              user_id, reviewer, template_id
               FROM tasks
               WHERE (task_id IN ({vals*}))"
     data <- db_get_query(query, vals = task_id)
@@ -65,12 +66,28 @@ task_get_from_user <- function(user_id) {
     return(data)
 }
 
+task_get_from_user2 <- function(user_id) {
+    query <- "SELECT task_id
+              FROM tasks
+              WHERE (user_id IN ({vals*}))"
+    data <- db_get_query(query, vals = user_id)
+    return(data$task_id)
+}
+
 task_get_status <- function(task_id) {
     query <- "SELECT status
               FROM tasks
               WHERE (task_id IN ({task_id}))"
     data <- db_get_query(query, task_id = task_id)
     return(data$status)
+}
+
+task_get_from_reviewer <- function(reviewer) {
+    query <- "SELECT task_id
+              FROM tasks
+              WHERE (reviewer IN ({vals*}))"
+    data <- db_get_query(query, vals = reviewer)
+    return(data$task_id)
 }
 
 mk_task_getter <- function(status) {
