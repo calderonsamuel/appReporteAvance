@@ -31,9 +31,11 @@ mod_groups_ui <- function(id){
 #' admin_groups Server Functions
 #'
 #' @noRd
-mod_groups_server <- function(id, user_iniciado){
+mod_groups_server <- function(id, rv){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
+    
+    user_iniciado <- isolate(rv$user_id)
 
     vals <- reactiveValues(
       users = user_get_from_privileges(c("user1", "user2")),
@@ -215,10 +217,9 @@ mod_groups_server <- function(id, user_iniciado){
   })
 }
 
-mod_groups_testapp <- function(id = "test") {
+mod_groups_apptest <- function(user_iniciado = "dgco93@mininter.gob.pe") {
   ui <- tagList(
     bs4Dash::dashboardPage(
-      # preloader = list(html = waiter::spin_1(), color = "#333e48"),
       header = bs4Dash::dashboardHeader(title = "TEST"),
       sidebar = bs4Dash::dashboardSidebar(
         bs4Dash::sidebarMenu(
@@ -228,7 +229,7 @@ mod_groups_testapp <- function(id = "test") {
         )
       ),
       body = bs4Dash::dashboardBody(
-        bs4Dash::tabItem(tabName = "groups", mod_groups_ui(id))
+        bs4Dash::tabItem(tabName = "groups", mod_groups_ui("test"))
       )
     )
   )
@@ -236,7 +237,10 @@ mod_groups_testapp <- function(id = "test") {
 
 
   server <- function(input, output, session) {
-    mod_groups_server(id, user_iniciado = "dgco93@mininter.gob.pe")
+      rv <- reactiveValues(
+          user_iniciado = user_iniciado
+      )
+    mod_groups_server("test", rv)
   }
 
   shinyApp(ui, server)

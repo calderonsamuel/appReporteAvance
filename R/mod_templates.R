@@ -32,9 +32,11 @@ mod_templates_ui <- function(id, user_iniciado) {
 #' admin_templates Server Functions
 #'
 #' @noRd
-mod_templates_server <- function(id, user_iniciado){
+mod_templates_server <- function(id, rv){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
+    
+    user_iniciado <- isolate(rv$user_id)
     
     btn_template_added <- mod_template_manager_server("template_manager", user_iniciado)
 
@@ -103,7 +105,7 @@ mod_templates_server <- function(id, user_iniciado){
   })
 }
 
-mod_templates_testapp <- function(id = "test") {
+mod_templates_apptest <- function(id = "test") {
     user_iniciado <- "dgco93@mininter.gob.pe"
   ui <- bs4Dash::dashboardPage(
     header = bs4Dash::dashboardHeader(title = "TEST"),
@@ -120,7 +122,10 @@ mod_templates_testapp <- function(id = "test") {
   )
 
   server <- function(input, output, session) {
-    mod_templates_server(id, user_iniciado)
+      rv <- reactiveValues(
+          user_iniciado = user_iniciado
+      )
+    mod_templates_server(id, rv)
   }
 
   shinyApp(ui, server)
