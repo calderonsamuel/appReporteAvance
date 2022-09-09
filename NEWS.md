@@ -14,3 +14,7 @@
 - Usuario responsable de equipo ya puede ver y modificar las tareas del resto del equipo. 
 - Agregar plantilla, usuario, tarea y progreso ya no se renderiza desde el servidor.
 - La app se inicia desde un `modalDialog()` para futura mayor facilidad en la personalización de la página de inicio.
+
+# version 0.2.1
+
+- Arreglado un bug que mostraba la pantalla correspondiente a usuarios no registrados junto con la ventana de inicio de sesión y reducía el tamaño de fuente de la app iniciada.
