@@ -28,8 +28,6 @@ mod_user_manager_output <- function(id) {
                 col_4(textInput(ns("last_name"), "Apellidos"))
             ),
             fluidRow(
-                col_4(selectInput(ns("privileges"), "Privilegios", choices = c("user1", "user2", "admin"))),
-                col_4(selectInput(ns("responds_to"), "Responde a:", choices = user_get_from_privileges("user2"))),
                 col_4(dateInput(ns("date_added"), "Fecha", language = "es", value = lubridate::today("America/Lima")))
             ),
             btn_cancelar(ns("cancelar")),
@@ -55,8 +53,6 @@ mod_user_manager_server <- function(id) {
             updateTextInput(session, "user_id", value = "")
             updateTextInput(session, "name", value = "")
             updateTextInput(session, "last_name", value = "")
-            updateSelectInput(session, "privileges", selected = "user1")
-            updateSelectInput(session, "responds_to", choices = user_get_from_privileges("user2"))
         }
 
         new_user_data <- reactive({
@@ -64,8 +60,6 @@ mod_user_manager_server <- function(id) {
                 user_id = input$user_id,
                 name = input$name,
                 last_name = input$last_name,
-                privileges = input$privileges,
-                responds_to = input$responds_to,
                 date_added = as.character(input$date_added)
             )
         })

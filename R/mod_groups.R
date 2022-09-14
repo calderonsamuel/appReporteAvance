@@ -38,7 +38,6 @@ mod_groups_server <- function(id, rv){
     user_iniciado <- isolate(rv$user_id)
 
     vals <- reactiveValues(
-      users = user_get_from_privileges(c("user1", "user2")),
       groups = group_get_all(),
       grusers_current = character()
     )
