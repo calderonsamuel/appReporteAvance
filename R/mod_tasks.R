@@ -54,15 +54,11 @@ mod_tasks_server <- function(id, SessionData){
     })
 
     observeEvent(input$remove, {
-        if (!isTruthy(task_for_deleting())) {
-            alert_error(session, "Debe seleccionar una tarea a eliminar")
-        } else if (SessionData$privileges == "user1"){
-            alert_error(session, "No puede eliminar tarea de grupo")
-        } else {
-            task_remove(task_for_deleting())
-            SessionData$update_tasks()
+        tryCatch({
+            SessionData$task_remove(task_for_deleting())
             alert_info(session, "Tarea eliminada")
-        }
+            SessionData$update_tasks()
+        }, error = \(e) alert_error(session, e$message))
     })
 
     output$tabla <- DT::renderDT(
