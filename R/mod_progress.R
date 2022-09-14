@@ -11,11 +11,12 @@ mod_progress_ui <- function(id){
   ns <- NS(id)
   tagList(
       fluidRow(
-          bs4Dash::box(
+          boxHidden(
               title = "Reportar avance de tarea",
               width = 12,
               id = ns("box_reporte"),
               collapsible = FALSE,
+              uiOutput(ns("task_description_ui")),
               fluidRow(
                   selectInput(
                       inputId = ns("step_id"),
@@ -49,7 +50,7 @@ mod_progress_ui <- function(id){
                       btn_guardar(ns("modificar"), block = TRUE)
                   )
               )
-          ) |> boxHide()
+          )
       ),
     fluidRow(
       bs4Dash::box(
@@ -131,6 +132,7 @@ mod_progress_server <- function(id, SessionData){
         steps <- step_get_from_template(template_id)
 
         list(
+            task_description = task$task_description,
             status = task$status,
             template_id = template_id,
             template_description = template_description,
@@ -199,8 +201,10 @@ mod_progress_server <- function(id, SessionData){
                         inputId = "step_explain",
                         value = ""
                     )
-
-                    if (!is.null(x)) bs4Dash::updateBox(id = "box_reporte", action = "restore")
+                    
+                    if (!is.null(x)) {
+                        bs4Dash::updateBox(id = "box_reporte", action = "restore")
+                    } 
 
                 }) |>
                     bindEvent(input[[x]])
@@ -214,12 +218,6 @@ mod_progress_server <- function(id, SessionData){
         SessionData$progress_insert(new_progress_data()) |> suppressMessages()
         SessionData$task_modify_status(rv$task_to_modify)
         SessionData$update_tasks()
-
-        # if (is.na(task_in_modal()$template_id)) {
-        #     SessionData$task_modify_status(
-        #         task_id = rv$task_to_modify
-        #     ) |> suppressMessages()
-        # }
         alert_info(session, "Estado de actividad actualizado")
     }) |>
         bindEvent(input$modificar)
@@ -280,6 +278,12 @@ mod_progress_server <- function(id, SessionData){
             lapply(box_dd_no, ns = ns) |> 
             tagList()
     }) 
+    
+    output$task_description_ui <- renderUI({
+        tagList(
+            tags$p(paste("Modificando:", task_in_modal()$task_description))
+        )
+    })
 
   })
 }
