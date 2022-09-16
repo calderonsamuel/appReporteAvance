@@ -1,5 +1,9 @@
 # appReporteAvance 0.2.2
 
+- Se arregló un bug que impedía a user1 eliminar sus propias tareas.
+- Se indica en la interfaz de reporte de progreso cuál es la tarea que se está modificando.
+- Los usuarios ya no cuentan con privilegios globales sino empezaran a contar con roles en sus equipos.
+
 # appReporteAvance 0.2.1
 
 - Arreglado un bug que mostraba la pantalla correspondiente a usuarios no registrados junto con la ventana de inicio de sesión y reducía el tamaño de fuente de la app iniciada.
