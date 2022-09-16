@@ -37,7 +37,7 @@ SessionData$set("public", "task_get_choices", function() {
     privileges <- self$privileges
     group_ids <- private$group_ids
     
-    users_for_tasks <- if (privileges == "user1") user_id else self$user_get_from_privileges(c("user1", "user2"))
+    users_for_tasks <- if (privileges == "user1") user_id else private$group_get_member_ids(group_ids)
     
     template_owners <- union(user_id, group_ids)
     
@@ -59,7 +59,7 @@ SessionData$set("public", "user_get_task_owners", function(user_id) {
     privileges <- self$privileges
     group_ids <- private$group_ids
     
-    users_for_tasks <- if (privileges == "user1") user_id else self$user_get_from_privileges(c("user1", "user2"))
+    users_for_tasks <- if (privileges == "user1") user_id else private$group_get_member_ids(group_ids)
     
     task_owners <- union(users_for_tasks, group_ids)
     

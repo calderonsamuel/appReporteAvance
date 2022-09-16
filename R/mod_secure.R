@@ -60,7 +60,7 @@ mod_secure_ui <- function(id, SessionData){
           ),
           bs4Dash::tabItem(
             tabName = "tasks",
-            mod_tasks_ui(ns("tasks_1"), user_iniciado)
+            mod_tasks_ui(ns("tasks_1"), SessionData)
           ),
           bs4Dash::tabItem(
             tabName = "admin_users",

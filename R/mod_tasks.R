@@ -7,7 +7,7 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-mod_tasks_ui <- function(id, user_iniciado) {
+mod_tasks_ui <- function(id, SessionData) {
     ns <- NS(id)
 
     tagList(
@@ -16,7 +16,7 @@ mod_tasks_ui <- function(id, user_iniciado) {
 
         tags$hr(),
 
-        mod_task_man_output(ns("task_manager"), user_iniciado),
+        mod_task_man_output(ns("task_manager"), SessionData),
 
         bs4Dash::box(
             title = "Tareas actuales",
@@ -72,6 +72,7 @@ mod_tasks_server <- function(id, SessionData){
 }
 
 mod_tasks_apptest <- function(user_iniciado = "dgco93@mininter.gob.pe") {
+      session_data <- SessionData$new(user_iniciado)
   ui <- tagList(
     bs4Dash::dashboardPage(
       header = bs4Dash::dashboardHeader(title = "TEST"),
@@ -84,13 +85,12 @@ mod_tasks_apptest <- function(user_iniciado = "dgco93@mininter.gob.pe") {
       ),
       body = bs4Dash::dashboardBody(
         golem_add_external_resources(),
-        bs4Dash::tabItem(tabName = "tasks", mod_tasks_ui("test", user_iniciado))
+        bs4Dash::tabItem(tabName = "tasks", mod_tasks_ui("test", session_data))
       )
     )
   )
 
   server <- function(input, output, session) {
-      session_data <- SessionData$new(user_iniciado)
     mod_tasks_server("test", session_data)
   }
 
