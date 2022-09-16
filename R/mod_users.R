@@ -10,10 +10,10 @@
 mod_users_ui <- function(id) {
   ns <- NS(id)
   tagList(
-      mod_user_manager_ui(ns("user_manager")),
+      mod_user_manager_btns(ns("user_manager")),
       btn_eliminar(ns("delete_user"), icon = icon("trash")),
       tags$hr(),
-      mod_user_manager_output(ns("user_manager")),
+      mod_user_manager_inputs(ns("user_manager")),
     bs4Dash::box(
       title = "Usuarios registrados",
       width = 12,
@@ -36,16 +36,16 @@ mod_users_server <- function(id){
       data_users = user_get_all()
     )
 
-    user_for_deleting <- reactive({
+    selected_user <- reactive({
       vals$data_users$user_id[input$tabla_rows_selected]
     })
 
     observeEvent(input$delete_user,{
-        if (!isTruthy(user_for_deleting())) {
+        if (!isTruthy(selected_user())) {
             alert_error(session, "Debe seleccionar usuario a eliminar")
         } else {
-            user_remove(user_for_deleting())
-            alert_info(session, sprintf("Se eliminó al usuario %s", user_for_deleting()))
+            user_remove(selected_user())
+            alert_info(session, sprintf("Se eliminó al usuario %s", selected_user()))
             vals$data_users <- user_get_all()
         }
     })

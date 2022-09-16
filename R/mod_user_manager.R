@@ -7,14 +7,15 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-mod_user_manager_ui <- function(id) {
+mod_user_manager_btns <- function(id) {
     ns <- NS(id)
     tagList(
-        btn_agregar(ns("add"), icon = icon("plus"))
+        btn_agregar(ns("add"), icon = icon("plus")),
+        btn_editar(ns("edit"), icon = icon("user-edit"))
     )
 }
 
-mod_user_manager_output <- function(id) {
+mod_user_manager_inputs <- function(id) {
     ns <- NS(id)
     tagList(
         bs4Dash::box(
@@ -42,8 +43,6 @@ mod_user_manager_output <- function(id) {
 mod_user_manager_server <- function(id) {
     moduleServer(id, function(input, output, session) {
         ns <- session$ns
-
-        # bs4Dash::updateBox("box_manager", "remove")
 
         out <- reactiveValues(
             save_sucess = 0
@@ -96,7 +95,7 @@ mod_user_manager_server <- function(id) {
 }
 
 ## To be copied in the UI
-# mod_user_manager_ui("user_manager_1")
+# mod_user_manager_btns("user_manager_1")
 
 ## To be copied in the server
 # mod_user_manager_server("user_manager_1")
@@ -116,9 +115,9 @@ mod_user_manager_apptest <- function() {
             body = bs4Dash::dashboardBody(
                 bs4Dash::tabItem(
                     tabName = "tasks",
-                    mod_user_manager_ui("test"),
+                    mod_user_manager_btns("test"),
                     tags$hr(),
-                    mod_user_manager_output("test")
+                    mod_user_manager_inputs("test")
                 )
             )
         )

@@ -71,3 +71,6 @@ btn_user_remove <- mk_btn(color = "danger", label = icon("user-minus"))
 
 #' @rdname buttons
 btn_user_edit <- mk_btn(color = "warning", label = icon("user-edit"))
+
+#' @rdname buttons
+btn_editar <- mk_btn(color = "warning", label = "Editar") 
