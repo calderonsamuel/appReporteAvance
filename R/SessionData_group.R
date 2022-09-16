@@ -10,7 +10,8 @@ SessionData$set("public", "groups_compute", function() {
         group_members = members_list
     )
     
-    purrr::pmap(params, list)
+    purrr::pmap(params, list) |> 
+        setNames(group_df$group_id)
 })
 
 

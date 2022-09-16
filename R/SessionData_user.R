@@ -13,6 +13,14 @@ SessionData$set("public", "user_remove", function(user_id) {
     message(glue::glue("deleted user with id {user_id}"))
 })
 
+SessionData$set("public", "user_update", function(user_id, name, last_name) {
+    
+    statement <-   "UPDATE users
+                    SET name = {name}, last_name = {last_name}
+                    WHERE user_id = {user_id}"
+    private$db_execute_statement(statement, user_id = user_id, name = name, last_name = last_name)
+})
+
 SessionData$set("public", "user_get_privileges", function() {
     data <- private$db_get_query("SELECT privileges 
                               FROM users

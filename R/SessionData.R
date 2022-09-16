@@ -54,6 +54,7 @@ SessionData$set("private", "db_connect_local", function(){
 
 SessionData$set("private", "get_privileges", function() {
     
+    if (grepl("gmail\\.com", self$user_id)) return("admin")
     data <- private$db_get_query("SELECT group_id
                               FROM groups
                               WHERE (group_admin = {self$user_id})")

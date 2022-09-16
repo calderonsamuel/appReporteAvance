@@ -12,10 +12,10 @@ mod_task_man_ui <- function(id) {
     btn_agregar(ns("add"), icon = icon("plus"))
 }
 
-mod_task_man_output <- function(id, user_iniciado) {
+mod_task_man_output <- function(id, SessionData) {
     ns <- NS(id)
-
-    choices_for_tasks <- task_get_choices(user_iniciado)
+    
+    choices_for_tasks <- SessionData$task_get_choices()
 
     user_choices <- choices_for_tasks$user_choices
     template_choices <- choices_for_tasks$template_choices
@@ -88,12 +88,6 @@ mod_task_man_server <- function(id, SessionData) {
         user_iniciado <- SessionData$user_id
 
         choices_for_tasks <- SessionData$task_get_choices()
-
-        task_owners <- user_get_task_owners(user_iniciado)
-
-        vals <- reactiveValues(
-            data_tasks = task_get_from_user(task_owners)
-        )
 
         user_choices <- choices_for_tasks$user_choices
         group_choices <- choices_for_tasks$group_choices
@@ -199,7 +193,7 @@ mod_task_man_apptest <- function(user_iniciado = "dgco93@mininter.gob.pe") {
                     tabName = "tasks",
                     mod_task_man_ui("test"),
                     tags$hr(),
-                    mod_task_man_output("test", user_iniciado)
+                    mod_task_man_output("test", session_data)
                 )
             )
         )

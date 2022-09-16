@@ -6,7 +6,6 @@ create_reporte_users <- function() {
       user_id = strrep(" ", 64),
       name = strrep(" ", 64),
       last_name = strrep(" ", 64),
-      privileges = strrep(" ", 64),
       date_added = strrep(" ", 64)
     )
 
@@ -36,22 +35,6 @@ user_remove <- function(user_id) {
     statement <- "DELETE FROM users WHERE (user_id = {user_id})"
     db_execute_statement(statement, user_id = user_id)
     message(glue::glue("deleted user with id {user_id}"))
-}
-
-user_get_privileges <- function(user_id) {
-    query <-    "SELECT privileges
-                FROM users
-                WHERE (user_id = {user_id})"
-    data <- db_get_query(query, user_id = user_id)
-    return(data$privileges)
-}
-
-user_get_from_privileges <- function(privileges) {
-    query <-    "SELECT user_id
-                FROM users
-                WHERE (privileges IN ({vals*}))"
-    data <- db_get_query(query, vals = privileges)
-    return(data$user_id |> sort())
 }
 
 user_get_names <- function(user_id) {

@@ -15,6 +15,13 @@ create_reporte_group_users <- function() {
     DBI::dbDisconnect(con)
 }
 
+gruser_get_all <- function() {
+    con <- db_connect()
+    data <- DBI::dbReadTable(con, "group_users")
+    DBI::dbDisconnect(con)
+    data
+}
+
 gruser_insert <- function(field_list) {
     con <- db_connect()
     DBI::dbWriteTable(con, "group_users", field_list, append = TRUE)
