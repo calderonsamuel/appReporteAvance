@@ -74,7 +74,7 @@ SessionData$set("private", "group_get_member_ids", function(group_ids) {
     query <- "SELECT *
             FROM group_users
             WHERE (group_id IN ({vals*}))"
-    data <- db_get_query(query, vals = group_id)
+    data <- db_get_query(query, vals = group_ids)
     unique(data$user_id)
 })
 
