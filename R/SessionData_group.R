@@ -10,7 +10,8 @@ SessionData$set("public", "groups_compute", function() {
         group_members = members_list
     )
     
-    purrr::pmap(params, list)
+    purrr::pmap(params, list) |> 
+        setNames(group_df$group_id)
 })
 
 
@@ -73,7 +74,7 @@ SessionData$set("private", "group_get_member_ids", function(group_ids) {
     query <- "SELECT *
             FROM group_users
             WHERE (group_id IN ({vals*}))"
-    data <- db_get_query(query, vals = group_id)
+    data <- db_get_query(query, vals = group_ids)
     unique(data$user_id)
 })
 

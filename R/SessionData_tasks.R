@@ -45,6 +45,13 @@ SessionData$set("private", "task_get_ids", function() {
     return(data$task_id)
 })
 
+SessionData$set("private", "task_can_be_deleted", function(task_id) {
+    user_is_user2 <- self$privileges == "user2"
+    user_is_task_assignee <- self$tasks[[task_id]]$task_assignee_id == self$user_id
+    
+    user_is_user2 || user_is_task_assignee
+})
+
 SessionData$set("public", "task_get_all", function() {
     private$db_get_query("SELECT * FROM tasks")
 })
@@ -56,6 +63,8 @@ SessionData$set("public", "task_insert", function(task_list) {
 })
 
 SessionData$set("public", "task_remove", function(task_id) {
+    if (!isTruthy(task_id)) stop("Debe seleccionar una tarea a eliminar")
+    if (!private$task_can_be_deleted(task_id)) stop("No puede eliminar tareas que no son propias")
     statement <- "DELETE
                   FROM tasks
                   WHERE (task_id = {task_id})"
