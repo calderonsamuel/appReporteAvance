@@ -31,13 +31,14 @@ mod_groups_ui <- function(id){
 #' admin_groups Server Functions
 #'
 #' @noRd
-mod_groups_server <- function(id, rv){
+mod_groups_server <- function(id, SessionData){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
-    user_iniciado <- isolate(rv$user_id)
+    user_iniciado <- isolate(SessionData$user_id)
 
     vals <- reactiveValues(
+        users = user_get_all()$user_id |> setdiff("samuelcs8.17@gmail.com"),
       groups = group_get_all(),
       grusers_current = character()
     )

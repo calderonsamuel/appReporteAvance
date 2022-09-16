@@ -1,7 +1,7 @@
 library(RMariaDB)
 library(purrr)
 
-con <- DBI::dbConnect(
+con_to <- DBI::dbConnect(
     drv = RMariaDB::MariaDB(),
     user = Sys.getenv("DB_USER"),
     password = Sys.getenv("DB_SECRET"),
@@ -11,7 +11,7 @@ con <- DBI::dbConnect(
 )
 
 # done with old config
-con2 <- DBI::dbConnect(
+con_from <- DBI::dbConnect(
     drv = RMariaDB::MariaDB(),
     user = Sys.getenv("DB_USER"),
     password = Sys.getenv("DB_SECRET"),
@@ -20,18 +20,23 @@ con2 <- DBI::dbConnect(
     port = Sys.getenv("DB_PORT")
 )
 
-tbl_names <- dbListTables(con2) 
+tbl_names <- dbListTables(con_from) 
 
 bd_data <- tbl_names |> 
-    map(~dbReadTable(con2, .x)) |> 
+    map(~dbReadTable(con_from, .x)) |> 
     set_names(tbl_names)
 
 tbl_names |> 
-    walk(~dbWriteTable(con, .x, bd_data[[.x]]))
+    walk(~{
+        dbWriteTable(con_to, .x, bd_data[[.x]], overwrite = TRUE)
+        message(glue::glue("done with {.x}"))
+    })
 
 new_tbl_data <- tbl_names |> 
-    map(~dbReadTable(con, .x)) |> 
+    map(~{
+        dbReadTable(con_to, .x)
+    }) |> 
     set_names(tbl_names)
 
-dbDisconnect(con)
-dbDisconnect(con2)
+dbDisconnect(con_to)
+dbDisconnect(con_from)
