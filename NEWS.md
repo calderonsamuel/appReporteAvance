@@ -1,3 +1,5 @@
+# appReporteAvance 0.2.2
+
 # appReporteAvance 0.2.1
 
 - Arreglado un bug que mostraba la pantalla correspondiente a usuarios no registrados junto con la ventana de inicio de sesión y reducía el tamaño de fuente de la app iniciada.
