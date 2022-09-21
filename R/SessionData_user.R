@@ -45,6 +45,27 @@ SessionData$set("public", "user_get_display_name", function(user_id) {
                             ORDER BY user_id"
     data <- private$db_get_query(query, vals = user_id)
     return(paste(data$last_name, data$name, sep = ", "))
+    # full_names <- self$user_get_full_names(user_id)
+    # return(paste(full_names$last_name, full_names$name, sep = ", "))
+})
+
+SessionData$set("public", "user_get_full_names", function(user_id) {
+    if (grepl("^team", user_id)) return(self$group_get_description(user_id))
+    
+    full_names_is_setted <- shiny::isTruthy(self$user_name) && shiny::isTruthy(self$user_last_name)
+    user_id_already_loaded <- self$user_id == user_id
+    
+    if (full_names_is_setted && user_id_already_loaded) {
+        return(list(user_name = self$user_name, user_last_name = self$user_last_name))
+    }
+    
+    
+    query <- "SELECT name, last_name
+                            FROM users
+                            WHERE (user_id IN ({vals*}))
+                            ORDER BY user_id"
+    private$db_get_query(query, vals = user_id) |> 
+        as.list()
 })
 
 SessionData$set("public", "user_is_registered", function(user_id) {
