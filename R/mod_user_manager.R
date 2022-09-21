@@ -18,7 +18,7 @@ mod_user_manager_btns <- function(id) {
 mod_user_manager_inputs <- function(id) {
     ns <- NS(id)
     tagList(
-        bs4Dash::box(
+        boxHidden(
             title = "Gestión de usuario",
             id = ns("box_manager"),
             width = 12,
@@ -32,17 +32,20 @@ mod_user_manager_inputs <- function(id) {
                 col_4(dateInput(ns("date_added"), "Fecha", language = "es", value = lubridate::today("America/Lima")))
             ),
             btn_cancelar(ns("cancelar")),
-            btn_guardar(ns("save"))
-        ) |> boxHide()
+            btn_modificar(ns("modify")) |> shinyjs::hidden(),
+            btn_guardar(ns("save")) |> shinyjs::hidden()
+        )
     )
 }
 
 #' user_manager Server Functions
 #'
 #' @noRd
-mod_user_manager_server <- function(id) {
+mod_user_manager_server <- function(id, selected_user) {
     moduleServer(id, function(input, output, session) {
         ns <- session$ns
+        
+        
 
         out <- reactiveValues(
             save_sucess = 0
@@ -53,7 +56,7 @@ mod_user_manager_server <- function(id) {
             updateTextInput(session, "name", value = "")
             updateTextInput(session, "last_name", value = "")
         }
-
+        
         new_user_data <- reactive({
             data.frame(
                 user_id = input$user_id,
@@ -79,8 +82,16 @@ mod_user_manager_server <- function(id) {
         }) |> bindEvent(input$save)
 
         observe({
+            shinyjs::show("save")
+            shinyjs::hide("modify")
             bs4Dash::updateBox(id = "box_manager", action = "restore", session = session)
         }) |> bindEvent(input$add)
+
+        observe({
+            shinyjs::show("modify")
+            shinyjs::hide("save")
+            bs4Dash::updateBox(id = "box_manager", action = "restore", session = session)
+        }) |> bindEvent(input$edit)
 
         observe({
             reset_ui()
@@ -113,6 +124,7 @@ mod_user_manager_apptest <- function() {
                 )
             ),
             body = bs4Dash::dashboardBody(
+                shinyjs::useShinyjs(),
                 bs4Dash::tabItem(
                     tabName = "tasks",
                     mod_user_manager_btns("test"),
@@ -124,7 +136,8 @@ mod_user_manager_apptest <- function() {
     )
 
     server <- function(input, output, session) {
-        mod_user_manager_server("test")
+        selected_user <- reactive("dgco93@mininter.gob.pe")
+        mod_user_manager_server("test", selected_user)
     }
 
     shinyApp(ui, server)
