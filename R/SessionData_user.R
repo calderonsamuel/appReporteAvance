@@ -36,8 +36,8 @@ SessionData$set("public", "user_get_from_privileges", function(privileges) {
     return(data$user_id |> sort())
 })
 
-SessionData$set("public", "user_get_names", function(user_id) {
-    if (isTruthy(self$user_names) && self$user_id == user_id) return(self$user_names)
+SessionData$set("public", "user_get_display_name", function(user_id) {
+    if (isTruthy(self$user_display_name) && self$user_id == user_id) return(self$user_display_name)
     if (grepl("^team", user_id)) return(self$group_get_description(user_id))
     query <- "SELECT name, last_name
                             FROM users
@@ -57,7 +57,7 @@ SessionData$set("public", "user_is_registered", function(user_id) {
 
 SessionData$set("public", "user_get_choices", function(user_id) {
     setNames(object = user_id,
-             nm = user_id |> purrr::map_chr(self$user_get_names))
+             nm = user_id |> purrr::map_chr(self$user_get_display_name))
 })
 
 # testing
@@ -75,7 +75,7 @@ SessionData$set("public", "user_get_choices", function(user_id) {
 # 
 # test$user_remove("testing")
 
-# test$user_get_names("team-politicas")
+# test$user_get_display_name("team-politicas")
 
 # test$user_is_registered("dgco84@mininter.gob.pe")
 

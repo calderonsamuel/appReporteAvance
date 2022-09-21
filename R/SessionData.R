@@ -2,7 +2,9 @@ SessionData <- R6::R6Class(
     classname = "SessionData",
     public = list(
         user_id = NULL,
-        user_names = NULL,
+        user_name = NULL,
+        user_last_name = NULL,
+        user_display_name = NULL,
         privileges = NULL,
         groups = NULL,
         tasks = NULL,
@@ -69,7 +71,9 @@ SessionData$set("public", "initialize", function(user_id,
     
     private$con <- if (remote) private$db_connect_remote() else private$db_connect_local()
     self$user_id <- user_id
-    self$user_names <- self$user_get_names(user_id)
+    self$user_display_name <- self$user_get_display_name(user_id)
+    self$user_name <- self$user_display_name |> stringr::str_remove("^.*,") |> stringr::str_squish()
+    self$user_last_name <- test$user_display_name |> stringr::str_remove(",.*") |> stringr::str_squish()
     self$privileges <- private$get_privileges()
     self$groups <- self$groups_compute()
     self$tasks <- private$tasks_compute()

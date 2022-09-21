@@ -60,7 +60,7 @@ SessionData$set("public", "group_get_members_list", function(group_id) {
             WHERE (group_id IN ({vals*}))"
     data <- db_get_query(query, vals = group_id)
     members_ids <- sort(data$user_id)
-    members_names <- purrr::map_chr(members_ids, self$user_get_names)
+    members_names <- purrr::map_chr(members_ids, self$user_get_display_name)
     
     purrr::map2(members_ids, members_names, ~{
         list(
