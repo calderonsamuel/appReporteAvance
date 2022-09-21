@@ -62,7 +62,7 @@ progress_get_step_status <- function(task_id, step_id) {
 progress_status_choices <- function(status) {
     status <- if (!isTruthy(status)) "Pendiente" else status
     if (status == "Pendiente") {
-        c("En proceso", "Pausado")
+        c("En proceso", "En revisión")
     } else if (status == "En proceso") {
         c("Pausado", "En revisión")
     } else if (status == "Pausado") {
