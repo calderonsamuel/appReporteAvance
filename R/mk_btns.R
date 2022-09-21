@@ -43,16 +43,16 @@ btn_trash <- mk_btn(color = "danger", label = icon("trash"))
 btn_agregar <- mk_btn(color = "success", label = "Agregar")
 
 #' @rdname buttons
-btn_guardar <- mk_btn(color = "success", label = "Guardar ", style = "simple")
+btn_guardar <- mk_btn(color = "success", label = "Guardar", style = "simple")
+
+#' @rdname buttons
+btn_modificar <- mk_btn(color = "primary", label = "Modificar", style = "simple")
 
 #' @rdname buttons
 btn_cancelar <- mk_btn(color = "danger", label = "Cancelar", style = "simple")
 
 #' @rdname buttons
 btn_eliminar <- mk_btn(color = "danger", label = "Eliminar")
-
-#' @rdname buttons
-btn_modificar <- mk_btn(color = "primary", label = "Modificar")
 
 #' @rdname buttons
 btn_minus <- mk_btn(color = "danger", label = icon("minus"))
