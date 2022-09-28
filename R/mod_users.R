@@ -8,44 +8,43 @@
 #'
 #' @importFrom shiny NS tagList
 mod_users_ui <- function(id) {
-  ns <- NS(id)
-  tagList(
-      mod_user_manager_ui(ns("user_manager")),
-      btn_eliminar(ns("delete_user"), icon = icon("trash")),
-      tags$hr(),
-      mod_user_manager_output(ns("user_manager")),
-    bs4Dash::box(
-      title = "Usuarios registrados",
-      width = 12,
-      DT::DTOutput(ns("tabla"))
+    ns <- NS(id)
+    tagList(
+        mod_user_manager_btns(ns("user_manager")),
+        btn_eliminar(ns("delete_user"), icon = icon("trash")),
+        tags$hr(),
+        mod_user_manager_inputs(ns("user_manager")),
+        bs4Dash::box(title = "Usuarios registrados",
+            width = 12,
+            DT::DTOutput(ns("tabla"))
+        )
     )
-  )
 }
 
 
 #' admin_users Server Functions
 #'
 #' @noRd
-mod_users_server <- function(id){
+mod_users_server <- function(id, SessionData){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
-    btn_usuario_agregado <- mod_user_manager_server("user_manager")
+    btn_usuario_agregado <- mod_user_manager_server("user_manager", SessionData, selected_user)
 
     vals <- reactiveValues(
       data_users = user_get_all()
     )
 
-    user_for_deleting <- reactive({
+    selected_user <- reactive({
       vals$data_users$user_id[input$tabla_rows_selected]
     })
 
     observeEvent(input$delete_user,{
-        if (!isTruthy(user_for_deleting())) {
+        if (!isTruthy(selected_user())) {
             alert_error(session, "Debe seleccionar usuario a eliminar")
         } else {
-            user_remove(user_for_deleting())
-            alert_info(session, sprintf("Se eliminó al usuario %s", user_for_deleting()))
+            SessionData$user_remove(selected_user())
+            alert_info(session, sprintf("Se eliminó al usuario %s", selected_user()))
             vals$data_users <- user_get_all()
         }
     })
@@ -65,25 +64,28 @@ mod_users_server <- function(id){
 }
 
 mod_users_apptest <- function(id = "test") {
-  ui <- bs4Dash::dashboardPage(
-    header = bs4Dash::dashboardHeader(title = "TEST"),
-    sidebar = bs4Dash::dashboardSidebar(
-      bs4Dash::sidebarMenu(
-        bs4Dash::menuItem(text = "Admin USers",
-                          tabName = "users",
-                          icon = icon("user-edit"))
-      )
-    ),
-    body = bs4Dash::dashboardBody(
-      bs4Dash::tabItem(tabName = "users", mod_users_ui(id))
+    session_data <- SessionData$new("dgco93@mininter.gob.pe")
+    
+    ui <- bs4Dash::dashboardPage(
+        header = bs4Dash::dashboardHeader(title = "TEST"),
+        sidebar = bs4Dash::dashboardSidebar(
+            bs4Dash::sidebarMenu(
+                bs4Dash::menuItem(text = "Admin USers",
+                                  tabName = "users",
+                                  icon = icon("user-edit"))
+                )
+            ),
+            body = bs4Dash::dashboardBody(
+                shinyjs::useShinyjs(),
+                bs4Dash::tabItem(tabName = "users", mod_users_ui(id))
+        )
     )
-  )
-
-  server <- function(input, output, session) {
-    mod_users_server(id)
-  }
-
-  shinyApp(ui, server)
+    
+    server <- function(input, output, session) {
+        mod_users_server(id, session_data)
+    }
+    
+    shinyApp(ui, server)
 }
 
 ## To be copied in the UI

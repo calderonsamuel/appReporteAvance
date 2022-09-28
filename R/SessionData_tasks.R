@@ -7,9 +7,9 @@ SessionData$set("private", "tasks_compute", function() {
         task_description = metadata$task_description,
         task_status = metadata$status,
         task_creator_id = metadata$reviewer,
-        task_creator_names = metadata$reviewer |> purrr::map_chr(self$user_get_names),
+        task_creator_names = metadata$reviewer |> purrr::map_chr(self$user_get_display_name),
         task_assignee_id = metadata$user_id,
-        task_assignee_names = metadata$user_id |> purrr::map_chr(self$user_get_names),
+        task_assignee_names = metadata$user_id |> purrr::map_chr(self$user_get_display_name),
         template_id = metadata$template_id,
         template_description = purrr::map_chr(metadata$template_id, self$template_get_description),
         is_from_group = grepl("^team", metadata$user_id)

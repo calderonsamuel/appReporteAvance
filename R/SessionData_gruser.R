@@ -30,7 +30,7 @@ SessionData$set("public", "gruser_get_from_group", function(group_id) {
 
 SessionData$set("public", "gruser_get_metadata", function(group_id) {
     user_id_list <- self$gruser_get_from_group(group_id)
-    self$user_get_names(user_id_list)
+    self$user_get_display_name(user_id_list)
 })
 
 SessionData$set("public", "gruser_purge", function(user_id) {

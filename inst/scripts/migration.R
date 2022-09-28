@@ -5,8 +5,8 @@ con_to <- DBI::dbConnect(
     drv = RMariaDB::MariaDB(),
     user = Sys.getenv("DB_USER"),
     password = Sys.getenv("DB_SECRET"),
-    dbname = Sys.getenv("DB_NAME"),
-    host = Sys.getenv("DB_HOST"),
+    dbname = Sys.getenv("DB_NAME_LATAM"),
+    host = Sys.getenv("DB_HOST_LATAM"),
     port = Sys.getenv("DB_PORT")
 )
 
@@ -16,7 +16,7 @@ con_from <- DBI::dbConnect(
     user = Sys.getenv("DB_USER"),
     password = Sys.getenv("DB_SECRET"),
     dbname = Sys.getenv("DB_NAME"),
-    host = Sys.getenv("DB_HOST_OLD"),
+    host = Sys.getenv("DB_HOST_TEST"),
     port = Sys.getenv("DB_PORT")
 )
 
