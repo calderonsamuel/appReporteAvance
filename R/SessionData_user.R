@@ -14,7 +14,9 @@ SessionData$set("public", "user_remove", function(user_id) {
 })
 
 SessionData$set("public", "user_update", function(user_id, name, last_name) {
-    
+    if (!isTruthy(user_id)) stop("Usuario a modificar debe ser seleccionado", call. = F)
+    if (name == "") stop("Debe especificar nombre", call. = F)
+    if (last_name == "") stop("Debe especificar apellido", call. = F)
     statement <-   "UPDATE users
                     SET name = {name}, last_name = {last_name}
                     WHERE user_id = {user_id}"
