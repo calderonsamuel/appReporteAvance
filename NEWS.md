@@ -1,3 +1,8 @@
+# appReporteAvance 0.2.3
+
+- Ahora es posible reportar tareas Pendientes directamente a En revisión.
+- El administrador puede editar información del registro de usuarios desde la interfaz de la aplicación
+
 # appReporteAvance 0.2.2
 
 - Se arregló un bug que impedía a user1 eliminar sus propias tareas.
