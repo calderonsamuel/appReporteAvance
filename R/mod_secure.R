@@ -53,6 +53,7 @@ mod_secure_ui <- function(id, SessionData){
       ),
       bs4Dash::dashboardBody(
           shinyWidgets::useSweetAlert(),
+          shinyjs::useShinyjs(),
         bs4Dash::tabItems(
           bs4Dash::tabItem(
             tabName = "progress",
@@ -102,7 +103,7 @@ mod_secure_server <- function(id, SessionData){
     mod_templates_server("templates_1", SessionData)
 
     if (privileges == "admin") {
-        mod_users_server("admin_users_1")
+        mod_users_server("admin_users_1", SessionData)
         mod_groups_server("admin_groups_1", SessionData)
     }
 

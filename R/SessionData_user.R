@@ -14,7 +14,9 @@ SessionData$set("public", "user_remove", function(user_id) {
 })
 
 SessionData$set("public", "user_update", function(user_id, name, last_name) {
-    
+    if (!isTruthy(user_id)) stop("Usuario a modificar debe ser seleccionado", call. = F)
+    if (name == "") stop("Debe especificar nombre", call. = F)
+    if (last_name == "") stop("Debe especificar apellido", call. = F)
     statement <-   "UPDATE users
                     SET name = {name}, last_name = {last_name}
                     WHERE user_id = {user_id}"
@@ -36,8 +38,8 @@ SessionData$set("public", "user_get_from_privileges", function(privileges) {
     return(data$user_id |> sort())
 })
 
-SessionData$set("public", "user_get_names", function(user_id) {
-    if (isTruthy(self$user_names) && self$user_id == user_id) return(self$user_names)
+SessionData$set("public", "user_get_display_name", function(user_id) {
+    if (isTruthy(self$user_display_name) && self$user_id == user_id) return(self$user_display_name)
     if (grepl("^team", user_id)) return(self$group_get_description(user_id))
     query <- "SELECT name, last_name
                             FROM users
@@ -45,6 +47,27 @@ SessionData$set("public", "user_get_names", function(user_id) {
                             ORDER BY user_id"
     data <- private$db_get_query(query, vals = user_id)
     return(paste(data$last_name, data$name, sep = ", "))
+    # full_names <- self$user_get_full_names(user_id)
+    # return(paste(full_names$last_name, full_names$name, sep = ", "))
+})
+
+SessionData$set("public", "user_get_full_names", function(user_id) {
+    if (grepl("^team", user_id)) return(self$group_get_description(user_id))
+    
+    full_names_is_setted <- shiny::isTruthy(self$user_name) && shiny::isTruthy(self$user_last_name)
+    user_id_already_loaded <- self$user_id == user_id
+    
+    if (full_names_is_setted && user_id_already_loaded) {
+        return(list(user_name = self$user_name, user_last_name = self$user_last_name))
+    }
+    
+    
+    query <- "SELECT name, last_name
+                            FROM users
+                            WHERE (user_id IN ({vals*}))
+                            ORDER BY user_id"
+    private$db_get_query(query, vals = user_id) |> 
+        as.list()
 })
 
 SessionData$set("public", "user_is_registered", function(user_id) {
@@ -57,7 +80,7 @@ SessionData$set("public", "user_is_registered", function(user_id) {
 
 SessionData$set("public", "user_get_choices", function(user_id) {
     setNames(object = user_id,
-             nm = user_id |> purrr::map_chr(self$user_get_names))
+             nm = user_id |> purrr::map_chr(self$user_get_display_name))
 })
 
 # testing
@@ -75,7 +98,7 @@ SessionData$set("public", "user_get_choices", function(user_id) {
 # 
 # test$user_remove("testing")
 
-# test$user_get_names("team-politicas")
+# test$user_get_display_name("team-politicas")
 
 # test$user_is_registered("dgco84@mininter.gob.pe")
 

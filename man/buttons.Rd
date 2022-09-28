@@ -6,15 +6,16 @@
 \alias{btn_trash}
 \alias{btn_agregar}
 \alias{btn_guardar}
+\alias{btn_modificar}
 \alias{btn_cancelar}
 \alias{btn_eliminar}
-\alias{btn_modificar}
 \alias{btn_minus}
 \alias{btn_refresh}
 \alias{btn_expand}
 \alias{btn_user_add}
 \alias{btn_user_remove}
 \alias{btn_user_edit}
+\alias{btn_editar}
 \title{Pre styled pretty action buttons}
 \usage{
 btn_add(inputId, icon = NULL, size = "md", block = FALSE, no_outline = TRUE)
@@ -37,6 +38,14 @@ btn_guardar(
   no_outline = TRUE
 )
 
+btn_modificar(
+  inputId,
+  icon = NULL,
+  size = "md",
+  block = FALSE,
+  no_outline = TRUE
+)
+
 btn_cancelar(
   inputId,
   icon = NULL,
@@ -46,14 +55,6 @@ btn_cancelar(
 )
 
 btn_eliminar(
-  inputId,
-  icon = NULL,
-  size = "md",
-  block = FALSE,
-  no_outline = TRUE
-)
-
-btn_modificar(
   inputId,
   icon = NULL,
   size = "md",
@@ -96,6 +97,8 @@ btn_user_edit(
   block = FALSE,
   no_outline = TRUE
 )
+
+btn_editar(inputId, icon = NULL, size = "md", block = FALSE, no_outline = TRUE)
 }
 \arguments{
 \item{inputId}{The \code{input} slot that will be used to access the value.}
