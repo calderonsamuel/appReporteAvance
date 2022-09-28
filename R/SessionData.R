@@ -73,7 +73,7 @@ SessionData$set("public", "initialize", function(user_id,
     self$user_id <- user_id
     self$user_display_name <- self$user_get_display_name(user_id)
     self$user_name <- self$user_display_name |> stringr::str_remove("^.*,") |> stringr::str_squish()
-    self$user_last_name <- test$user_display_name |> stringr::str_remove(",.*") |> stringr::str_squish()
+    self$user_last_name <- self$user_display_name |> stringr::str_remove(",.*") |> stringr::str_squish()
     self$privileges <- private$get_privileges()
     self$groups <- self$groups_compute()
     self$tasks <- private$tasks_compute()
