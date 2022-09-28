@@ -29,7 +29,7 @@ mod_users_server <- function(id, SessionData){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
-    btn_usuario_agregado <- mod_user_manager_server("user_manager", selected_user)
+    btn_usuario_agregado <- mod_user_manager_server("user_manager", SessionData, selected_user)
 
     vals <- reactiveValues(
       data_users = user_get_all()
