@@ -1,3 +1,7 @@
+# appReporteAvance 0.2.4
+
+- Use fresh theme for user colors. fix #65
+
 # appReporteAvance 0.2.3
 
 - Ahora es posible reportar tareas Pendientes directamente a En revisión.

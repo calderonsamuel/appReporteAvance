@@ -38,6 +38,13 @@ mk_box <- function(icon = NULL, use_ddMenu = TRUE) {
 
 box_bg_by_assignee <- function(user_id) {
     if (grepl("^team", user_id)) "olive" else "teal"
+    switch (user_id,
+        "team-politicas" = "olive",
+        "wolivos@mininter.gob.pe" = "orange",
+        "dgco84@mininter.gob.pe" = "teal",
+        "dgco93@mininter.gob.pe" = "lime",
+        "dgco80@mininter.gob.pe" = "purple"
+    )
 }
 
 ns_safe <- function(id, ns = NULL) {

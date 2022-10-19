@@ -106,3 +106,11 @@ SessionData$set("public", "group_get_choices", function(group_id){
     setNames(object = group_id,
              nm = group_id |> purrr::map_chr(self$group_get_description))
 })
+
+SessionData$set("public", "group_update_group_admin", function(group_id, new_admin_id) {
+    statement <- "UPDATE groups
+                SET group_admin = {new_admin_id}
+                WHERE group_id = {group_id}"
+    db_execute_statement(statement, new_admin_id = new_admin_id, group_id = group_id)
+})
+
