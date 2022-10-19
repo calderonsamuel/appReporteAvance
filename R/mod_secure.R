@@ -14,6 +14,7 @@ mod_secure_ui <- function(id, SessionData){
   
   tagList(
     bs4Dash::dashboardPage(
+        freshTheme = custom_theme(),
         # preloader = list(html = tagList(waiter::spin_pixel(), "Cargando ..."), color = "#3c8dbc"),
       bs4Dash::dashboardHeader(
           title = "Reporte" 
