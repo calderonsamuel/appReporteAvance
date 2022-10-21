@@ -58,6 +58,7 @@ mod_progress_ui <- function(id){
         solidHeader = TRUE,
         collapsible = FALSE,
         width = 3,
+        class = "cw cw-lg",
         icon = icon("calendar"),
         uiOutput(ns("pendientes"))
       ),
@@ -67,6 +68,7 @@ mod_progress_ui <- function(id){
           solidHeader = TRUE,
           collapsible = FALSE,
           width = 12,
+          class = "cw cw-sm",
           icon = icon("pen"),
           uiOutput(ns("en_proceso"))
         ),
@@ -75,6 +77,7 @@ mod_progress_ui <- function(id){
           solidHeader = TRUE,
           collapsible = FALSE,
           width = 12,
+          class = "cw cw-sm",
           icon = icon("pause-circle"),
           uiOutput(ns("pausado"))
         ),
@@ -84,6 +87,7 @@ mod_progress_ui <- function(id){
         solidHeader = TRUE,
         collapsible = FALSE,
         width = 3,
+        class = "cw cw-lg",
         icon = icon("eye"),
           uiOutput(ns("en_revision"))
       ),
@@ -92,6 +96,7 @@ mod_progress_ui <- function(id){
         solidHeader = TRUE,
         collapsible = FALSE,
         width = 3,
+        class = "cw cw-lg",
         icon = icon("check-circle"),
           uiOutput(ns("terminado"))
       )
@@ -292,7 +297,7 @@ mod_progress_apptest <- function(user_iniciado = "dgco93@mininter.gob.pe") {
     session_data <- SessionData$new(user_iniciado)
     
   ui <- bs4Dash::dashboardPage(
-      preloader = list(html = tagList(waiter::spin_pixel(), HTML("<br/>Cargando ...")), color = "#3c8dbc"),
+      # preloader = list(html = tagList(waiter::spin_pixel(), HTML("<br/>Cargando ...")), color = "#3c8dbc"),
     header = bs4Dash::dashboardHeader(title = "TEST"),
     sidebar = bs4Dash::dashboardSidebar(
       bs4Dash::sidebarMenu(
@@ -302,6 +307,10 @@ mod_progress_apptest <- function(user_iniciado = "dgco93@mininter.gob.pe") {
       )
     ),
     body = bs4Dash::dashboardBody(
+        tags$head(
+            includeCSS("inst/app/www/custom.css")
+            # tags$link(rel = "stylesheet", type = "text/css", href = "inst/app/www/custom.css")
+        ),
       bs4Dash::tabItem(tabName = "progress", mod_progress_ui("test"))
     )
   )

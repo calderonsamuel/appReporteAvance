@@ -53,8 +53,9 @@ mod_secure_ui <- function(id, SessionData){
         )
       ),
       bs4Dash::dashboardBody(
-          shinyWidgets::useSweetAlert(),
-          shinyjs::useShinyjs(),
+          # shinyWidgets::useSweetAlert(),
+          # shinyjs::useShinyjs(),
+          golem_add_external_resources(),
         bs4Dash::tabItems(
           bs4Dash::tabItem(
             tabName = "progress",
