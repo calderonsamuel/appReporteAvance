@@ -38,11 +38,28 @@ SessionData$set("private", "task_get_ids", function() {
     group_ids <- private$group_ids
     admined_members <- private$group_admined_members()
     task_owner_ids <- c(self$user_id, group_ids, admined_members) |> unique()
-    query <- "SELECT task_id
+    
+    query_no_terminados <- "SELECT task_id
               FROM tasks
-              WHERE (user_id IN ({vals*}))"
-    data <- db_get_query(query, vals = task_owner_ids)
-    return(data$task_id)
+              WHERE (
+                user_id IN ({vals*}) AND
+                status NOT IN ('Terminado')
+              )"
+    query_terminados <- "
+              SELECT task_id,
+                     ROW_NUMBER() OVER(ORDER BY (SELECT 0)) AS row_number
+              FROM tasks 
+              WHERE (
+                user_id IN ({vals*}) AND
+                status = 'Terminado'
+              )
+              ORDER BY row_number DESC 
+              LIMIT 5
+              "
+    data_no_terminados <- db_get_query(query_no_terminados, vals = task_owner_ids)
+    data_terminados <- db_get_query(query_terminados, vals = task_owner_ids)
+    ids <- union(data_terminados$task_id, data_no_terminados$task_id)
+    return(ids)
 })
 
 SessionData$set("private", "task_can_be_deleted", function(task_id) {
