@@ -54,7 +54,7 @@ SessionData$set("private", "task_get_ids", function() {
                 status = 'Terminado'
               )
               ORDER BY row_number DESC 
-              LIMIT 5
+              LIMIT 10
               "
     data_no_terminados <- db_get_query(query_no_terminados, vals = task_owner_ids)
     data_terminados <- db_get_query(query_terminados, vals = task_owner_ids)
