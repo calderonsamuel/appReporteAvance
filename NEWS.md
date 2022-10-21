@@ -1,3 +1,5 @@
+# appReporteAvance 0.2.5
+
 # appReporteAvance 0.2.4
 
 - Use fresh theme for user colors. fix #65
