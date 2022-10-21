@@ -3,6 +3,7 @@
 - Los contenedores de las tarjetas de progreso se ajustan mejor a la pantalla y tienen scroll independiente.
 - En el contenedor de tareas terminadas ahora solo se muestra como máximo las últimas 10 tareas terminadas. Esto mejora la experiencia para los usuarios responsables de equipo.
 
+
 # appReporteAvance 0.2.4
 
 - Use fresh theme for user colors. fix #65
