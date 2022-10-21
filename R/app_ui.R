@@ -49,6 +49,7 @@ golem_add_external_resources <- function() {
     # Add here other external resources
     # for example, you can add shinyalert::useShinyalert()
     shinyWidgets::useSweetAlert(),
-    firebase::useFirebase()
+    firebase::useFirebase(),
+    shinyjs::useShinyjs()
   )
 }
