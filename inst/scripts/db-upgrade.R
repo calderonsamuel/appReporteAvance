@@ -213,10 +213,22 @@ db_tasks <-
     ) |> 
     pmap_dfr(create_task)
 
-progress |>
+db_progress <- progress |>
     as_tibble() |> 
     semi_join(db_tasks, by = c("task_id" = "task_description")) |> 
-    mutate(task_id = map_chr(task_id, get_new_id_task))
+    mutate(
+        process_id = NA_character_,
+        activity_id = NA_character_,
+        org_id = db_organisations$org_id,
+        group_id = get_new_id_group("team-politicas"),
+        task_id = map_chr(task_id, get_new_id_task),
+        reported_by = map_chr(reported_by, get_new_id_user),
+        time = as_datetime(time),
+        output_progress = if_else(status == "Terminado", 1L, 0L)
+    ) |> 
+    rename(details = explain) |> 
+    select(-c(status_id, step_id)) |> 
+    pmap_dfr(create_progress)
 
 
 # process_id
@@ -233,5 +245,23 @@ progress |>
    
 ## Data migration ----
 
-# con_dev <- DBI::dbConnect(RSQLite::SQLite(), "inst/scripts/db_v0-3-0.db")
-# DBI::dbDisconnect(con_dev)
+# This needs to change for a remote DB 
+con_dev <- DBI::dbConnect(RSQLite::SQLite(), "inst/scripts/db_v0-3-0.db")
+
+df_list <- list(
+    users = db_users,
+    organisations = db_organisations,
+    org_users = db_org_users,
+    groups = db_groups,
+    group_users = db_group_users,
+    tasks = db_tasks,
+    progress = db_progress
+)
+
+df_list |> 
+    names() |> 
+    walk(~DBI::dbWriteTable(con_dev, name = .x, value = df_list[[.x]] , overwrite = TRUE))
+
+DBI::dbListTables(con_dev)
+
+DBI::dbDisconnect(con_dev)
