@@ -11,7 +11,6 @@ con_prod <- DBI::dbConnect(
     port = Sys.getenv("DB_PORT")
 )
 
-con_dev <- DBI::dbConnect(RSQLite::SQLite(), "inst/scripts/db_v0-3-0.db")
 
 ## Data recuperation ----
 
@@ -19,6 +18,8 @@ users <- DBI::dbGetQuery(con_prod, "SELECT * FROM users")
 tasks <- DBI::dbGetQuery(con_prod, "SELECT * FROM tasks")
 progress <- DBI::dbGetQuery(con_prod, "SELECT * FROM progress")
 groups <- DBI::dbGetQuery(con_prod, "SELECT * FROM groups")
+
+DBI::dbDisconnect(con_prod)
 
 ## Constructors ----
 
@@ -221,7 +222,7 @@ db_tasks <-
 #     )
 #     
    
+## Data migration ----
 
-
-DBI::dbDisconnect(con_prod)
-DBI::dbDisconnect(con_dev)
+# con_dev <- DBI::dbConnect(RSQLite::SQLite(), "inst/scripts/db_v0-3-0.db")
+# DBI::dbDisconnect(con_dev)
