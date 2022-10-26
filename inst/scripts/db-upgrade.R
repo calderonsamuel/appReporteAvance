@@ -212,14 +212,23 @@ db_tasks <-
     ) |> 
     pmap_dfr(create_task)
 
-# progress |> 
-#     semi_join(tasks, by = "task_id") |> 
-#     as_tibble() |> 
-#     mutate(
-#         time = as_datetime(time),
-#         task_id = map_chr(task_id, possibly(get_new_id_task, random_id()))
-#     )
-#     
+progress |>
+    as_tibble() |> 
+    semi_join(db_tasks, by = c("task_id" = "task_description")) |> 
+    mutate(task_id = map_chr(task_id, get_new_id_task))
+
+
+# process_id
+# activity_id
+# org_id
+# group_id
+# task_id
+# reported_by
+# output_progress
+# status
+# time
+# details
+
    
 
 
