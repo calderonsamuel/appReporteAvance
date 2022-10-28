@@ -4,9 +4,10 @@
 DBManager <- R6::R6Class(
     classname = "DBManager",
     public = list(
-        initialize = function() {
+        initialize = function(use_tibble = TRUE) {
             message("Starting DB connection")
             private$con <-  private$db_connect()
+            private$use_tibble <- use_tibble
         },
         finalize = function() {
             message("Finalizing DB connection")
@@ -26,11 +27,14 @@ DBManager <- R6::R6Class(
             
             query <- do.call(what = glue::glue_sql, args = dots)
             
-            DBI::dbGetQuery(private$con, query)
+            data_returned <- DBI::dbGetQuery(private$con, query)
+            
+            if (private$use_tibble) tibble::as_tibble(data_returned) else data_returned
         }
     ),
     private = list(
         con = NULL,
+        use_tibble = NULL,
         db_connect = function() {
             DBI::dbConnect(
                 drv = RMariaDB::MariaDB(),
