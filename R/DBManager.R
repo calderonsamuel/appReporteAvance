@@ -36,7 +36,7 @@ DBManager <- R6::R6Class(
                 drv = RMariaDB::MariaDB(),
                 user = Sys.getenv("DB_USER"),
                 password = Sys.getenv("DB_SECRET"),
-                dbname = Sys.getenv("DB_NAME"),
+                dbname = Sys.getenv("DB_NAME_DEV"),
                 host = Sys.getenv("DB_HOST"),
                 port = Sys.getenv("DB_PORT")
             )  

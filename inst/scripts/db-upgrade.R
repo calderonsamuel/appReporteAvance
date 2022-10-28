@@ -246,7 +246,15 @@ db_progress <- progress |>
 ## Data migration ----
 
 # This needs to change for a remote DB 
-con_dev <- DBI::dbConnect(RSQLite::SQLite(), "inst/scripts/db_v0-3-0.db")
+con_dev <- DBI::dbConnect(
+    # RSQLite::SQLite(), "inst/scripts/db_v0-3-0.db"
+    drv = RMariaDB::MariaDB(),
+    user = Sys.getenv("DB_USER"),
+    password = Sys.getenv("DB_SECRET"),
+    dbname = Sys.getenv("DB_NAME_DEV"),
+    host = Sys.getenv("DB_HOST"),
+    port = Sys.getenv("DB_PORT")
+)
 
 df_list <- list(
     users = db_users,
