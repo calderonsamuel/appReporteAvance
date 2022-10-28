@@ -21,6 +21,8 @@ groups <- DBI::dbGetQuery(con_prod, "SELECT * FROM groups")
 
 DBI::dbDisconnect(con_prod)
 
+cli::cli_alert_success("Data retrieved")
+
 ## Constructors ----
 
 create_organisation <- function(org_title, org_description) {
@@ -155,8 +157,9 @@ db_groups <-
 db_group_users <- db_groups |> 
     select(ends_with("_id")) |> 
     left_join(db_org_users) |> 
-    select(-user_id) |> 
-    rename(group_role = org_role)
+    select(-starts_with("time")) |>
+    rename(group_role = org_role) |> 
+    pmap_dfr(create_group_user)
 
 
 
@@ -230,18 +233,7 @@ db_progress <- progress |>
     select(-c(status_id, step_id)) |> 
     pmap_dfr(create_progress)
 
-
-# process_id
-# activity_id
-# org_id
-# group_id
-# task_id
-# reported_by
-# output_progress
-# status
-# time
-# details
-
+cli::cli_alert_success("Data processed")
    
 ## Data migration ----
 
@@ -273,3 +265,5 @@ df_list |>
 DBI::dbListTables(con_dev)
 
 DBI::dbDisconnect(con_dev)
+
+cli::cli_alert_success("Data migrated")
