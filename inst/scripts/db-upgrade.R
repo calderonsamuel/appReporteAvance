@@ -28,8 +28,8 @@ create_organisation <- function(org_title, org_description) {
         org_id = random_id(),
         org_title = org_title,
         org_description = org_description,
-        time_creation = now(),
-        time_last_modified = now()
+        time_creation = now("America/Lima"),
+        time_last_modified = now("America/Lima")
     )
 }
 
@@ -39,8 +39,8 @@ create_user <- function(name, last_name, email, time_creation = NULL) {
         name = name,
         last_name = last_name,
         email = email,
-        time_creation = time_creation %||% now(),
-        time_last_modified = now()
+        time_creation = time_creation %||% now("America/Lima"),
+        time_last_modified = now("America/Lima")
     )
 }
 
@@ -49,8 +49,8 @@ create_org_user <- function(org_id, user_id, org_role) {
         org_id = org_id,
         user_id = user_id,
         org_role = org_role,
-        time_creation = now(),
-        time_last_modified = now()
+        time_creation = now("America/Lima"),
+        time_last_modified = now("America/Lima")
     )
 }
 
@@ -61,8 +61,8 @@ create_group <- function(org_id, group_title, group_description, parent_group) {
         group_title = group_title,
         group_description = group_description,
         parent_group = parent_group,
-        time_creation = now(),
-        time_last_modified = now()
+        time_creation = now("America/Lima"),
+        time_last_modified = now("America/Lima")
     )
 }
 
@@ -72,8 +72,8 @@ create_group_user <- function(org_id, group_id, user_id, group_role) {
         group_id = group_id,
         user_id = user_id,
         group_role = group_role,
-        time_creation = now(),
-        time_last_modified = now()
+        time_creation = now("America/Lima"),
+        time_last_modified = now("America/Lima")
     )
 }
 
@@ -98,8 +98,8 @@ create_task <- function(org_id, group_id, task_title,
         output_goal = output_goal,
         output_current = output_current,
         status_current = status_current %||% "Pendiente",
-        time_creation = time_creation %||% now(),
-        time_last_modified = now()
+        time_creation = time_creation %||% now("America/Lima"),
+        time_last_modified = now("America/Lima")
     )
 }
 
@@ -116,7 +116,7 @@ create_progress <- function(org_id, group_id, task_id,
         reported_by = reported_by,
         output_progress = output_progress,
         status = status,
-        time_reported = time_reported %||% now(),
+        time_reported = time_reported %||% now("America/Lima"),
         details = details
     )
 }
@@ -206,7 +206,7 @@ db_tasks <-
         activity_id = NA_character_,
         org_id = db_organisations$org_id,
         group_id = get_new_id_group("team-politicas"),
-        time_due = now() + weeks(2),
+        time_due = now("America/Lima") + weeks(2),
         output_unit = "Documento",
         output_goal = 1L,
         output_current = if_else(status_current == "Terminado", 1L, 0L)
