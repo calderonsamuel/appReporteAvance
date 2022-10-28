@@ -9,10 +9,6 @@ DBManager <- R6::R6Class(
             private$con <-  private$db_connect()
             private$use_tibble <- use_tibble
         },
-        finalize = function() {
-            message("Finalizing DB connection")
-            DBI::dbDisconnect(private$con)
-        },
         db_execute_statement = function(...) {
             dots <- list(...)
             dots[[".con"]] <- private$con
@@ -44,6 +40,10 @@ DBManager <- R6::R6Class(
                 host = Sys.getenv("DB_HOST"),
                 port = Sys.getenv("DB_PORT")
             )  
+        },
+        finalize = function() {
+            message("Finalizing DB connection")
+            DBI::dbDisconnect(private$con)
         }
     )
 )
