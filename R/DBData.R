@@ -4,12 +4,15 @@ DBData <- R6::R6Class(
     public = list(
         user = NULL,
         orgs = NULL,
+        org_users = NULL,
         groups = NULL,
+        group_users = NULL,
         initialize = function(email) {
             super$initialize()
             self$user <- private$get_user_from_email(email)
             self$orgs <- private$get_orgs()
             self$groups <- private$get_groups()
+            self$org_users <- private$get_org_users()
         }
     ),
     private = list(
@@ -66,6 +69,18 @@ DBData <- R6::R6Class(
             db_data |> 
                 purrr::pmap(list) |> 
                 setNames(nm = db_data$group_id)
+        },
+        get_org_users = function() {
+            # NOT WORKING AS INTENDED
+            
+            # query <- 
+            #     "SELECT *
+            #     FROM org_users
+            #     WHERE org_id IN ({vals})"
+            # db_data <- super$db_get_query(query, vals = names(self$orgs))
+            # 
+            # db_data |> 
+            #     purrr::pmap(list)
         }
     )
 )
