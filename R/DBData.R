@@ -15,6 +15,7 @@ DBData <- R6::R6Class(
             self$groups <- private$get_groups()
             self$org_users <- private$get_org_users()
             self$group_users <- private$get_group_users()
+            self$tasks <- private$get_tasks()
         }
     ),
     private = list(
@@ -116,6 +117,26 @@ DBData <- R6::R6Class(
                     ~purrr::pmap(.x, list) |> 
                         setNames(.x$user_id)
                 )
+        },
+        get_tasks = function() {
+            query <- 
+                "SELECT *
+                FROM tasks 
+                WHERE org_id IN ({orgs*}) AND
+                    group_id IN ({groups*}) AND (
+                        status_current != 'Terminado' OR (
+                            status_current = 'Terminado' AND
+                            time_last_modified BETWEEN date_sub(now(), INTERVAL 1 WEEK) AND now()
+                            )
+                        )"
+            
+            db_data <- super$db_get_query(query, 
+                                          orgs = names(self$orgs),
+                                          groups = names(self$groups))
+            
+            db_data |> 
+                purrr::pmap(list) |> 
+                setNames(nm = db_data$task_id)
         }
     )
 )
