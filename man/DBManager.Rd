@@ -9,8 +9,48 @@ Una base de datos puede ejecutar y obtener querys
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
+\item \href{#method-DBManager-new}{\code{DBManager$new()}}
+\item \href{#method-DBManager-db_execute_statement}{\code{DBManager$db_execute_statement()}}
+\item \href{#method-DBManager-db_get_query}{\code{DBManager$db_get_query()}}
+\item \href{#method-DBManager-db_make_query}{\code{DBManager$db_make_query()}}
 \item \href{#method-DBManager-clone}{\code{DBManager$clone()}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DBManager-new"></a>}}
+\if{latex}{\out{\hypertarget{method-DBManager-new}{}}}
+\subsection{Method \code{new()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DBManager$new(use_tibble = TRUE)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DBManager-db_execute_statement"></a>}}
+\if{latex}{\out{\hypertarget{method-DBManager-db_execute_statement}{}}}
+\subsection{Method \code{db_execute_statement()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DBManager$db_execute_statement(...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DBManager-db_get_query"></a>}}
+\if{latex}{\out{\hypertarget{method-DBManager-db_get_query}{}}}
+\subsection{Method \code{db_get_query()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DBManager$db_get_query(...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DBManager-db_make_query"></a>}}
+\if{latex}{\out{\hypertarget{method-DBManager-db_make_query}{}}}
+\subsection{Method \code{db_make_query()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DBManager$db_make_query(...)}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DBManager-clone"></a>}}
