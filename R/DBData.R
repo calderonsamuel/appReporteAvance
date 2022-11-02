@@ -13,6 +13,7 @@ DBData <- R6::R6Class(
             self$orgs <- private$get_orgs()
             self$groups <- private$get_groups()
             self$org_users <- private$get_org_users()
+            self$group_users <- private$get_group_users()
         }
     ),
     private = list(
@@ -71,16 +72,28 @@ DBData <- R6::R6Class(
                 setNames(nm = db_data$group_id)
         },
         get_org_users = function() {
-            # NOT WORKING AS INTENDED
             
-            # query <- 
-            #     "SELECT *
-            #     FROM org_users
-            #     WHERE org_id IN ({vals})"
-            # db_data <- super$db_get_query(query, vals = names(self$orgs))
-            # 
-            # db_data |> 
-            #     purrr::pmap(list)
+        },
+        get_group_users = function() {
+            query <- 
+                "SELECT
+                    rhs.*
+                FROM (
+                    SELECT org_id, group_id, group_role
+                    FROM group_users
+                    WHERE user_id = {self$user$user_id} 
+                ) lhs
+                LEFT JOIN group_users rhs ON
+                lhs.org_id = rhs.org_id AND
+                    lhs.group_id = rhs.group_id"
+            
+            db_data <- super$db_get_query(query)
+            
+            
+            db_data |> 
+                identity()
+                # purrr::pmap(list) |> 
+                # setNames(nm = db_data$group_id)
         }
     )
 )
