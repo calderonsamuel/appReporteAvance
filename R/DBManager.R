@@ -26,6 +26,12 @@ DBManager <- R6::R6Class(
             data_returned <- DBI::dbGetQuery(private$con, query)
             
             if (private$use_tibble) tibble::as_tibble(data_returned) else data_returned
+        },
+        db_make_query = function(...) {
+            dots <- list(...)
+            dots[[".con"]] <- private$con
+            
+            do.call(what = glue::glue_sql, args = dots)
         }
     ),
     private = list(
