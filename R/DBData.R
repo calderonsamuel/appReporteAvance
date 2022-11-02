@@ -7,6 +7,7 @@ DBData <- R6::R6Class(
         org_users = NULL,
         groups = NULL,
         group_users = NULL,
+        tasks = NULL,
         initialize = function(email) {
             super$initialize()
             self$user <- private$get_user_from_email(email)
@@ -72,14 +73,33 @@ DBData <- R6::R6Class(
                 setNames(nm = db_data$group_id)
         },
         get_org_users = function() {
+            query <- 
+                "SELECT
+                    rhs.*
+                FROM (
+                    SELECT org_id
+                    FROM org_users
+                    WHERE user_id = {self$user$user_id} 
+                ) lhs
+                LEFT JOIN org_users rhs ON
+                lhs.org_id = rhs.org_id"
             
+            db_data <- super$db_get_query(query)
+            
+            
+            db_data |> 
+                split(~org_id) |> 
+                purrr::map(
+                    ~purrr::pmap(.x, list) |> 
+                        setNames(.x$user_id)
+                )
         },
         get_group_users = function() {
             query <- 
                 "SELECT
                     rhs.*
                 FROM (
-                    SELECT org_id, group_id, group_role
+                    SELECT org_id, group_id
                     FROM group_users
                     WHERE user_id = {self$user$user_id} 
                 ) lhs
@@ -91,9 +111,11 @@ DBData <- R6::R6Class(
             
             
             db_data |> 
-                identity()
-                # purrr::pmap(list) |> 
-                # setNames(nm = db_data$group_id)
+                split(~group_id) |> 
+                purrr::map(
+                    ~purrr::pmap(.x, list) |> 
+                        setNames(.x$user_id)
+                )
         }
     )
 )
