@@ -8,14 +8,16 @@ User <- R6::R6Class(
             private$sync_user_data(email)
         },
         user_edit_names = function(name, last_name) {
+            t_stamp <- super$get_timestamp()
             statement <- 
                 "UPDATE users
                 SET
-                    name = {nm},
-                    last_name = {lnm}
+                    name = {name},
+                    last_name = {last_name},
+                    time_last_modified = {t_stamp}
                 WHERE
                     user_id = {self$user$user_id}"
-            super$db_execute_statement(statement, nm = name, lnm = last_name)
+            super$db_execute_statement(statement, .envir = rlang::current_env())
             private$sync_user_data(self$user$email)
         }
     ),
