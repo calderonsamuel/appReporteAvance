@@ -45,7 +45,7 @@ User <- R6::R6Class(
             fields <- list(
                 id = ids::random_id(),
                 email = email,
-                t_stamp = lubridate::now(tzone = "America/Lima")
+                t_stamp = private$get_timestamp()
             )
             statement <- "
                 INSERT INTO users

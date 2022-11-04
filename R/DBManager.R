@@ -32,6 +32,9 @@ DBManager <- R6::R6Class(
             dots[[".con"]] <- private$con
             
             do.call(what = glue::glue_sql, args = dots)
+        },
+        get_timestamp = function() {
+            lubridate::now("America/Lima")  
         }
     ),
     private = list(
