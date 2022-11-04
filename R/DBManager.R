@@ -5,9 +5,9 @@ DBManager <- R6::R6Class(
     classname = "DBManager",
     public = list(
         initialize = function(use_tibble = TRUE) {
-            message("Starting DB connection")
             private$con <-  private$db_connect()
             private$use_tibble <- use_tibble
+            cli::cli_alert_info("Connected to DB")
         },
         db_execute_statement = function(...) {
             dots <- list(...)
@@ -51,7 +51,7 @@ DBManager <- R6::R6Class(
             )  
         },
         finalize = function() {
-            message("Finalizing DB connection")
+            cli::cli_alert_info("Ending DB connection")
             DBI::dbDisconnect(private$con)
         }
     )
