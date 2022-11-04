@@ -52,7 +52,28 @@ Organisation <- R6::R6Class(
             super$db_execute_statement(statement, .envir = rlang::current_env())
             
             private$sync_org_users()
+            
+            cli::cli_alert_info("User '{user_id}' inserted into org '{org_id}' with role '{role}'")
         },
+        org_user_delete = function(org_id, user_id) {
+            statement <- 
+                "DELETE FROM org_users
+                WHERE 
+                    org_id = {org_id} AND
+                    user_id = {user_id}"
+            
+            super$db_execute_statement(statement, .envir = rlang::current_env())
+            private$sync_org_users()
+            
+            cli::cli_alert_info("User '{user_id}' deleted from org '{org_id}'")
+        },
+        
+        # TODO: Complete org_user_edit() 
+        org_user_edit = function() {
+            
+        },
+        
+        
         org_finalize = function(org_id) {
             statement <- 
                 "DELETE FROM org_users
