@@ -11,27 +11,58 @@ Organisation <- R6::R6Class(
         org_initialize = function() {
             org_id <- private$org_create()
             
-            self$org_add_user(
+            self$org_user_add(
                 org_id = org_id,
                 user_id = self$user$user_id,
-                role = "owner"
+                role = "ownr"
             )
+            
             private$sync_orgs()
+            
+            cli::cli_alert_info("Initialized org '{org_id}'")
         },
-        org_add_user = function(org_id, user_id, role) {
+        org_edit = function(org_id, org_title, org_description) {
+            t_stamp <- super$get_timestamp()
+            statement <- 
+                "UPDATE organisations
+                SET 
+                    org_title = {org_title},
+                    org_description = {org_description},
+                    time_last_modified = {t_stamp}
+                WHERE
+                    org_id = {org_id}"
+            
+            super$db_execute_statement(statement, .envir = rlang::current_env())
+            
+            private$sync_orgs()
+            
+            cli::cli_alert_info("Edited org '{org_id}'")
+        },
+        org_user_add = function(org_id, user_id, role) {
             t_stamp <- super$get_timestamp()
             statement <- 
                 "INSERT INTO org_users
                 SET
                     org_id = {org_id},
                     user_id = {user_id},
-                    role = {role},
+                    org_role = {role},
                     time_creation = {t_stamp},
-                    time_last_modofied = {t_stamp}"
+                    time_last_modified = {t_stamp}"
             
             super$db_execute_statement(statement, .envir = rlang::current_env())
             
             private$sync_org_users()
+        },
+        org_finalize = function(org_id) {
+            statement <- 
+                "DELETE FROM org_users
+                WHERE org_id = {org_id}"
+            
+            super$db_execute_statement(statement, .envir = rlang::current_env())
+            
+            private$org_delete(org_id) # this syncs after
+            
+            cli::cli_alert_info("Finalized org '{org_id}'")
         }
     ),
     private = list(
