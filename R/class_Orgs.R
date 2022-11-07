@@ -69,8 +69,20 @@ Organisation <- R6::R6Class(
         },
         
         # TODO: Complete org_user_edit() 
-        org_user_edit = function() {
+        org_user_edit = function(org_id, user_id, org_role) {
+            statement <- 
+                "UPDATE org_users
+                SET 
+                    org_role = {org_role}
+                WHERE
+                    org_id = {org_id} AND
+                    user_id = {user_id}"
             
+            super$db_execute_statement(statement, .envir = rlang::current_env())
+            
+            private$sync_org_users()
+            
+            cli::cli_alert_info("User '{user_id}' now has role '{org_role}' in org '{org_id}'")
         },
         
         
