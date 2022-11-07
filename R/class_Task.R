@@ -14,10 +14,11 @@ Task <- R6::R6Class(
                 "SELECT *
                 FROM tasks 
                 WHERE org_id IN ({orgs*}) AND
-                    group_id IN ({groups*}) AND (
-                        status_current != 'Terminado' OR (
+                    group_id IN ({groups*}) AND 
+                    assignee = {self$user$user_id} AND
+                        (status_current != 'Terminado' OR (
                             status_current = 'Terminado' AND
-                            time_last_modified BETWEEN date_sub(now(), INTERVAL 1 WEEK) AND now()
+                            time_last_modified BETWEEN date_sub(now(), INTERVAL 2 WEEK) AND now()
                             )
                         )",
                 orgs = names(self$orgs),
