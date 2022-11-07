@@ -16,8 +16,16 @@ mod_board_ui <- function(id) {
                 solidHeader = TRUE,
                 collapsible = FALSE,
                 width = 3,
+                headerBorder = FALSE,
                 class = "cw cw-lg",
                 icon = icon("calendar"),
+                dropdownMenu = bs4Dash::boxDropdown(
+                    icon = fontawesome::fa("fas fa-ellipsis-h"),
+                    bs4Dash::boxDropdownItem(
+                        "Agregar",
+                        icon = fontawesome::fa("fas fa-plus-circle"),
+                    )
+                ),
                 uiOutput(ns("pendientes"))
             ),
             col_3(
@@ -25,6 +33,7 @@ mod_board_ui <- function(id) {
                     title = "En proceso",
                     solidHeader = TRUE,
                     collapsible = FALSE,
+                    headerBorder = FALSE,
                     width = 12,
                     class = "cw cw-sm",
                     icon = icon("pen"),
@@ -34,6 +43,7 @@ mod_board_ui <- function(id) {
                     title = "Pausado",
                     solidHeader = TRUE,
                     collapsible = FALSE,
+                    headerBorder = FALSE,
                     width = 12,
                     class = "cw cw-sm",
                     icon = icon("pause-circle"),
@@ -44,6 +54,7 @@ mod_board_ui <- function(id) {
                 title = "En revisión",
                 solidHeader = TRUE,
                 collapsible = FALSE,
+                headerBorder = FALSE,
                 width = 3,
                 class = "cw cw-lg",
                 icon = icon("eye"),
@@ -53,6 +64,7 @@ mod_board_ui <- function(id) {
                 title = "Terminado",
                 solidHeader = TRUE,
                 collapsible = FALSE,
+                headerBorder = FALSE,
                 width = 3,
                 class = "cw cw-lg",
                 icon = icon("check-circle"),
@@ -115,8 +127,9 @@ mod_board_server <- function(id, AppData) {
 
 mod_board_apptest <- function() {
     AppData <- AppData$new("dgco93@mininter.gob.pe")
+    id = ids::random_id()
     quick_bs4dash(
-        modUI = mod_board_ui(id = "test"),
-        modServer = mod_board_server(id = "test", AppData)
+        modUI = mod_board_ui(id = id),
+        modServer = mod_board_server(id = id, AppData)
     )
 }
