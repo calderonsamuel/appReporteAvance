@@ -1,4 +1,4 @@
-quick_bs4dash <- function(...) {
+quick_bs4dash <- function(..., modUI = NULL, modServer = NULL) {
     ui <- bs4Dash::dashboardPage(
         header = bs4Dash::dashboardHeader(title = "quick bs4dash"),
         sidebar = bs4Dash::dashboardSidebar(
@@ -9,14 +9,13 @@ quick_bs4dash <- function(...) {
             )
         ),
         body = bs4Dash::dashboardBody(
-            tags$head(
-            ),
-            bs4Dash::tabItem(tabName = "tab-a", ...)
+            golem_add_external_resources(),
+            bs4Dash::tabItem(tabName = "tab-a", modUI, ...)
         )
     )
     
     server <- function(input, output, session) {
-        
+        modServer
     }
     
     shinyApp(ui, server)
