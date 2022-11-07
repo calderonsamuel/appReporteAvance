@@ -122,6 +122,8 @@ task_box <- function(task) {
     bs4Dash::box(
         id = task$task_id,
         title = task$task_title,
+        width = 12,
+        collapsed = TRUE,
         label = bs4Dash::boxLabel(
             text = glue::glue("{task$output_current}/{task$output_goal}"), 
             status = "danger",
