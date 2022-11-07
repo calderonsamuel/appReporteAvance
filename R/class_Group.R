@@ -8,19 +8,20 @@ Group <- R6::R6Class(
             super$initialize(email)
             private$sync_groups()
         },
-        group_initialize = function() {
-            group_id <- private$group_create()
+        group_initialize = function(org_id) {
+            group_id <- private$group_create(org_id)
             
-            self$groip_user_add(
+            
+            self$group_user_add(
                 org_id = org_id,
                 group_id = group_id,
                 user_id = self$user$user_id,
                 role = "ownr"
-            )
+            ) |> suppressMessages()
             
             private$sync_groups()
             
-            cli::cli_alert_info("Initialized group '{group_id}' in org '{org_id}'")
+            cli::cli_alert_info("Initialized group '{group_id}' in org '{org_id}' by user '{self$user$user_id}'")
         },
         group_edit = function(org_id, group_id, group_title, group_description) {
             t_stamp <- super$get_timestamp()
@@ -40,10 +41,10 @@ Group <- R6::R6Class(
             
             cli::cli_alert_info("Edited group '{group_id}' from org '{org_id}'")
         },
-        group_user_add = function(org_id, group_id, user_id, role) {
+        group_user_add = function(org_id, group_id, user_id, role = "user") {
             t_stamp <- super$get_timestamp()
             statement <- 
-                "INSERT INTO org_users
+                "INSERT INTO group_users
                 SET
                     org_id = {org_id},
                     group_id = {group_id},
@@ -69,11 +70,23 @@ Group <- R6::R6Class(
             super$db_execute_statement(statement, .envir = rlang::current_env())
             private$sync_group_users()
             
-            cli::cli_alert_info("User '{user_id}' deleted from group '{group} in org '{org_id}'")
+            cli::cli_alert_info("User '{user_id}' deleted from group '{group_id}' in org '{org_id}'")
         },
         
         group_user_edit = function() {
+            statement <- 
+                "UPDATE group_users
+                SET
+                    group_role = {group_role}
+                WHERE
+                    org_id = {org_id} AND
+                    group_id = {group_id} AND
+                    user_id = {user_id}"
             
+            super$db_execute_statement(statement, .envir = rlang::current_env())
+            private$sync_group_users()
+            
+            cli::cli_alert_info("User '{user_id}' now has role '{group_role}' in group '{group_id} in org '{org_id}'")
         },
         group_finalize = function(org_id, group_id) {
             statement <- 
@@ -141,11 +154,11 @@ Group <- R6::R6Class(
             t_stamp <- super$get_timestamp()
             
             statement <- 
-                "INSERT INTO organisations
+                "INSERT INTO groups
                 SET
                     org_id = {org_id},
                     group_id = {group_id},
-                    group_title = 'Grupo sin nombre',
+                    group_title = 'Sin nombre',
                     group_description = '',
                     parent_group = {parent_group},
                     time_creation = {t_stamp},
