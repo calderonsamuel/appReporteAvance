@@ -124,12 +124,14 @@ task_box <- function(task) {
         title = task$task_title,
         width = 12,
         collapsed = TRUE,
+        headerBorder = FALSE,
         label = bs4Dash::boxLabel(
             text = glue::glue("{task$output_current}/{task$output_goal}"), 
             status = "danger",
             tooltip = task$output_unit
         ),
         dropdownMenu = bs4Dash::boxDropdown(
+            icon = fontawesome::fa("fas fa-ellipsis-h"),
             bs4Dash::boxDropdownItem("Avance", 
                                      id = paste0(task$task_id, "-report"), 
                                      icon = fontawesome::fa("fas fa-arrow-alt-circle-right")),
