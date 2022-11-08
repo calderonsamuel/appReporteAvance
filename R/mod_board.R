@@ -139,14 +139,16 @@ mod_board_server <- function(id, AppData) {
         })
         
         observe({
-            data$task_delete(
-                process_id = rv$task_to_delete$process_id, 
-                activity_id = rv$task_to_delete$activity_id, 
-                org_id = rv$task_to_delete$org_id, 
-                group_id = rv$task_to_delete$group_id, 
-                task_id = rv$task_to_delete$task_id)
-            
-            rv$task_has_been_deleted <- rv$task_has_been_deleted + 1L
+            if(isTRUE(input$confirm_delete)) {
+                data$task_delete(
+                    process_id = rv$task_to_delete$process_id, 
+                    activity_id = rv$task_to_delete$activity_id, 
+                    org_id = rv$task_to_delete$org_id, 
+                    group_id = rv$task_to_delete$group_id, 
+                    task_id = rv$task_to_delete$task_id)
+                
+                rv$task_has_been_deleted <- rv$task_has_been_deleted + 1L
+            }
             
         }) |> 
             bindEvent(input$confirm_delete)
