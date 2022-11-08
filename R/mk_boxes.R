@@ -131,13 +131,13 @@ task_box <- function(task) {
             tooltip = task$output_unit
         ),
         dropdownMenu = bs4Dash::boxDropdown(
-            icon = fontawesome::fa("fas fa-ellipsis-h"),
+            icon = fontawesome::fa("fas fa-ellipsis"),
             bs4Dash::boxDropdownItem("Avance", 
                                      id = paste0(task$task_id, "-report"), 
-                                     icon = fontawesome::fa("fas fa-arrow-alt-circle-right")),
+                                     icon = fontawesome::fa("fas fa-forward")),
             bs4Dash::boxDropdownItem("Editar", 
                                      id = paste0(task$task_id, "-edit"), 
-                                     icon = fontawesome::fa("fas fa-edit")),
+                                     icon = fontawesome::fa("fas fa-pen-to-square")),
             bs4Dash::boxDropdownItem("Eliminar", 
                                      id = paste0(task$task_id, "-del"),
                                      icon = fontawesome::fa("fas fa-trash"))

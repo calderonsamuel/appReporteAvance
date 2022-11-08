@@ -21,10 +21,10 @@ mod_board_ui <- function(id) {
                 class = "cw cw-lg",
                 icon = icon("calendar"),
                 dropdownMenu = bs4Dash::boxDropdown(
-                    icon = fontawesome::fa("fas fa-ellipsis-h"),
+                    icon = fontawesome::fa("fas fa-ellipsis"),
                     bs4Dash::boxDropdownItem(
                         "Agregar",
-                        icon = fontawesome::fa("fas fa-plus-circle"),
+                        icon = fontawesome::fa("fas fa-circle-plus"),
                         id = ns("task_add")
                     )
                 ),
