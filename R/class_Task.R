@@ -40,7 +40,6 @@ Task <- R6::R6Class(
                     time_last_modified = {t_stamp}
                 "
             super$db_execute_statement(statement, .envir = rlang::current_env())
-            # private$sync_tasks()
 
             cli::cli_h2("Task added")
             cli::cli_alert_info("process_id: {process_id}")
@@ -52,9 +51,8 @@ Task <- R6::R6Class(
         task_delete = function(process_id = NA_character_, activity_id = NA_character_,
                                org_id, group_id, task_id) {
             
-            if (xor(is.na(process_id), is.na(activity_id))) {
-                rlang::abort("`process_id` y `activity_id` deben ser o NA o chr en simultáneo")
-            }
+            private$check_process(process_id, activity_id)
+            
             statement <- 
                 "DELETE FROM tasks
                 WHERE
@@ -69,9 +67,41 @@ Task <- R6::R6Class(
             }
             
             super$db_execute_statement(statement, .envir = rlang::current_env())
-            # private$sync_tasks()
             
             cli::cli_h2("Task deleted")
+            cli::cli_alert_info("process_id: {process_id}")
+            cli::cli_alert_info("activity_id: {activity_id}")
+            cli::cli_alert_info("org_id: {org_id}")
+            cli::cli_alert_info("group_id: {group_id}")
+            cli::cli_alert_danger("task_id: {task_id}")
+        },
+        task_report_progress = function(process_id = NA_character_, activity_id = NA_character_,
+                               org_id, group_id, task_id, status_current, output_current) {
+            
+            private$check_process(process_id, activity_id)
+            
+            t_stamp <- super$get_timestamp()
+            
+            statement <- 
+                "UPDATE tasks
+                SET
+                    status_current = {status_current},
+                    output_current = {output_current},
+                    time_last_modified = {t_stamp}
+                WHERE
+                    org_id = {org_id} AND
+                    group_id = {group_id} AND
+                    task_id = {task_id}"
+            
+            if (!is.na(process_id) && !is.na(activity_id)) {
+                statement <- 
+                    paste0(statement, 
+                           " AND process_id = {process_id} AND activity_id = {activity_id}")
+            }
+            
+            super$db_execute_statement(statement, .envir = rlang::current_env())
+            
+            cli::cli_h2("Task edited")
             cli::cli_alert_info("process_id: {process_id}")
             cli::cli_alert_info("activity_id: {activity_id}")
             cli::cli_alert_info("org_id: {org_id}")
@@ -114,10 +144,12 @@ Task <- R6::R6Class(
             db_data |> 
                 purrr::pmap(list) |> 
                 setNames(nm = db_data$task_id)
-        }#,
-        # sync_tasks = function() {
-        #     self$tasks <- private$get_tasks()
-        # }
+        },
+        check_process = function(process_id, activity_id) {
+            if (xor(is.na(process_id), is.na(activity_id))) {
+                rlang::abort("`process_id` y `activity_id` deben ser o NA o chr en simultáneo")
+            }
+        }
     ),
     active = list(
         tasks = function() {
