@@ -75,8 +75,10 @@ Task <- R6::R6Class(
             cli::cli_alert_info("group_id: {group_id}")
             cli::cli_alert_danger("task_id: {task_id}")
         },
-        task_report_progress = function(process_id = NA_character_, activity_id = NA_character_,
-                               org_id, group_id, task_id, status_current, output_current) {
+        task_report_progress = function(process_id = NA_character_, 
+                                        activity_id = NA_character_,
+                                        org_id, group_id, task_id, 
+                                        status_current, output_current) {
             
             private$check_process(process_id, activity_id)
             
