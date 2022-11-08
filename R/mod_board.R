@@ -88,44 +88,52 @@ mod_board_server <- function(id, AppData) {
         
         # Modules ----
         
-        mod_task_add_server(
+        task_gets_added <- mod_task_add_server(
             id = "task_add_1", 
             AppData = AppData, 
             trigger = reactive(input$task_add)
         )
         
+        # Reactives ----
+        
+        tasks <- reactive({
+            print(task_gets_added())
+            print(paste0("N: ", length(AppData$tasks)))
+            AppData$tasks
+        }) |> bindEvent(task_gets_added())
+        
         # Outputs ----
         
         output$pendientes <- renderUI({
-            AppData$tasks |> 
+            tasks() |> 
                 purrr::keep(~ .x$status_current == "Pendiente") |> 
                 lapply(task_box) |>
                 tagList()
         }) 
         
         output$en_proceso <- renderUI({
-            AppData$tasks |> 
+            tasks() |> 
                 purrr::keep(~ .x$status_current == "En proceso") |> 
                 lapply(task_box) |>
                 tagList()
         })
         
         output$pausado <- renderUI({
-            AppData$tasks |> 
+            tasks() |> 
                 purrr::keep(~ .x$status_current == "Pausado") |> 
                 lapply(task_box) |>
                 tagList()
         })
         
         output$en_revision <- renderUI({
-            AppData$tasks |> 
+            tasks() |> 
                 purrr::keep(~ .x$status_current == "En revisión") |> 
                 lapply(task_box) |>
                 tagList()
         })
         
         output$terminado <- renderUI({
-            AppData$tasks |> 
+            tasks() |> 
                 purrr::keep(~ .x$status_current == "Terminado") |> 
                 lapply(task_box) |>
                 tagList()

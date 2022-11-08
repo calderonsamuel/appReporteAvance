@@ -2,10 +2,10 @@ Task <- R6::R6Class(
     classname = "Task",
     inherit = Group,
     public = list(
-        tasks = NULL,
+        # tasks = NULL,
         initialize = function(email) {
             super$initialize(email)
-            private$sync_tasks()
+            # private$sync_tasks()
         },
         task_add = function(process_id = NA_character_, activity_id = NA_character_, 
                             org_id, group_id, 
@@ -40,7 +40,7 @@ Task <- R6::R6Class(
                     time_last_modified = {t_stamp}
                 "
             super$db_execute_statement(statement, .envir = rlang::current_env())
-            private$sync_tasks()
+            # private$sync_tasks()
 
             cli::cli_h2("Task added")
             cli::cli_alert_info("process_id: {process_id}")
@@ -69,7 +69,7 @@ Task <- R6::R6Class(
             }
             
             super$db_execute_statement(statement, .envir = rlang::current_env())
-            private$sync_tasks()
+            # private$sync_tasks()
             
             cli::cli_h2("Task deleted")
             cli::cli_alert_info("process_id: {process_id}")
@@ -114,9 +114,14 @@ Task <- R6::R6Class(
             db_data |> 
                 purrr::pmap(list) |> 
                 setNames(nm = db_data$task_id)
-        },
-        sync_tasks = function() {
-            self$tasks <- private$get_tasks()
+        }#,
+        # sync_tasks = function() {
+        #     self$tasks <- private$get_tasks()
+        # }
+    ),
+    active = list(
+        tasks = function() {
+            private$get_tasks()
         }
     )
 )

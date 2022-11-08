@@ -21,6 +21,10 @@ mod_task_add_server <- function(id, AppData, trigger){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
+    out_values <- reactiveValues(
+        added = 0L
+    )
+    
     org_choices <- reactive({
         ids <- AppData$orgs |> purrr::map_chr("org_id")
         titles <- AppData$orgs |> purrr::map_chr("org_title")
@@ -53,7 +57,7 @@ mod_task_add_server <- function(id, AppData, trigger){
                 label = "Descripción de tarea"
             ),
             shinyWidgets::airDatepickerInput(
-                inputId = "time_due",
+                inputId = ns("time_due"),
                 label = "Plazo máximo",
                 value = computeMinTimeDue(tzone = "America/Lima"), 
                 timepicker = TRUE,
@@ -84,6 +88,32 @@ mod_task_add_server <- function(id, AppData, trigger){
             )
         ))
     }) |> bindEvent(trigger())
+    
+    observe({
+        tryCatch(expr = {
+            AppData$task_add(
+                org_id = input$org_id,
+                group_id = input$group_id,
+                task_title = input$title,
+                task_description = input$description,
+                assignee = AppData$user$user_id,
+                time_due = input$time_due,
+                output_unit = input$output_unit,
+                output_goal = input$output_goal
+            )
+            
+            removeModal(session)
+            
+            alert_success(session, "Tarea agregada")
+            
+            out_values$added <- out_values$added + 1L
+            
+        }, error = \(e) alert_error(session, e))
+    }) |> bindEvent(input$save)
+    
+    # output
+    
+    reactive(out_values$added)
  
   })
 }
