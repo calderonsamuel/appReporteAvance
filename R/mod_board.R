@@ -75,7 +75,8 @@ mod_board_ui <- function(id) {
         ),
         
         
-        mod_task_add_ui(ns("task_add_1"))
+        mod_task_add_ui(ns("task_add_1")),
+        verbatimTextOutput(ns("debug"))
     )
 }
 
@@ -96,48 +97,106 @@ mod_board_server <- function(id, AppData) {
         
         # Reactives ----
         
-        tasks <- reactive({
-            print(task_gets_added())
-            print(paste0("N: ", length(AppData$tasks)))
-            AppData$tasks
-        }) |> bindEvent(task_gets_added())
+        tasks <- reactive(AppData$tasks) |> 
+            bindEvent(
+                task_gets_added(),
+                rv$task_has_been_deleted
+            )
+        
+        rv <- reactiveValues(
+            task_to_delete = list(),
+            task_has_been_deleted = 0L
+        )
+        
+        
+        delete_btns <- reactive({
+            ids <- tasks() |> 
+                purrr::map_chr("task_id") |> 
+                purrr::map_chr(~paste0(.x, "-task-delete"))
+            
+            ids 
+        })
+        
+        # Observers ----
+        
+        observe({
+            delete_btns() |> 
+                purrr::walk(~
+                    observe({
+                        task_id <- stringr::str_remove(.x, "-task-delete")
+                        rv$task_to_delete <- tasks()[[task_id]]
+                        
+                        shinyWidgets::ask_confirmation(
+                            inputId = ns("confirm_delete"),
+                            title = "Eliminar tarea", 
+                            text = "Se eliminará también cualquier progreso asociado. No se podrá recuperar la información.", 
+                            type = "warning", 
+                            btn_labels = c("Cancelar", "Confirmar"),
+                            btn_colors = c("#6e7d88", "#ff5964")
+                        )
+                    }) |> bindEvent(input[[.x]])
+                )
+        })
+        
+        observe({
+            data$task_delete(
+                process_id = rv$task_to_delete$process_id, 
+                activity_id = rv$task_to_delete$activity_id, 
+                org_id = rv$task_to_delete$org_id, 
+                group_id = rv$task_to_delete$group_id, 
+                task_id = rv$task_to_delete$task_id)
+            
+            rv$task_has_been_deleted <- rv$task_has_been_deleted + 1L
+            
+        }) |> 
+            bindEvent(input$confirm_delete)
+        
+        
+        
+        
         
         # Outputs ----
         
         output$pendientes <- renderUI({
             tasks() |> 
                 purrr::keep(~ .x$status_current == "Pendiente") |> 
-                lapply(task_box) |>
+                lapply(task_box, ns) |>
                 tagList()
         }) 
         
         output$en_proceso <- renderUI({
             tasks() |> 
                 purrr::keep(~ .x$status_current == "En proceso") |> 
-                lapply(task_box) |>
+                lapply(task_box, ns) |>
                 tagList()
         })
         
         output$pausado <- renderUI({
             tasks() |> 
                 purrr::keep(~ .x$status_current == "Pausado") |> 
-                lapply(task_box) |>
+                lapply(task_box, ns) |>
                 tagList()
         })
         
         output$en_revision <- renderUI({
             tasks() |> 
                 purrr::keep(~ .x$status_current == "En revisión") |> 
-                lapply(task_box) |>
+                lapply(task_box, ns) |>
                 tagList()
         })
         
         output$terminado <- renderUI({
             tasks() |> 
                 purrr::keep(~ .x$status_current == "Terminado") |> 
-                lapply(task_box) |>
+                lapply(task_box, ns) |>
                 tagList()
         })
+        
+        # Debug ----
+        
+        # output$debug <- renderPrint({
+        #     rv$task_to_delete
+        # })
         
     })
 }
