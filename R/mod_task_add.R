@@ -21,17 +21,29 @@ mod_task_add_server <- function(id, AppData, trigger){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
+    org_choices <- reactive({
+        ids <- AppData$orgs |> purrr::map_chr("org_id")
+        titles <- AppData$orgs |> purrr::map_chr("org_title")
+        setNames(ids, titles)
+    })
+    
+    group_choices <- reactive({
+        ids <- AppData$groups |> purrr::map_chr("group_id")
+        titles <- AppData$groups |> purrr::map_chr("group_title")
+        setNames(ids, titles)
+    })
+    
     observe({
         showModal(modalDialog(
             h1("Añadir tarea"),
             selectInput(
                 inputId = ns("org_id"), 
                 label = "Organización", 
-                choices = head(letters)),
+                choices = org_choices()),
             selectInput(
                 inputId = ns("group_id"), 
                 label = "Equipo", 
-                choices = tail(letters)),
+                choices = group_choices()),
             textInput(
                 inputId = ns("title"), 
                 label = "Título de tarea"
@@ -43,17 +55,17 @@ mod_task_add_server <- function(id, AppData, trigger){
             shinyWidgets::airDatepickerInput(
                 inputId = "time_due",
                 label = "Plazo máximo",
-                value = lubridate::now("America/Lima"), 
+                value = computeMinTimeDue(tzone = "America/Lima"), 
                 timepicker = TRUE,
                 dateFormat = "dd/mm/yyyy", 
                 language = "es",
-                minDate = lubridate::today("America/Lima"),
-                maxDate = lubridate::today("America/Lima") + lubridate::weeks(4),
+                minDate = computeMinDateDue(tzone = "America/Lima"),
+                maxDate = computeMinDateDue(tzone = "America/Lima") + lubridate::weeks(4),
                 todayButton = TRUE,
                 timepickerOpts = shinyWidgets::timepickerOptions(
                     minutesStep = 15,
                     minHours = 8,
-                    maxHours = 17
+                    maxHours = 18
                 )
             ),
             selectInput(
@@ -65,9 +77,11 @@ mod_task_add_server <- function(id, AppData, trigger){
                 inputId = ns("output_goal"),
                 label = "Meta",
                 value = 1
+            ),
+            footer = tagList(
+                modalButton("Cancelar"),
+                btn_guardar(ns("save"))
             )
-            
-            
         ))
     }) |> bindEvent(trigger())
  
