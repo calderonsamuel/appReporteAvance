@@ -100,12 +100,15 @@ mod_board_server <- function(id, AppData) {
         tasks <- reactive(AppData$tasks) |> 
             bindEvent(
                 task_gets_added(),
-                rv$task_has_been_deleted
+                rv$task_has_been_deleted,
+                rv$task_has_been_reported
             )
         
         rv <- reactiveValues(
             task_to_delete = list(),
-            task_has_been_deleted = 0L
+            task_has_been_deleted = 0L,
+            task_to_report = list(),
+            task_has_been_reported = 0L
         )
         
         
@@ -117,7 +120,17 @@ mod_board_server <- function(id, AppData) {
             ids 
         })
         
+        report_btns <- reactive({
+            ids <- tasks() |> 
+                purrr::map_chr("task_id") |> 
+                purrr::map_chr(~paste0(.x, "-task-report"))
+            
+            ids 
+        })
+        
         # Observers ----
+        
+        ## Deleting task ----
         
         observe({
             delete_btns() |> 
@@ -153,8 +166,58 @@ mod_board_server <- function(id, AppData) {
         }) |> 
             bindEvent(input$confirm_delete)
         
+        ## Reporting progress ----
         
+        observe({
+            report_btns() |> 
+                purrr::walk(~
+                    observe({
+                        task_id <- stringr::str_remove(.x, "-task-report")
+                        rv$task_to_report <- tasks()[[task_id]]
+                        
+                        showModal(modalDialog(
+                            h1("Reporte de avance"),
+                            selectInput(
+                                inputId = ns("report_status_current"),
+                                label =  "Nuevo estado", 
+                                choices = c("En proceso", "Pausado", "En revisión") |> setdiff(rv$task_to_report$status_current)),
+                            numericInput(
+                                inputId = ns("report_output_current"), 
+                                label = paste0("Avance actual (", rv$task_to_report$output_unit, ")"),
+                                value = rv$task_to_report$output_current,
+                                min = rv$task_to_report$output_current,
+                                max = rv$task_to_report$output_goal
+                            ),
+                            
+                            footer = tagList(
+                                modalButton("Cancelar"),
+                                btn_guardar(ns("save_report"))
+                            )
+                        ))
+                    }) |> bindEvent(input[[.x]], ignoreInit = TRUE)
+                )
+        })
         
+        observe({
+            tryCatch(expr = {
+                AppData$task_report_progress(
+                    process_id = rv$task_to_report$process_id, 
+                    activity_id = rv$task_to_report$activity_id, 
+                    org_id = rv$task_to_report$org_id, 
+                    group_id = rv$task_to_report$group_id, 
+                    task_id = rv$task_to_report$task_id,
+                    status_current = input$report_status_current,
+                    output_current = input$report_output_current)
+                
+                
+                removeModal(session)
+                
+                rv$task_has_been_reported <- rv$task_has_been_reported + 1L
+                
+            }, error = \(e) alert_error(session, e))
+                
+        }) |> 
+            bindEvent(input$save_report)
         
         
         # Outputs ----
