@@ -118,9 +118,10 @@ boxHidden <- function(
     if (hidden) boxHide(myBox) else myBox
 }
 
-task_box <- function(task) {
+task_box <- function(task, ns = NULL) {
+    id <- ns_safe(task$task_id, ns)
     bs4Dash::box(
-        id = task$task_id,
+        id = id,
         title = task$task_title,
         width = 12,
         collapsed = TRUE,
@@ -133,13 +134,13 @@ task_box <- function(task) {
         dropdownMenu = bs4Dash::boxDropdown(
             icon = fontawesome::fa("fas fa-ellipsis"),
             bs4Dash::boxDropdownItem("Avance", 
-                                     id = paste0(task$task_id, "-report"), 
+                                     id = paste0(id, "-task-report"), 
                                      icon = fontawesome::fa("fas fa-forward")),
             bs4Dash::boxDropdownItem("Editar", 
-                                     id = paste0(task$task_id, "-edit"), 
+                                     id = paste0(id, "-task-edit"), 
                                      icon = fontawesome::fa("fas fa-pen-to-square")),
             bs4Dash::boxDropdownItem("Eliminar", 
-                                     id = paste0(task$task_id, "-del"),
+                                     id = paste0(id, "-task-delete"),
                                      icon = fontawesome::fa("fas fa-trash"))
         ),
         tags$p(task$task_description),
