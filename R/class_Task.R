@@ -106,7 +106,7 @@ Task <- R6::R6Class(
             cli::cli_alert_info("activity_id: {activity_id}")
             cli::cli_alert_info("org_id: {org_id}")
             cli::cli_alert_info("group_id: {group_id}")
-            cli::cli_alert_danger("task_id: {task_id}")
+            cli::cli_alert_warning("task_id: {task_id}")
         }
     ),
     private = list(
