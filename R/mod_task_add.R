@@ -97,7 +97,7 @@ mod_task_add_server <- function(id, AppData, trigger){
                 task_title = input$title,
                 task_description = input$description,
                 assignee = AppData$user$user_id,
-                time_due = input$time_due,
+                time_due = lubridate::with_tz(input$time_due, "America/Lima"),
                 output_unit = input$output_unit,
                 output_goal = input$output_goal
             )
