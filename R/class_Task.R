@@ -109,6 +109,40 @@ Task <- R6::R6Class(
             cli::cli_alert_info("org_id: {org_id}")
             cli::cli_alert_info("group_id: {group_id}")
             cli::cli_alert_warning("task_id: {task_id}")
+        },
+        task_edit_metadata = function(process_id = NA_character_, 
+                                      activity_id = NA_character_,
+                                      org_id, group_id, task_id,
+                                      task_title, task_description) {
+            private$check_process(process_id, activity_id)
+            
+            t_stamp <- super$get_timestamp()
+            
+            statement <- 
+                "UPDATE tasks
+                SET
+                    task_title = {task_title},
+                    task_description = {task_description},
+                    time_last_modified = {t_stamp}
+                WHERE
+                    org_id = {org_id} AND
+                    group_id = {group_id} AND
+                    task_id = {task_id}"
+            
+            if (!is.na(process_id) && !is.na(activity_id)) {
+                statement <- 
+                    paste0(statement, 
+                           " AND process_id = {process_id} AND activity_id = {activity_id}")
+            }
+            
+            super$db_execute_statement(statement, .envir = rlang::current_env())
+            
+            cli::cli_h2("Task edited")
+            cli::cli_alert_info("process_id: {process_id}")
+            cli::cli_alert_info("activity_id: {activity_id}")
+            cli::cli_alert_info("org_id: {org_id}")
+            cli::cli_alert_info("group_id: {group_id}")
+            cli::cli_alert_warning("task_id: {task_id}")
         }
     ),
     private = list(

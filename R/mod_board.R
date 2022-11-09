@@ -101,14 +101,17 @@ mod_board_server <- function(id, AppData) {
             bindEvent(
                 task_gets_added(),
                 rv$task_has_been_deleted,
-                rv$task_has_been_reported
+                rv$task_has_been_reported,
+                rv$task_has_been_edited
             )
         
         rv <- reactiveValues(
             task_to_delete = list(),
             task_has_been_deleted = 0L,
             task_to_report = list(),
-            task_has_been_reported = 0L
+            task_has_been_reported = 0L,
+            task_to_edit = list(),
+            task_has_been_edited = 0L
         )
         
         
@@ -124,6 +127,14 @@ mod_board_server <- function(id, AppData) {
             ids <- tasks() |> 
                 purrr::map_chr("task_id") |> 
                 purrr::map_chr(~paste0(.x, "-task-report"))
+            
+            ids 
+        })
+        
+        edit_btns <- reactive({
+            ids <- tasks() |> 
+                purrr::map_chr("task_id") |> 
+                purrr::map_chr(~paste0(.x, "-task-edit"))
             
             ids 
         })
@@ -152,16 +163,18 @@ mod_board_server <- function(id, AppData) {
         })
         
         observe({
-            if(isTRUE(input$confirm_delete)) {
-                data$task_delete(
-                    process_id = rv$task_to_delete$process_id, 
-                    activity_id = rv$task_to_delete$activity_id, 
-                    org_id = rv$task_to_delete$org_id, 
-                    group_id = rv$task_to_delete$group_id, 
-                    task_id = rv$task_to_delete$task_id)
-                
-                rv$task_has_been_deleted <- rv$task_has_been_deleted + 1L
-            }
+            tryCatch(expr = {
+                if(isTRUE(input$confirm_delete)) {
+                    AppData$task_delete(
+                        process_id = rv$task_to_delete$process_id, 
+                        activity_id = rv$task_to_delete$activity_id, 
+                        org_id = rv$task_to_delete$org_id, 
+                        group_id = rv$task_to_delete$group_id, 
+                        task_id = rv$task_to_delete$task_id)
+                    
+                    rv$task_has_been_deleted <- rv$task_has_been_deleted + 1L
+                }
+            }, error = \(e) alert_error(session, e))
             
         }) |> 
             bindEvent(input$confirm_delete)
@@ -218,6 +231,60 @@ mod_board_server <- function(id, AppData) {
                 
         }) |> 
             bindEvent(input$save_report)
+        
+        ## Editing task metadata
+        
+        observe({
+            edit_btns() |> 
+                purrr::walk(~
+                    observe({
+                        task_id <- stringr::str_remove(.x, "-task-edit")
+                        rv$task_to_edit <- tasks()[[task_id]]
+                        
+                        showModal(modalDialog(
+                            
+                            h1("Editar tarea"),
+                            
+                            textInput(
+                                inputId = ns("edit_title"),
+                                label = "Título de tarea",
+                                value = rv$task_to_edit$task_title
+                            ),
+                            textAreaInput(
+                                inputId = ns("edit_description"),
+                                label = "Descripción de tarea",
+                                value = rv$task_to_edit$task_description
+                            ),
+                            
+                            footer = tagList(
+                                modalButton("Cancelar"),
+                                btn_guardar(ns("save_edition"))
+                            )
+                        ))
+                    }) |> bindEvent(input[[.x]], ignoreInit = TRUE)
+                )
+        })
+        
+        observe({
+            tryCatch(expr = {
+                AppData$task_edit_metadata(
+                    process_id = rv$task_to_edit$process_id, 
+                    activity_id = rv$task_to_edit$activity_id, 
+                    org_id = rv$task_to_edit$org_id, 
+                    group_id = rv$task_to_edit$group_id, 
+                    task_id = rv$task_to_edit$task_id,
+                    task_title = input$edit_title,
+                    task_description = input$edit_description)
+                
+                
+                removeModal(session)
+                
+                rv$task_has_been_edited <- rv$task_has_been_edited + 1L
+                
+            }, error = \(e) alert_error(session, e))
+            
+        }) |> 
+            bindEvent(input$save_edition)
         
         
         # Outputs ----
