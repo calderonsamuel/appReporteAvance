@@ -117,3 +117,42 @@ boxHidden <- function(
     
     if (hidden) boxHide(myBox) else myBox
 }
+
+task_box <- function(task, ns = NULL) {
+    id <- ns_safe(task$task_id, ns)
+    bs4Dash::box(
+        id = id,
+        title = task$task_title,
+        width = 12,
+        collapsed = TRUE,
+        headerBorder = FALSE,
+        label = bs4Dash::boxLabel(
+            text = glue::glue("{task$output_current}/{task$output_goal}"), 
+            status = "danger",
+            tooltip = task$output_unit
+        ),
+        dropdownMenu = bs4Dash::boxDropdown(
+            icon = fontawesome::fa("fas fa-ellipsis"),
+            bs4Dash::boxDropdownItem("Avance", 
+                                     id = paste0(id, "-task-report"), 
+                                     icon = fontawesome::fa("fas fa-forward")),
+            bs4Dash::boxDropdownItem("Editar", 
+                                     id = paste0(id, "-task-edit"), 
+                                     icon = fontawesome::fa("fas fa-pen-to-square")),
+            bs4Dash::boxDropdownItem("Eliminar", 
+                                     id = paste0(id, "-task-delete"),
+                                     icon = fontawesome::fa("fas fa-trash"))
+        ),
+        tags$p(task$task_description),
+        tags$div(
+            tags$span(fontawesome::fa("far fa-user"), glue::glue("{task$assignee_name} {task$assignee_last_name}"))
+        ),
+        tags$div(
+            tags$span(fontawesome::fa("far fa-thumbs-up"), glue::glue("{task$assigned_by_name} {task$assigned_by_last_name}"))
+        ),
+        tags$div(
+            tags$span(fontawesome::fa("far fa-calendar"), format(task$time_due, "%d/%m/%Y")),
+            tags$span(fontawesome::fa("far fa-clock"), format(task$time_due, "%H:%M:%S"))
+        )
+    )
+}

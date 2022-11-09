@@ -1,0 +1,29 @@
+# Session data
+user:
+    id:
+    name:
+    last_name:
+    email:
+    time_creation:
+    time_last_modified:
+orgs:
+    id:
+    title:
+    description:
+    time_last_modified:
+    user_role:
+    org_users:
+        id:
+        name:
+        last_name:
+groups:
+    id:
+    title:
+    description:
+    time_last_modified:
+    user_role:
+    group_users:
+        id:
+        name:
+        last_name:
+        time_last_modified:

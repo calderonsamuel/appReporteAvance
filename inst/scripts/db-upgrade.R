@@ -21,6 +21,8 @@ groups <- DBI::dbGetQuery(con_prod, "SELECT * FROM groups")
 
 DBI::dbDisconnect(con_prod)
 
+cli::cli_alert_success("Data retrieved")
+
 ## Constructors ----
 
 create_organisation <- function(org_title, org_description) {
@@ -28,8 +30,8 @@ create_organisation <- function(org_title, org_description) {
         org_id = random_id(),
         org_title = org_title,
         org_description = org_description,
-        time_creation = now(),
-        time_last_modified = now()
+        time_creation = now("America/Lima"),
+        time_last_modified = now("America/Lima")
     )
 }
 
@@ -39,8 +41,8 @@ create_user <- function(name, last_name, email, time_creation = NULL) {
         name = name,
         last_name = last_name,
         email = email,
-        time_creation = time_creation %||% now(),
-        time_last_modified = now()
+        time_creation = time_creation %||% now("America/Lima"),
+        time_last_modified = now("America/Lima")
     )
 }
 
@@ -49,8 +51,8 @@ create_org_user <- function(org_id, user_id, org_role) {
         org_id = org_id,
         user_id = user_id,
         org_role = org_role,
-        time_creation = now(),
-        time_last_modified = now()
+        time_creation = now("America/Lima"),
+        time_last_modified = now("America/Lima")
     )
 }
 
@@ -61,8 +63,8 @@ create_group <- function(org_id, group_title, group_description, parent_group) {
         group_title = group_title,
         group_description = group_description,
         parent_group = parent_group,
-        time_creation = now(),
-        time_last_modified = now()
+        time_creation = now("America/Lima"),
+        time_last_modified = now("America/Lima")
     )
 }
 
@@ -72,8 +74,8 @@ create_group_user <- function(org_id, group_id, user_id, group_role) {
         group_id = group_id,
         user_id = user_id,
         group_role = group_role,
-        time_creation = now(),
-        time_last_modified = now()
+        time_creation = now("America/Lima"),
+        time_last_modified = now("America/Lima")
     )
 }
 
@@ -98,8 +100,8 @@ create_task <- function(org_id, group_id, task_title,
         output_goal = output_goal,
         output_current = output_current,
         status_current = status_current %||% "Pendiente",
-        time_creation = time_creation %||% now(),
-        time_last_modified = now()
+        time_creation = time_creation %||% now("America/Lima"),
+        time_last_modified = now("America/Lima")
     )
 }
 
@@ -116,7 +118,7 @@ create_progress <- function(org_id, group_id, task_id,
         reported_by = reported_by,
         output_progress = output_progress,
         status = status,
-        time_reported = time_reported %||% now(),
+        time_reported = time_reported %||% now("America/Lima"),
         details = details
     )
 }
@@ -155,8 +157,9 @@ db_groups <-
 db_group_users <- db_groups |> 
     select(ends_with("_id")) |> 
     left_join(db_org_users) |> 
-    select(-user_id) |> 
-    rename(group_role = org_role)
+    select(-starts_with("time")) |>
+    rename(group_role = org_role) |> 
+    pmap_dfr(create_group_user)
 
 
 
@@ -206,7 +209,7 @@ db_tasks <-
         activity_id = NA_character_,
         org_id = db_organisations$org_id,
         group_id = get_new_id_group("team-politicas"),
-        time_due = now() + weeks(2),
+        time_due = now("America/Lima") + weeks(2),
         output_unit = "Documento",
         output_goal = 1L,
         output_current = if_else(status_current == "Terminado", 1L, 0L)
@@ -230,24 +233,115 @@ db_progress <- progress |>
     select(-c(status_id, step_id)) |> 
     pmap_dfr(create_progress)
 
-
-# process_id
-# activity_id
-# org_id
-# group_id
-# task_id
-# reported_by
-# output_progress
-# status
-# time
-# details
-
+cli::cli_alert_success("Data processed")
    
 ## Data migration ----
 
 # This needs to change for a remote DB 
-con_dev <- DBI::dbConnect(RSQLite::SQLite(), "inst/scripts/db_v0-3-0.db")
+con_dev <- DBI::dbConnect(
+    # RSQLite::SQLite(), "inst/scripts/db_v0-3-0.db"
+    drv = RMariaDB::MariaDB(),
+    user = Sys.getenv("DB_USER"),
+    password = Sys.getenv("DB_SECRET"),
+    dbname = Sys.getenv("DB_NAME_DEV"),
+    host = Sys.getenv("DB_HOST"),
+    port = Sys.getenv("DB_PORT")
+)
 
+xrep <- \(num = 32) strrep("x", num)
+
+base_users <- create_user(
+    name = xrep(32),
+    last_name = xrep(32),
+    email = xrep(64)
+)
+
+base_organisations <-
+    create_organisation(
+        org_title = xrep(64), 
+        org_description = xrep(256)
+    )    
+
+base_org_users <- 
+    create_org_user(
+        org_id = ids::random_id(),
+        user_id = ids::random_id(), 
+        org_role = xrep(32))
+
+base_groups <- 
+    create_group(
+        org_id = ids::random_id(),
+        group_title = xrep(64), 
+        group_description = xrep(256), 
+        parent_group = ids::random_id()
+    )
+
+base_group_users <- 
+    create_group_user(
+        org_id = ids::random_id(), 
+        group_id = ids::random_id(), 
+        user_id = ids::random_id(), 
+        group_role = xrep(32)
+    )
+
+base_tasks <- 
+    create_task(
+        org_id = ids::random_id(), 
+        group_id = ids::random_id(), 
+        task_title = xrep(256),
+        task_description = xrep(512), 
+        assigned_by = ids::random_id(), 
+        assignee = ids::random_id(), 
+        time_due = lubridate::now("America/Lima"), 
+        output_unit = xrep(32),
+        output_goal = 9999999.99, 
+        output_current = 9999999.99,
+        status_current = xrep(32), 
+        process_id = ids::random_id(), 
+        activity_id = ids::random_id()
+    )
+
+base_progress <- 
+    create_progress(
+        org_id = ids::random_id(), 
+        group_id = ids::random_id(),
+        task_id = ids::random_id(), 
+        reported_by = ids::random_id(), 
+        output_progress = 9999999.99, 
+        status = xrep(32), 
+        details = xrep(256), 
+        process_id = ids::random_id(), 
+        activity_id = ids::random_id()
+    )
+
+base_df <- list(
+    users = base_users,
+    organisations = base_organisations,
+    org_users = base_org_users,
+    groups = base_groups,
+    group_users = base_group_users,
+    tasks = base_tasks,
+    progress = base_progress
+)
+
+cli::cli_alert_info("Dummy tables created")
+
+# Set placeholders
+base_df |> 
+    names() |> 
+    walk(~DBI::dbWriteTable(con_dev, name = .x, value = base_df[[.x]], overwrite = TRUE))
+
+cli::cli_alert_info("Dummy tables inserted")
+
+# Delete placeholders
+base_df |> 
+    names() |> 
+    walk(~DBI::dbExecute(con_dev, paste0("DELETE FROM ", .x)))
+
+cli::cli_alert_info("Dummy tables deleted")
+
+
+# Put real data
 df_list <- list(
     users = db_users,
     organisations = db_organisations,
@@ -260,8 +354,12 @@ df_list <- list(
 
 df_list |> 
     names() |> 
-    walk(~DBI::dbWriteTable(con_dev, name = .x, value = df_list[[.x]] , overwrite = TRUE))
+    walk(~DBI::dbWriteTable(con_dev, name = .x, value = df_list[[.x]], append = TRUE))
+
+cli::cli_alert_info("Real data inserted")
 
 DBI::dbListTables(con_dev)
 
 DBI::dbDisconnect(con_dev)
+
+cli::cli_alert_success("Data migrated")
