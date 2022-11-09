@@ -47,6 +47,14 @@ Task <- R6::R6Class(
             cli::cli_alert_info("org_id: {org_id}")
             cli::cli_alert_info("group_id: {group_id}")
             cli::cli_alert_success("task_id: {task_id}")
+            
+            self$progress_add(process_id, activity_id,
+                              org_id, group_id, task_id,
+                              output_progress = 0, 
+                              status = "Pendiente",
+                              details = "Tarea iniciada") |> 
+                suppressMessages()
+            
         },
         task_delete = function(process_id = NA_character_, activity_id = NA_character_,
                                org_id, group_id, task_id) {
@@ -143,6 +151,38 @@ Task <- R6::R6Class(
             cli::cli_alert_info("org_id: {org_id}")
             cli::cli_alert_info("group_id: {group_id}")
             cli::cli_alert_warning("task_id: {task_id}")
+        },
+        progress_add = function(process_id = NA_character_, 
+                                activity_id = NA_character_,
+                                org_id, group_id, task_id,
+                                output_progress, status, details) {
+            private$check_process(process_id, activity_id)
+            
+            t_stamp <- super$get_timestamp()
+            
+            statement <- 
+                "INSERT INTO progress
+                SET
+                    process_id = {process_id},
+                    activity_id = {activity_id},
+                    org_id = {org_id},
+                    group_id = {group_id},
+                    task_id = {task_id},
+                    reported_by = {self$user$user_id},
+                    output_progress = {output_progress},
+                    status = {status},
+                    time_reported = {t_stamp},
+                    details = {details}"
+            
+            super$db_execute_statement(statement, .envir = rlang::current_env())
+            
+            cli::cli_h2("Progress reported")
+            cli::cli_alert_info("process_id: {process_id}")
+            cli::cli_alert_info("activity_id: {activity_id}")
+            cli::cli_alert_info("org_id: {org_id}")
+            cli::cli_alert_info("group_id: {group_id}")
+            cli::cli_alert_warning("task_id: {task_id}")
+            cli::cli_alert_warning("status: {status}")
         }
     ),
     private = list(
