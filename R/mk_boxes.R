@@ -151,8 +151,8 @@ task_box <- function(task, ns = NULL) {
             tags$span(fontawesome::fa("far fa-thumbs-up"), glue::glue("{task$assigned_by_name} {task$assigned_by_last_name}"))
         ),
         tags$div(
-            tags$span(fontawesome::fa("far fa-calendar"), format(task$time_due, "%d/%m/%Y", tz = "America/Lima")),
-            tags$span(fontawesome::fa("far fa-clock"), format(task$time_due, "%H:%M:%S", tz = "America/Lima"))
+            tags$span(fontawesome::fa("far fa-calendar"), format(task$time_due, "%d/%m/%Y")),
+            tags$span(fontawesome::fa("far fa-clock"), format(task$time_due, "%H:%M:%S"))
         )
     )
 }

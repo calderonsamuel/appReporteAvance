@@ -144,7 +144,7 @@ Task <- R6::R6Class(
             ) 
             
             db_data |> 
-                transform(time_due = lubridate::with_tz(time_due, "America/Lima")) |> 
+                # transform(time_due = lubridate::with_tz(time_due, "America/Lima")) |> 
                 purrr::pmap(list) |> 
                 setNames(nm = db_data$task_id)
         },
