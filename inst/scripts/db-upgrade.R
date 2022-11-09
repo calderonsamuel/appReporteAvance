@@ -248,6 +248,100 @@ con_dev <- DBI::dbConnect(
     port = Sys.getenv("DB_PORT")
 )
 
+xrep <- \(num = 32) strrep("x", num)
+
+base_users <- create_user(
+    name = xrep(32),
+    last_name = xrep(32),
+    email = xrep(64)
+)
+
+base_organisations <-
+    create_organisation(
+        org_title = xrep(64), 
+        org_description = xrep(256)
+    )    
+
+base_org_users <- 
+    create_org_user(
+        org_id = ids::random_id(),
+        user_id = ids::random_id(), 
+        org_role = xrep(32))
+
+base_groups <- 
+    create_group(
+        org_id = ids::random_id(),
+        group_title = xrep(64), 
+        group_description = xrep(256), 
+        parent_group = ids::random_id()
+    )
+
+base_group_users <- 
+    create_group_user(
+        org_id = ids::random_id(), 
+        group_id = ids::random_id(), 
+        user_id = ids::random_id(), 
+        group_role = xrep(32)
+    )
+
+base_tasks <- 
+    create_task(
+        org_id = ids::random_id(), 
+        group_id = ids::random_id(), 
+        task_title = xrep(256),
+        task_description = xrep(512), 
+        assigned_by = ids::random_id(), 
+        assignee = ids::random_id(), 
+        time_due = lubridate::now("America/Lima"), 
+        output_unit = xrep(32),
+        output_goal = 9999999.99, 
+        output_current = 9999999.99,
+        status_current = xrep(32), 
+        process_id = ids::random_id(), 
+        activity_id = ids::random_id()
+    )
+
+base_progress <- 
+    create_progress(
+        org_id = ids::random_id(), 
+        group_id = ids::random_id(),
+        task_id = ids::random_id(), 
+        reported_by = ids::random_id(), 
+        output_progress = 9999999.99, 
+        status = xrep(32), 
+        details = xrep(256), 
+        process_id = ids::random_id(), 
+        activity_id = ids::random_id()
+    )
+
+base_df <- list(
+    users = base_users,
+    organisations = base_organisations,
+    org_users = base_org_users,
+    groups = base_groups,
+    group_users = base_group_users,
+    tasks = base_tasks,
+    progress = base_progress
+)
+
+cli::cli_alert_info("Dummy tables created")
+
+# Set placeholders
+base_df |> 
+    names() |> 
+    walk(~DBI::dbWriteTable(con_dev, name = .x, value = base_df[[.x]], overwrite = TRUE))
+
+cli::cli_alert_info("Dummy tables inserted")
+
+# Delete placeholders
+base_df |> 
+    names() |> 
+    walk(~DBI::dbExecute(con_dev, paste0("DELETE FROM ", .x)))
+
+cli::cli_alert_info("Dummy tables deleted")
+
+
+# Put real data
 df_list <- list(
     users = db_users,
     organisations = db_organisations,
@@ -260,7 +354,9 @@ df_list <- list(
 
 df_list |> 
     names() |> 
-    walk(~DBI::dbWriteTable(con_dev, name = .x, value = df_list[[.x]] , overwrite = TRUE))
+    walk(~DBI::dbWriteTable(con_dev, name = .x, value = df_list[[.x]], append = TRUE))
+
+cli::cli_alert_info("Real data inserted")
 
 DBI::dbListTables(con_dev)
 
