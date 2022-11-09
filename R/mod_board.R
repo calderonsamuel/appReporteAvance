@@ -201,6 +201,10 @@ mod_board_server <- function(id, AppData) {
                                 min = rv$task_to_report$output_current,
                                 max = rv$task_to_report$output_goal
                             ),
+                            textAreaInput(
+                                inputId = ns("report_details"), 
+                                label = "Detalles"
+                            ),
                             
                             footer = tagList(
                                 modalButton("Cancelar"),
@@ -220,7 +224,8 @@ mod_board_server <- function(id, AppData) {
                     group_id = rv$task_to_report$group_id, 
                     task_id = rv$task_to_report$task_id,
                     status_current = input$report_status_current,
-                    output_current = input$report_output_current)
+                    output_current = input$report_output_current,
+                    details = input$report_details)
                 
                 
                 removeModal(session)

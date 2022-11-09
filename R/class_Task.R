@@ -90,10 +90,11 @@ Task <- R6::R6Class(
                               details = "Tarea eliminada") |> 
                 suppressMessages()
         },
+        
         task_report_progress = function(process_id = NA_character_, 
                                         activity_id = NA_character_,
                                         org_id, group_id, task_id, 
-                                        status_current, output_current) {
+                                        status_current, output_current, details) {
             
             private$check_process(process_id, activity_id)
             
@@ -129,9 +130,10 @@ Task <- R6::R6Class(
                               org_id, group_id, task_id,
                               output_progress = output_current, 
                               status = status_current,
-                              details = "Tarea con avance reportado") |> 
+                              details = details) |> 
                 suppressMessages()
         },
+        
         task_edit_metadata = function(process_id = NA_character_, 
                                       activity_id = NA_character_,
                                       org_id, group_id, task_id,
