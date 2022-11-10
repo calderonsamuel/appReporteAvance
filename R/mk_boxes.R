@@ -129,7 +129,7 @@ task_box <- function(task, ns = NULL) {
         background = task$user_color,
         label = bs4Dash::boxLabel(
             text = glue::glue("{task$output_current}/{task$output_goal}"), 
-            status = "danger",
+            status = "primary",
             tooltip = task$output_unit
         ),
         dropdownMenu = bs4Dash::boxDropdown(
