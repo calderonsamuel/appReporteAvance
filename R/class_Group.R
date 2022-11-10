@@ -73,7 +73,7 @@ Group <- R6::R6Class(
             cli::cli_alert_info("User '{user_id}' deleted from group '{group_id}' in org '{org_id}'")
         },
         
-        group_user_edit = function() {
+        group_user_edit = function(org_id, group_id, user_id, group_role) {
             statement <- 
                 "UPDATE group_users
                 SET
