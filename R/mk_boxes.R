@@ -120,6 +120,22 @@ boxHidden <- function(
 
 task_box <- function(task, ns = NULL) {
     id <- ns_safe(task$task_id, ns)
+    
+    dropdown <- if (task$status_current != "Terminado") {
+        bs4Dash::boxDropdown(
+            icon = fontawesome::fa("fas fa-ellipsis"),
+            bs4Dash::boxDropdownItem("Avance", 
+                                     id = paste0(id, "-task-report"), 
+                                     icon = fontawesome::fa("fas fa-forward")),
+            bs4Dash::boxDropdownItem("Editar", 
+                                     id = paste0(id, "-task-edit"), 
+                                     icon = fontawesome::fa("fas fa-pen-to-square")),
+            bs4Dash::boxDropdownItem("Eliminar", 
+                                     id = paste0(id, "-task-delete"),
+                                     icon = fontawesome::fa("fas fa-trash"))
+        )
+    } else NULL
+        
     bs4Dash::box(
         id = id,
         title = task$task_title,
@@ -132,18 +148,7 @@ task_box <- function(task, ns = NULL) {
             status = "primary",
             tooltip = task$output_unit
         ),
-        dropdownMenu = bs4Dash::boxDropdown(
-            icon = fontawesome::fa("fas fa-ellipsis"),
-            bs4Dash::boxDropdownItem("Avance", 
-                                     id = paste0(id, "-task-report"), 
-                                     icon = fontawesome::fa("fas fa-forward")),
-            bs4Dash::boxDropdownItem("Editar", 
-                                     id = paste0(id, "-task-edit"), 
-                                     icon = fontawesome::fa("fas fa-pen-to-square")),
-            bs4Dash::boxDropdownItem("Eliminar", 
-                                     id = paste0(id, "-task-delete"),
-                                     icon = fontawesome::fa("fas fa-trash"))
-        ),
+        dropdownMenu = dropdown,
         tags$p(task$task_description),
         tags$div(
             tags$span(fontawesome::fa("far fa-user"), glue::glue("{task$assignee_name} {task$assignee_last_name}"))
