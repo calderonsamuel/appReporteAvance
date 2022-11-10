@@ -154,9 +154,19 @@ db_groups <-
         pmap_dfr(create_group) |> 
         add_row(create_group(db_organisations$org_id, "Main", "Main wrapper", "organisation"))
 
-user_colors <- c("indigo", "lightblue", "navy", 
-                 "purple", "fuchsia", "pink", "maroon", "orange", "lime", "teal", 
-                 "olive")        
+user_colors <- c(
+    # "indigo",
+    "lightblue",
+    "navy",
+    "purple",
+    "fuchsia",
+    # "pink",
+    "maroon",
+    "orange",
+    "lime",
+    "teal",
+    "olive"
+)        
 
 db_group_users <- db_groups |> 
     select(ends_with("_id")) |> 
