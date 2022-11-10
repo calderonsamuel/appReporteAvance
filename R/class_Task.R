@@ -232,12 +232,17 @@ Task <- R6::R6Class(
                     rhs.name AS assignee_name,
                     rhs.last_name AS assignee_last_name,
                     rhs2.name AS assigned_by_name,
-                    rhs2.last_name AS assigned_by_last_name
+                    rhs2.last_name AS assigned_by_last_name,
+                    rhs3.user_color AS user_color
                 FROM ({query_tasks}) AS lhs
                 LEFT JOIN users rhs ON
                     lhs.assignee = rhs.user_id
                 LEFT JOIN users rhs2 ON
-                    lhs.assigned_by = rhs2.user_id",
+                    lhs.assigned_by = rhs2.user_id
+                LEFT JOIN group_users rhs3 ON
+                    lhs.assignee = rhs3.user_id AND
+                    lhs.group_id = rhs3.group_id
+                ",
                 query_tasks = query_tasks
             ) 
             
