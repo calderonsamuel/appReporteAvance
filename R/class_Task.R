@@ -215,14 +215,15 @@ Task <- R6::R6Class(
                 FROM tasks 
                 WHERE org_id IN ({orgs*}) AND
                     group_id IN ({groups*}) AND 
-                    assignee = {self$user$user_id} AND
+                    assignee IN ({assignees*}) AND
                         (status_current != 'Terminado' OR (
                             status_current = 'Terminado' AND
                             time_last_modified BETWEEN date_sub(now(), INTERVAL 2 WEEK) AND now()
                             )
                         )",
                 orgs = names(self$orgs),
-                groups = names(self$groups)
+                groups = names(self$groups),
+                assignees = private$get_assignees()
             )
             
             db_data <- super$db_get_query(
@@ -249,6 +250,22 @@ Task <- R6::R6Class(
             if (xor(is.na(process_id), is.na(activity_id))) {
                 rlang::abort("`process_id` y `activity_id` deben ser o NA o chr en simultáneo")
             }
+        },
+        get_assignees = function() {
+            groups_where_admin <- self$groups |> 
+                purrr::keep(~.x$group_role == "admin") |> 
+                names()
+            
+            users_where_admin <- character()
+            
+            if (length(groups_where_admin) > 0) {
+                users_where_admin <- self$group_users[groups_where_admin] |> 
+                    purrr::map(~purrr::map_chr(.x, "user_id")) |> 
+                    purrr::reduce(union)
+            }
+            
+            
+            union(users_where_admin, self$user$user_id)
         }
     ),
     active = list(
