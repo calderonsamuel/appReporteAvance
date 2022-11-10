@@ -49,6 +49,7 @@ Group <- R6::R6Class(
                     org_id = {org_id},
                     group_id = {group_id},
                     user_id = {user_id},
+                    user_color = 'white',
                     group_role = {role},
                     time_creation = {t_stamp},
                     time_last_modified = {t_stamp}"

@@ -68,11 +68,12 @@ create_group <- function(org_id, group_title, group_description, parent_group) {
     )
 }
 
-create_group_user <- function(org_id, group_id, user_id, group_role) {
+create_group_user <- function(org_id, group_id, user_id, user_color, group_role) {
     tibble(
         org_id = org_id,
         group_id = group_id,
         user_id = user_id,
+        user_color = user_color,
         group_role = group_role,
         time_creation = now("America/Lima"),
         time_last_modified = now("America/Lima")
@@ -159,7 +160,10 @@ db_group_users <- db_groups |>
     left_join(db_org_users) |> 
     select(-starts_with("time")) |>
     rename(group_role = org_role) |> 
-    pmap_dfr(create_group_user)
+    group_by(group_id) |> 
+    mutate(user_color = sample(bs4Dash::getAdminLTEColors(), size = n())) |> 
+    ungroup() |> 
+    pmap_dfr(create_group_user) 
 
 
 
@@ -281,6 +285,7 @@ base_group_users <-
         org_id = ids::random_id(), 
         group_id = ids::random_id(), 
         user_id = ids::random_id(), 
+        user_color = xrep(32),
         group_role = xrep(32)
     )
 
