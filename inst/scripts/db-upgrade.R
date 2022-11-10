@@ -153,7 +153,10 @@ db_groups <-
         select(-group_admin) |> 
         pmap_dfr(create_group) |> 
         add_row(create_group(db_organisations$org_id, "Main", "Main wrapper", "organisation"))
-        
+
+user_colors <- c("indigo", "lightblue", "navy", 
+                 "purple", "fuchsia", "pink", "maroon", "orange", "lime", "teal", 
+                 "olive")        
 
 db_group_users <- db_groups |> 
     select(ends_with("_id")) |> 
@@ -161,10 +164,9 @@ db_group_users <- db_groups |>
     select(-starts_with("time")) |>
     rename(group_role = org_role) |> 
     group_by(group_id) |> 
-    mutate(user_color = sample(bs4Dash::getAdminLTEColors(), size = n())) |> 
+    mutate(user_color = sample(user_colors, size = n())) |> 
     ungroup() |> 
     pmap_dfr(create_group_user) 
-
 
 
 get_new_id_user <- function(old_id) {
