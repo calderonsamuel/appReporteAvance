@@ -193,7 +193,7 @@ mod_board_server <- function(id, AppData) {
                             selectInput(
                                 inputId = ns("report_status_current"),
                                 label =  "Nuevo estado", 
-                                choices = c("En proceso", "Pausado", "En revisión") |> setdiff(rv$task_to_report$status_current)),
+                                choices = task_get_status_choices(rv$task_to_report$status_current)),
                             numericInput(
                                 inputId = ns("report_output_current"), 
                                 label = paste0("Avance actual (", rv$task_to_report$output_unit, ")"),
@@ -344,11 +344,22 @@ mod_board_server <- function(id, AppData) {
 ## To be copied in the server
 # mod_board_server("board_1")
 
-mod_board_apptest <- function() {
-    AppData <- AppData$new("dgco93@mininter.gob.pe")
+mod_board_apptest <- function(email = "dgco93@mininter.gob.pe") {
+    AppData <- AppData$new(email)
     id = ids::random_id()
     quick_bs4dash(
         modUI = mod_board_ui(id = id),
         modServer = mod_board_server(id = id, AppData)
+    )
+}
+
+
+task_get_status_choices <- function(status) {
+    switch (status,
+        "Pendiente" = c("En proceso", "En revisión"),
+        "En proceso" = c("En proceso", "Pausado", "En revisión"),
+        "Pausado" = c("En proceso", "En revisión"),
+        "En revisión" = c("En proceso", "Terminado"),
+        "Terminado" = c("Archivado")
     )
 }

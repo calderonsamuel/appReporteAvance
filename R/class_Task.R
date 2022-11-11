@@ -215,14 +215,15 @@ Task <- R6::R6Class(
                 FROM tasks 
                 WHERE org_id IN ({orgs*}) AND
                     group_id IN ({groups*}) AND 
-                    assignee = {self$user$user_id} AND
+                    assignee IN ({assignees*}) AND
                         (status_current != 'Terminado' OR (
                             status_current = 'Terminado' AND
                             time_last_modified BETWEEN date_sub(now(), INTERVAL 2 WEEK) AND now()
                             )
                         )",
                 orgs = names(self$orgs),
-                groups = names(self$groups)
+                groups = names(self$groups),
+                assignees = private$get_assignees()
             )
             
             db_data <- super$db_get_query(
@@ -231,12 +232,17 @@ Task <- R6::R6Class(
                     rhs.name AS assignee_name,
                     rhs.last_name AS assignee_last_name,
                     rhs2.name AS assigned_by_name,
-                    rhs2.last_name AS assigned_by_last_name
+                    rhs2.last_name AS assigned_by_last_name,
+                    rhs3.user_color AS user_color
                 FROM ({query_tasks}) AS lhs
                 LEFT JOIN users rhs ON
                     lhs.assignee = rhs.user_id
                 LEFT JOIN users rhs2 ON
-                    lhs.assigned_by = rhs2.user_id",
+                    lhs.assigned_by = rhs2.user_id
+                LEFT JOIN group_users rhs3 ON
+                    lhs.assignee = rhs3.user_id AND
+                    lhs.group_id = rhs3.group_id
+                ",
                 query_tasks = query_tasks
             ) 
             
@@ -249,6 +255,22 @@ Task <- R6::R6Class(
             if (xor(is.na(process_id), is.na(activity_id))) {
                 rlang::abort("`process_id` y `activity_id` deben ser o NA o chr en simultáneo")
             }
+        },
+        get_assignees = function() {
+            groups_where_admin <- self$groups |> 
+                purrr::keep(~.x$group_role == "admin") |> 
+                names()
+            
+            users_where_admin <- character()
+            
+            if (length(groups_where_admin) > 0) {
+                users_where_admin <- self$group_users[groups_where_admin] |> 
+                    purrr::map(~purrr::map_chr(.x, "user_id")) |> 
+                    purrr::reduce(union)
+            }
+            
+            
+            union(users_where_admin, self$user$user_id)
         }
     ),
     active = list(

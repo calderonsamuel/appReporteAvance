@@ -1,5 +1,6 @@
 quick_bs4dash <- function(..., modUI = NULL, modServer = NULL) {
     ui <- bs4Dash::dashboardPage(
+        freshTheme = custom_theme(),
         header = bs4Dash::dashboardHeader(title = "quick bs4dash"),
         sidebar = bs4Dash::dashboardSidebar(
             bs4Dash::sidebarMenu(

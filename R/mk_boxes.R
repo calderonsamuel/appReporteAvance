@@ -120,18 +120,9 @@ boxHidden <- function(
 
 task_box <- function(task, ns = NULL) {
     id <- ns_safe(task$task_id, ns)
-    bs4Dash::box(
-        id = id,
-        title = task$task_title,
-        width = 12,
-        collapsed = TRUE,
-        headerBorder = FALSE,
-        label = bs4Dash::boxLabel(
-            text = glue::glue("{task$output_current}/{task$output_goal}"), 
-            status = "danger",
-            tooltip = task$output_unit
-        ),
-        dropdownMenu = bs4Dash::boxDropdown(
+    
+    dropdown <- if (task$status_current != "Terminado") {
+        bs4Dash::boxDropdown(
             icon = fontawesome::fa("fas fa-ellipsis"),
             bs4Dash::boxDropdownItem("Avance", 
                                      id = paste0(id, "-task-report"), 
@@ -142,7 +133,22 @@ task_box <- function(task, ns = NULL) {
             bs4Dash::boxDropdownItem("Eliminar", 
                                      id = paste0(id, "-task-delete"),
                                      icon = fontawesome::fa("fas fa-trash"))
+        )
+    } else NULL
+        
+    bs4Dash::box(
+        id = id,
+        title = task$task_title,
+        width = 12,
+        collapsed = TRUE,
+        headerBorder = FALSE,
+        background = task$user_color,
+        label = bs4Dash::boxLabel(
+            text = glue::glue("{task$output_current}/{task$output_goal}"), 
+            status = "primary",
+            tooltip = task$output_unit
         ),
+        dropdownMenu = dropdown,
         tags$p(task$task_description),
         tags$div(
             tags$span(fontawesome::fa("far fa-user"), glue::glue("{task$assignee_name} {task$assignee_last_name}"))

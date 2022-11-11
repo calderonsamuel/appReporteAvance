@@ -68,11 +68,12 @@ create_group <- function(org_id, group_title, group_description, parent_group) {
     )
 }
 
-create_group_user <- function(org_id, group_id, user_id, group_role) {
+create_group_user <- function(org_id, group_id, user_id, user_color, group_role) {
     tibble(
         org_id = org_id,
         group_id = group_id,
         user_id = user_id,
+        user_color = user_color,
         group_role = group_role,
         time_creation = now("America/Lima"),
         time_last_modified = now("America/Lima")
@@ -152,15 +153,30 @@ db_groups <-
         select(-group_admin) |> 
         pmap_dfr(create_group) |> 
         add_row(create_group(db_organisations$org_id, "Main", "Main wrapper", "organisation"))
-        
+
+user_colors <- c(
+    # "indigo",
+    "lightblue",
+    "navy",
+    "purple",
+    "fuchsia",
+    # "pink",
+    "maroon",
+    "orange",
+    "lime",
+    "teal",
+    "olive"
+)        
 
 db_group_users <- db_groups |> 
     select(ends_with("_id")) |> 
     left_join(db_org_users) |> 
     select(-starts_with("time")) |>
     rename(group_role = org_role) |> 
-    pmap_dfr(create_group_user)
-
+    group_by(group_id) |> 
+    mutate(user_color = sample(user_colors, size = n())) |> 
+    ungroup() |> 
+    pmap_dfr(create_group_user) 
 
 
 get_new_id_user <- function(old_id) {
@@ -281,6 +297,7 @@ base_group_users <-
         org_id = ids::random_id(), 
         group_id = ids::random_id(), 
         user_id = ids::random_id(), 
+        user_color = xrep(32),
         group_role = xrep(32)
     )
 

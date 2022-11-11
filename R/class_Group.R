@@ -49,6 +49,7 @@ Group <- R6::R6Class(
                     org_id = {org_id},
                     group_id = {group_id},
                     user_id = {user_id},
+                    user_color = 'white',
                     group_role = {role},
                     time_creation = {t_stamp},
                     time_last_modified = {t_stamp}"
@@ -73,7 +74,7 @@ Group <- R6::R6Class(
             cli::cli_alert_info("User '{user_id}' deleted from group '{group_id}' in org '{org_id}'")
         },
         
-        group_user_edit = function() {
+        group_user_edit = function(org_id, group_id, user_id, group_role) {
             statement <- 
                 "UPDATE group_users
                 SET
@@ -129,15 +130,19 @@ Group <- R6::R6Class(
         get_group_users = function() {
             query <- 
                 "SELECT
-                    rhs.*
+                    rhs.*,
+                    rhs2.name, rhs2.last_name
                 FROM (
                     SELECT org_id, group_id
                     FROM group_users
                     WHERE user_id = {self$user$user_id} 
                 ) lhs
                 LEFT JOIN group_users rhs ON
-                lhs.org_id = rhs.org_id AND
-                    lhs.group_id = rhs.group_id"
+                    lhs.org_id = rhs.org_id AND
+                    lhs.group_id = rhs.group_id
+                LEFT JOIN users rhs2 ON
+                    rhs.user_id = rhs2.user_id
+                "
             
             db_data <- super$db_get_query(query)
             
