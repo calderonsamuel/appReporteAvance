@@ -344,8 +344,8 @@ mod_board_server <- function(id, AppData) {
 ## To be copied in the server
 # mod_board_server("board_1")
 
-mod_board_apptest <- function() {
-    AppData <- AppData$new("dgco93@mininter.gob.pe")
+mod_board_apptest <- function(email = "dgco93@mininter.gob.pe") {
+    AppData <- AppData$new(email)
     id = ids::random_id()
     quick_bs4dash(
         modUI = mod_board_ui(id = id),
