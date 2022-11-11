@@ -1,8 +1,8 @@
 ---
-name: Progress
+name: Board
 about: Reportar issues en módulo progress
-title: "[Progress]"
-labels: ''
+title: "[BOARD]"
+labels: new feature
 assignees: ''
 
 ---
