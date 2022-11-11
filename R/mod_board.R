@@ -23,8 +23,8 @@ mod_board_ui <- function(id) {
                 dropdownMenu = bs4Dash::boxDropdown(
                     icon = fontawesome::fa("fas fa-ellipsis"),
                     bs4Dash::boxDropdownItem(
-                        "Agregar",
-                        icon = fontawesome::fa("fas fa-circle-plus"),
+                        "Nueva tarea",
+                        icon = fontawesome::fa("fas fa-list-check"),
                         id = ns("task_add")
                     )
                 ),
