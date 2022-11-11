@@ -36,10 +36,17 @@ mod_task_add_server <- function(id, AppData, trigger){
     }
     
     get_user_choices <- function(group_id) {
-        users <- AppData$group_users[[group_id]]
-        ids <- users |> purrr::map_chr("user_id")
-        titles <- users |> purrr::map_chr(~paste(.x$name, .x$last_name))
-        setNames(ids, titles)
+        is_admin <- AppData$groups[[group_id]]$group_role == "admin"
+        if (is_admin) {
+            users <- AppData$group_users[[group_id]]
+            ids <- users |> purrr::map_chr("user_id")
+            titles <- users |> purrr::map_chr(~paste(.x$name, .x$last_name))
+            setNames(ids, titles)
+        } else {
+            setNames(object = AppData$user$user_id, 
+                     nm = paste(AppData$user$name, AppData$user$last_name))
+        }
+        
     }
     
     out_values <- reactiveValues(
