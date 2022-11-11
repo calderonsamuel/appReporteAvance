@@ -295,38 +295,23 @@ mod_board_server <- function(id, AppData) {
         # Outputs ----
         
         output$pendientes <- renderUI({
-            tasks() |> 
-                purrr::keep(~ .x$status_current == "Pendiente") |> 
-                lapply(task_box, ns) |>
-                tagList()
+            task_box_by_status(tasks(), "Pendiente", ns, AppData$groups)
         }) 
         
         output$en_proceso <- renderUI({
-            tasks() |> 
-                purrr::keep(~ .x$status_current == "En proceso") |> 
-                lapply(task_box, ns) |>
-                tagList()
+            task_box_by_status(tasks(), "En proceso", ns, AppData$groups)
         })
         
         output$pausado <- renderUI({
-            tasks() |> 
-                purrr::keep(~ .x$status_current == "Pausado") |> 
-                lapply(task_box, ns) |>
-                tagList()
+            task_box_by_status(tasks(), "Pausado", ns, AppData$groups)
         })
         
         output$en_revision <- renderUI({
-            tasks() |> 
-                purrr::keep(~ .x$status_current == "En revisión") |> 
-                lapply(task_box, ns) |>
-                tagList()
+            task_box_by_status(tasks(), "En revisión", ns, AppData$groups)
         })
         
         output$terminado <- renderUI({
-            tasks() |> 
-                purrr::keep(~ .x$status_current == "Terminado") |> 
-                lapply(task_box, ns) |>
-                tagList()
+            task_box_by_status(tasks(), "Terminado", ns, AppData$groups)
         })
         
         # Debug ----
@@ -362,4 +347,15 @@ task_get_status_choices <- function(status) {
         "En revisión" = c("En proceso", "Terminado"),
         "Terminado" = c("Archivado")
     )
+}
+
+task_box_by_status <- function(tasks, status, ns, groups) {
+    tasks |> 
+        purrr::keep(~ .x$status_current == status) |> 
+        purrr::map(~ task_box(
+            task = .x,
+            ns = ns, 
+            is_group_admin = groups[[.x$group_id]]$group_role == "admin"
+        )) |>
+        tagList()
 }
