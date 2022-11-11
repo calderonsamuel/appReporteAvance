@@ -1,3 +1,17 @@
+# appReporteAvance 0.3.0
+
+## UI 
+
+- Las tareas ganan un nuevo estado posible: 'Observado' (#43)
+- Las tarjetas de tarea ahora muestran la fecha límite (#63)
+- Se incrementan los colores que pueden tener las tarjetas de tareas (#80)
+- Administrador de grupo ahora puede ver y asignar tareas de otros miembros del equipo (#81, #82, #83, #86)
+
+## Datos
+
+- Se crearon clases R6 para el manejo de los datos. La clase base es un administrador
+de bases de datos genérico sobre el cual se montaron clases de Organizaciones, Usuarios, Grupos y Tareas. (#78)
+
 # appReporteAvance 0.2.5
 
 - Los contenedores de las tarjetas de progreso se ajustan mejor a la pantalla y tienen scroll independiente.
@@ -6,7 +20,7 @@
 
 # appReporteAvance 0.2.4
 
-- Use fresh theme for user colors. fix #65
+- Se usa un tema 'fresh' para colores de usuarios asignados a tareas. fix #65
 
 # appReporteAvance 0.2.3
 
