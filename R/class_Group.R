@@ -130,15 +130,19 @@ Group <- R6::R6Class(
         get_group_users = function() {
             query <- 
                 "SELECT
-                    rhs.*
+                    rhs.*,
+                    rhs2.name, rhs2.last_name
                 FROM (
                     SELECT org_id, group_id
                     FROM group_users
                     WHERE user_id = {self$user$user_id} 
                 ) lhs
                 LEFT JOIN group_users rhs ON
-                lhs.org_id = rhs.org_id AND
-                    lhs.group_id = rhs.group_id"
+                    lhs.org_id = rhs.org_id AND
+                    lhs.group_id = rhs.group_id
+                LEFT JOIN users rhs2 ON
+                    rhs.user_id = rhs2.user_id
+                "
             
             db_data <- super$db_get_query(query)
             
