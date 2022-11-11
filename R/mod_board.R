@@ -52,15 +52,27 @@ mod_board_ui <- function(id) {
                     uiOutput(ns("pausado"))
                 ),
             ),
-            bs4Dash::box(
-                title = "En revisión",
-                solidHeader = TRUE,
-                collapsible = FALSE,
-                headerBorder = FALSE,
-                width = 3,
-                class = "cw cw-lg",
-                icon = icon("eye"),
-                uiOutput(ns("en_revision"))
+            col_3(
+                bs4Dash::box(
+                    title = "En revisión",
+                    solidHeader = TRUE,
+                    collapsible = FALSE,
+                    headerBorder = FALSE,
+                    width = 12,
+                    class = "cw cw-sm",
+                    icon = icon("eye"),
+                    uiOutput(ns("en_revision"))
+                ),
+                bs4Dash::box(
+                    title = "Observado",
+                    solidHeader = TRUE,
+                    collapsible = FALSE,
+                    headerBorder = FALSE,
+                    width = 12,
+                    class = "cw cw-sm",
+                    icon = fontawesome::fa("far fa-hand"),
+                    uiOutput(ns("observado"))
+                )
             ),
             bs4Dash::box(
                 title = "Terminado",
@@ -310,6 +322,10 @@ mod_board_server <- function(id, AppData) {
             task_box_by_status(tasks(), "En revisión", ns, AppData$groups)
         })
         
+        output$observado <- renderUI({
+            task_box_by_status(tasks(), "Observado", ns, AppData$groups)
+        })
+        
         output$terminado <- renderUI({
             task_box_by_status(tasks(), "Terminado", ns, AppData$groups)
         })
@@ -344,7 +360,8 @@ task_get_status_choices <- function(status) {
         "Pendiente" = c("En proceso", "En revisión"),
         "En proceso" = c("En proceso", "Pausado", "En revisión"),
         "Pausado" = c("En proceso", "En revisión"),
-        "En revisión" = c("En proceso", "Terminado"),
+        "En revisión" = c("En proceso", "Observado", "Terminado"),
+        "Observado" = c("En revisión"),
         "Terminado" = c("Archivado")
     )
 }
