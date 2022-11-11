@@ -13,6 +13,7 @@ Una base de datos puede ejecutar y obtener querys
 \item \href{#method-DBManager-db_execute_statement}{\code{DBManager$db_execute_statement()}}
 \item \href{#method-DBManager-db_get_query}{\code{DBManager$db_get_query()}}
 \item \href{#method-DBManager-db_make_query}{\code{DBManager$db_make_query()}}
+\item \href{#method-DBManager-get_timestamp}{\code{DBManager$get_timestamp()}}
 \item \href{#method-DBManager-clone}{\code{DBManager$clone()}}
 }
 }
@@ -49,6 +50,15 @@ Una base de datos puede ejecutar y obtener querys
 \subsection{Method \code{db_make_query()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DBManager$db_make_query(...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DBManager-get_timestamp"></a>}}
+\if{latex}{\out{\hypertarget{method-DBManager-get_timestamp}{}}}
+\subsection{Method \code{get_timestamp()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DBManager$get_timestamp()}\if{html}{\out{</div>}}
 }
 
 }
