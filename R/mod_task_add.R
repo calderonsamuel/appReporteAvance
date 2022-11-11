@@ -66,52 +66,63 @@ mod_task_add_server <- function(id, AppData, trigger){
     observe({
         showModal(modalDialog(
             h1("Añadir tarea"),
+            textInput(
+                inputId = ns("title"), 
+                label = "Título de tarea",
+                width = "100%"
+            ),
+            textAreaInput(
+                inputId = ns("description"), 
+                label = "Descripción de tarea",
+                width = "100%"
+            ),
+            
+            fluidRow(
+                col_3(numericInput(
+                    inputId = ns("output_goal"),
+                    label = "Meta",
+                    value = 1
+                )),
+                col_4(selectInput(
+                    inputId = ns("output_unit"), 
+                    label = "Unidad de medida",
+                    choices = c("Documento")
+                )),
+                column(shinyWidgets::airDatepickerInput(
+                    inputId = ns("time_due"),
+                    label = "Plazo máximo",
+                    value = computeMinTimeDue(tzone = "America/Lima"), 
+                    timepicker = TRUE,
+                    dateFormat = "dd/mm/yyyy", 
+                    language = "es",
+                    minDate = computeMinDateDue(tzone = "America/Lima"),
+                    maxDate = computeMinDateDue(tzone = "America/Lima") + lubridate::weeks(4),
+                    todayButton = TRUE,
+                    addon = 'none',
+                    timepickerOpts = shinyWidgets::timepickerOptions(
+                        minutesStep = 15,
+                        minHours = 8,
+                        maxHours = 18
+                    )
+                ), width = 5)
+            ),
+            
             selectInput(
                 inputId = ns("org_id"), 
                 label = "Organización", 
                 choices = rvalues$org_choices),
-            selectInput(
-                inputId = ns("group_id"), 
-                label = "Equipo", 
-                choices = rvalues$group_choices),
-            selectInput(
-                inputId = ns("user_id"),
-                label = "Encargado",
-                choices = rvalues$user_choices),
-            textInput(
-                inputId = ns("title"), 
-                label = "Título de tarea"
+            
+            fluidRow(
+                col_6(selectInput(
+                    inputId = ns("group_id"), 
+                    label = "Equipo", 
+                    choices = rvalues$group_choices)),
+                col_6(selectInput(
+                    inputId = ns("user_id"),
+                    label = "Encargado",
+                    choices = rvalues$user_choices))
             ),
-            textAreaInput(
-                inputId = ns("description"), 
-                label = "Descripción de tarea"
-            ),
-            shinyWidgets::airDatepickerInput(
-                inputId = ns("time_due"),
-                label = "Plazo máximo",
-                value = computeMinTimeDue(tzone = "America/Lima"), 
-                timepicker = TRUE,
-                dateFormat = "dd/mm/yyyy", 
-                language = "es",
-                minDate = computeMinDateDue(tzone = "America/Lima"),
-                maxDate = computeMinDateDue(tzone = "America/Lima") + lubridate::weeks(4),
-                todayButton = TRUE,
-                timepickerOpts = shinyWidgets::timepickerOptions(
-                    minutesStep = 15,
-                    minHours = 8,
-                    maxHours = 18
-                )
-            ),
-            selectInput(
-                inputId = ns("output_unit"), 
-                label = "Unidad de medida",
-                choices = c("Documento")
-            ),
-            numericInput(
-                inputId = ns("output_goal"),
-                label = "Meta",
-                value = 1
-            ),
+            
             footer = tagList(
                 modalButton("Cancelar"),
                 btn_guardar(ns("save"))
