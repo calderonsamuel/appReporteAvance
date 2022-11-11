@@ -21,9 +21,35 @@ mod_task_add_server <- function(id, AppData, trigger){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
+    get_org_choices <- function() {
+        ids <- AppData$orgs |> purrr::map_chr("org_id")
+        titles <- AppData$orgs |> purrr::map_chr("org_title")
+        setNames(ids, titles)
+    }
+    
+    get_group_choices <- function(org_id) {
+        groups <- AppData$groups |> 
+            purrr::keep(~.x$org_id == org_id)
+        ids <- groups |> purrr::map_chr("group_id")
+        titles <- groups |> purrr::map_chr("group_title")
+        setNames(ids, titles)
+    }
+    
+    get_user_choices <- function(group_id) {
+        users <- AppData$group_users[[group_id]]
+        ids <- users |> purrr::map_chr("user_id")
+        titles <- users |> purrr::map_chr("user_id")
+        setNames(ids, titles)
+    }
+    
     out_values <- reactiveValues(
         added = 0L
     )
+    
+    rvalues <- rv()
+    rvalues$org_choices <- get_org_choices()
+    rvalues$group_choices <- get_group_choices(isolate(rvalues$org_choices[[1]]))
+    rvalues$user_choices <- get_user_choices(isolate(rvalues$group_choices[[1]]))
     
     org_choices <- reactive({
         ids <- AppData$orgs |> purrr::map_chr("org_id")
@@ -43,11 +69,15 @@ mod_task_add_server <- function(id, AppData, trigger){
             selectInput(
                 inputId = ns("org_id"), 
                 label = "Organización", 
-                choices = org_choices()),
+                choices = rvalues$org_choices),
             selectInput(
                 inputId = ns("group_id"), 
                 label = "Equipo", 
-                choices = group_choices()),
+                choices = rvalues$group_choices),
+            selectInput(
+                inputId = ns("user_id"),
+                label = "Encargado",
+                choices = rvalues$user_choices),
             textInput(
                 inputId = ns("title"), 
                 label = "Título de tarea"
@@ -90,13 +120,23 @@ mod_task_add_server <- function(id, AppData, trigger){
     }) |> bindEvent(trigger())
     
     observe({
+        rvalues$group_choices <- get_group_choices(input$org_id)
+        updateSelectInput(session, inputId = "group_id",  choices = rvalues$group_choices)
+    }) |> bindEvent(input$org_id)
+    
+    observe({
+        rvalues$user_choices <- get_user_choices(input$group_id)
+        updateSelectInput(session, inputId = "user_id",  choices = rvalues$user_choices)
+    }) |> bindEvent(input$group_id)
+    
+    observe({
         tryCatch(expr = {
             AppData$task_add(
                 org_id = input$org_id,
                 group_id = input$group_id,
                 task_title = input$title,
                 task_description = input$description,
-                assignee = AppData$user$user_id,
+                assignee = input$user_id,
                 time_due = lubridate::with_tz(input$time_due, "America/Lima"),
                 output_unit = input$output_unit,
                 output_goal = input$output_goal
