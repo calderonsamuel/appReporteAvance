@@ -142,6 +142,7 @@ Group <- R6::R6Class(
                     lhs.group_id = rhs.group_id
                 LEFT JOIN users rhs2 ON
                     rhs.user_id = rhs2.user_id
+                ORDER BY rhs.group_role
                 "
             
             db_data <- super$db_get_query(query)

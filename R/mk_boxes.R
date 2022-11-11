@@ -118,13 +118,13 @@ boxHidden <- function(
     if (hidden) boxHide(myBox) else myBox
 }
 
-task_box <- function(task, ns = NULL) {
+task_box <- function(task, ns = NULL, is_group_admin = FALSE) {
     id <- ns_safe(task$task_id, ns)
     
-    dropdown <- if (task$status_current != "Terminado") {
+    dropdown <- if (task$status_current %in% c("Pendiente", "En proceso", "Pausado")) {
         bs4Dash::boxDropdown(
             icon = fontawesome::fa("fas fa-ellipsis"),
-            bs4Dash::boxDropdownItem("Avance", 
+            bs4Dash::boxDropdownItem("Avanzar", 
                                      id = paste0(id, "-task-report"), 
                                      icon = fontawesome::fa("fas fa-forward")),
             bs4Dash::boxDropdownItem("Editar", 
@@ -133,6 +133,13 @@ task_box <- function(task, ns = NULL) {
             bs4Dash::boxDropdownItem("Eliminar", 
                                      id = paste0(id, "-task-delete"),
                                      icon = fontawesome::fa("fas fa-trash"))
+        )
+    } else if (task$status_current == "En revisión" && is_group_admin) {
+        bs4Dash::boxDropdown(
+            icon = fontawesome::fa("fas fa-ellipsis"),
+            bs4Dash::boxDropdownItem("Revisar", 
+                                     id = paste0(id, "-task-report"), 
+                                     icon = fontawesome::fa("fas fa-book-open-reader"))
         )
     } else NULL
         
