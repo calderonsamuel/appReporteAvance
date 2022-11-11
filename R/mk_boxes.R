@@ -117,3 +117,61 @@ boxHidden <- function(
     
     if (hidden) boxHide(myBox) else myBox
 }
+
+task_box <- function(task, ns = NULL, is_group_admin = FALSE) {
+    id <- ns_safe(task$task_id, ns)
+    
+    dropdown <- if (task$status_current %in% c("Pendiente", "En proceso", "Pausado")) {
+        bs4Dash::boxDropdown(
+            icon = fontawesome::fa("fas fa-ellipsis"),
+            bs4Dash::boxDropdownItem("Avanzar", 
+                                     id = paste0(id, "-task-report"), 
+                                     icon = fontawesome::fa("fas fa-forward")),
+            bs4Dash::boxDropdownItem("Editar", 
+                                     id = paste0(id, "-task-edit"), 
+                                     icon = fontawesome::fa("fas fa-pen-to-square")),
+            bs4Dash::boxDropdownItem(tags$span(fontawesome::fa("fas fa-trash", fill = "#cf222e"), "Eliminar", style = "color: #cf222e;"),
+                                     id = paste0(id, "-task-delete"))
+        )
+    } else if (task$status_current == "Observado") {
+        bs4Dash::boxDropdown(
+            icon = fontawesome::fa("fas fa-ellipsis"),
+            bs4Dash::boxDropdownItem("Avanzar", 
+                                     id = paste0(id, "-task-report"), 
+                                     icon = fontawesome::fa("fas fa-forward"))
+        )
+    } else if (task$status_current == "En revisión" && is_group_admin) {
+        bs4Dash::boxDropdown(
+            icon = fontawesome::fa("fas fa-ellipsis"),
+            bs4Dash::boxDropdownItem("Revisar", 
+                                     id = paste0(id, "-task-report"), 
+                                     icon = fontawesome::fa("fas fa-book-open-reader"))
+        )
+    } else NULL
+        
+    bs4Dash::box(
+        id = id,
+        title = task$task_title,
+        width = 12,
+        collapsed = TRUE,
+        headerBorder = FALSE,
+        background = task$user_color,
+        label = bs4Dash::boxLabel(
+            text = glue::glue("{task$output_current}/{task$output_goal}"), 
+            status = "primary",
+            tooltip = task$output_unit
+        ),
+        dropdownMenu = dropdown,
+        tags$p(task$task_description),
+        tags$div(
+            tags$span(fontawesome::fa("far fa-user"), glue::glue("{task$assignee_name} {task$assignee_last_name}"))
+        ),
+        tags$div(
+            tags$span(fontawesome::fa("far fa-thumbs-up"), glue::glue("{task$assigned_by_name} {task$assigned_by_last_name}"))
+        ),
+        tags$div(
+            tags$span(fontawesome::fa("far fa-calendar"), format(task$time_due, "%d/%m/%Y")),
+            tags$span(fontawesome::fa("far fa-clock"), format(task$time_due, "%H:%M:%S"))
+        )
+    )
+}
