@@ -130,9 +130,15 @@ task_box <- function(task, ns = NULL, is_group_admin = FALSE) {
             bs4Dash::boxDropdownItem("Editar", 
                                      id = paste0(id, "-task-edit"), 
                                      icon = fontawesome::fa("fas fa-pen-to-square")),
-            bs4Dash::boxDropdownItem("Eliminar", 
-                                     id = paste0(id, "-task-delete"),
-                                     icon = fontawesome::fa("fas fa-trash"))
+            bs4Dash::boxDropdownItem(tags$span(fontawesome::fa("fas fa-trash", fill = "#cf222e"), "Eliminar", style = "color: #cf222e;"),
+                                     id = paste0(id, "-task-delete"))
+        )
+    } else if (task$status_current == "Observado") {
+        bs4Dash::boxDropdown(
+            icon = fontawesome::fa("fas fa-ellipsis"),
+            bs4Dash::boxDropdownItem("Avanzar", 
+                                     id = paste0(id, "-task-report"), 
+                                     icon = fontawesome::fa("fas fa-forward"))
         )
     } else if (task$status_current == "En revisión" && is_group_admin) {
         bs4Dash::boxDropdown(
