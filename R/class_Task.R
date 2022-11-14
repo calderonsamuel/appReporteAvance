@@ -220,7 +220,8 @@ Task <- R6::R6Class(
                             status_current = 'Terminado' AND
                             time_last_modified BETWEEN date_sub(now(), INTERVAL 2 WEEK) AND now()
                             )
-                        )",
+                        )
+                ",
                 orgs = names(self$orgs),
                 groups = names(self$groups),
                 assignees = private$get_assignees()
@@ -242,12 +243,12 @@ Task <- R6::R6Class(
                 LEFT JOIN group_users rhs3 ON
                     lhs.assignee = rhs3.user_id AND
                     lhs.group_id = rhs3.group_id
+                ORDER BY lhs.time_last_modified DESC
                 ",
                 query_tasks = query_tasks
             ) 
             
             db_data |> 
-                # transform(time_due = lubridate::with_tz(time_due, "America/Lima")) |> 
                 purrr::pmap(list) |> 
                 setNames(nm = db_data$task_id)
         },
