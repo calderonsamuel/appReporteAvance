@@ -20,6 +20,7 @@ Imports:
     ids,
     lubridate,
     purrr,
+    reactable,
     reportesAPI (>= 0.1.0),
     shiny (>= 1.7.1),
     shinyjs,

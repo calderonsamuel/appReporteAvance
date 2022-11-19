@@ -59,18 +59,27 @@ task_dropdown <- function(id, status, is_group_admin) {
             id = paste0(id, "-task-report"), 
             icon = fontawesome::fa("fas fa-book-open-reader"))
     
-    if (status %in% c("Pendiente", "En proceso", "Pausado")) {
-        bs4Dash::boxDropdown(
-            icon = fontawesome::fa("fas fa-ellipsis"),
-            item_avanzar, item_editar, item_eliminar, item_historia
-        )
-    } else if (status == "Observado") {
-        bs4Dash::boxDropdown(
-            icon = fontawesome::fa("fas fa-ellipsis"), item_avanzar
-        )
-    } else if (status == "En revisión" && is_group_admin) {
-        bs4Dash::boxDropdown(
-            icon = fontawesome::fa("fas fa-ellipsis"), item_revisar
-        )
-    } else NULL
+    dd_items <- 
+        if (status %in% c("Pendiente", "En proceso", "Pausado")) {
+            tagList(
+                item_avanzar, item_editar, item_historia, item_eliminar
+            )
+        } else if (status == "Observado") {
+            tagList(
+                item_avanzar, item_historia
+            )
+        } else if (status == "En revisión" && is_group_admin) {
+            tagList(
+                item_revisar, item_historia
+            )
+        } else {
+            tagList(
+                item_historia
+            )
+        }
+
+    bs4Dash::boxDropdown(
+        icon = fontawesome::fa("fas fa-ellipsis"), dd_items
+        
+    )
 }
