@@ -68,7 +68,7 @@ mod_secure_server <- function(id, AppData){
 }
 
 mod_secure_apptest <-
-    function(user_iniciado = "dgco93@mininter.gob.pe") {
+    function(user_iniciado = Sys.getenv("REPORTES_EMAIL")) {
         
         AppData <- AppData$new(user_iniciado)
         
