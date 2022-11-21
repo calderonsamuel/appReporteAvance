@@ -9,6 +9,7 @@
 #' @importFrom shiny NS tagList
 mod_config_ui <- function(id) {
     ns <- NS(id)
+    
     tagList(
         selectInput(
             inputId = ns("orgs"), 
@@ -98,4 +99,6 @@ get_user_choices <- function(AppData, group_id) {
     }
     
 }
+
+is_group_admin <- function(AppData, group_id) AppData$groups[[group_id]]$group_role == "admin"
 

@@ -17,13 +17,23 @@ mod_role_transfer_ui <- function(id) {
 #' role_transfer Server Functions
 #'
 #' @noRd
-mod_role_transfer_server <- function(id, AppData, trigger) {
+mod_role_transfer_server <- function(id, AppData, trigger, config) {
     moduleServer(id, function(input, output, session) {
         ns <- session$ns
         
+        groups <- AppData$groups |> 
+            purrr::keep(~.x$group_role == "admin")
+        
         observe({
             showModal(modalDialog(
-                h1("hi"),
+                h1("Transferir cargo"),
+                
+                selectInput(
+                    inputId = ns("user"),
+                    label = "Seleccione usuario",
+                    choices = get_user_choices(AppData, config$group_selected())
+                ),
+                
                 footer = tagList(
                     modalButton("Cancelar"),
                     btn_guardar(ns("save"))
