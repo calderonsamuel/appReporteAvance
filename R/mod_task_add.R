@@ -21,42 +21,14 @@ mod_task_add_server <- function(id, AppData, trigger){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
-    get_org_choices <- function() {
-        ids <- AppData$orgs |> purrr::map_chr("org_id")
-        titles <- AppData$orgs |> purrr::map_chr("org_title")
-        setNames(ids, titles)
-    }
-    
-    get_group_choices <- function(org_id) {
-        groups <- AppData$groups |> 
-            purrr::keep(~.x$org_id == org_id)
-        ids <- groups |> purrr::map_chr("group_id")
-        titles <- groups |> purrr::map_chr("group_title")
-        setNames(ids, titles)
-    }
-    
-    get_user_choices <- function(group_id) {
-        is_admin <- AppData$groups[[group_id]]$group_role == "admin"
-        if (is_admin) {
-            users <- AppData$group_users[[group_id]]
-            ids <- users |> purrr::map_chr("user_id")
-            titles <- users |> purrr::map_chr(~paste(.x$name, .x$last_name))
-            setNames(ids, titles)
-        } else {
-            setNames(object = AppData$user$user_id, 
-                     nm = paste(AppData$user$name, AppData$user$last_name))
-        }
-        
-    }
-    
     out_values <- reactiveValues(
         added = 0L
     )
     
     rvalues <- rv()
-    rvalues$org_choices <- get_org_choices()
-    rvalues$group_choices <- get_group_choices(isolate(rvalues$org_choices[[1]]))
-    rvalues$user_choices <- get_user_choices(isolate(rvalues$group_choices[[1]]))
+    rvalues$org_choices <- get_org_choices(AppData)
+    rvalues$group_choices <- get_group_choices(AppData, isolate(rvalues$org_choices[[1]]))
+    rvalues$user_choices <- get_user_choices(AppData, isolate(rvalues$group_choices[[1]]))
     
     org_choices <- reactive({
         ids <- AppData$orgs |> purrr::map_chr("org_id")
@@ -138,12 +110,12 @@ mod_task_add_server <- function(id, AppData, trigger){
     }) |> bindEvent(trigger())
     
     observe({
-        rvalues$group_choices <- get_group_choices(input$org_id)
+        rvalues$group_choices <- get_group_choices(AppData, input$org_id)
         updateSelectInput(session, inputId = "group_id",  choices = rvalues$group_choices)
     }) |> bindEvent(input$org_id)
     
     observe({
-        rvalues$user_choices <- get_user_choices(input$group_id)
+        rvalues$user_choices <- get_user_choices(AppData, input$group_id)
         updateSelectInput(session, inputId = "user_id",  choices = rvalues$user_choices)
     }) |> bindEvent(input$group_id)
     

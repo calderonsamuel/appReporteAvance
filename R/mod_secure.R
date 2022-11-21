@@ -7,17 +7,18 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-mod_secure_ui <- function(id){
+mod_secure_ui <- function(id, AppData){
   ns <- NS(id)
   
   tagList(
     bs4Dash::dashboardPage(
         freshTheme = custom_theme(),
         # preloader = list(html = tagList(waiter::spin_pixel(), "Cargando ..."), color = "#3c8dbc"),
-      bs4Dash::dashboardHeader(
-          title = "Reporte" 
+      header = bs4Dash::dashboardHeader(
+          title = "Reporte", 
+          controlbarIcon = fontawesome::fa("fas fa-gear")
       ),
-      bs4Dash::dashboardSidebar(
+      sidebar = bs4Dash::dashboardSidebar(
         collapsed = TRUE,
         expandOnHover = FALSE,
         bs4Dash::sidebarMenu(
@@ -30,7 +31,7 @@ mod_secure_ui <- function(id){
           )
         )
       ),
-      bs4Dash::dashboardBody(
+      body = bs4Dash::dashboardBody(
           golem_add_external_resources(),
         bs4Dash::tabItems(
           bs4Dash::tabItem(
@@ -38,6 +39,15 @@ mod_secure_ui <- function(id){
             mod_board_ui(ns("board_1"))
           )
         )
+      ),
+      controlbar = bs4Dash::dashboardControlbar(
+          id = ns("controlbar"),
+          bs4Dash::controlbarMenu(
+              bs4Dash::controlbarItem(
+                  title = "Configuración",
+                  mod_config_ui(ns("config_1"))
+              )
+          )
       )
     )
   )
@@ -50,7 +60,9 @@ mod_secure_server <- function(id, AppData){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
-    mod_board_server("board_1", AppData)
+    config <- mod_config_server("config_1", AppData, reactive(input$controlbar))
+    
+    mod_board_server("board_1", AppData, config)
 
   })
 }
@@ -60,7 +72,7 @@ mod_secure_apptest <-
         
         AppData <- AppData$new(user_iniciado)
         
-        ui <- mod_secure_ui(id = "test")
+        ui <- mod_secure_ui(id = "test", AppData)
         
         server <- function(input, output, session) {
             mod_secure_server(id = "test", AppData)

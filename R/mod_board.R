@@ -103,7 +103,7 @@ mod_board_ui <- function(id) {
 #' board Server Functions
 #'
 #' @noRd
-mod_board_server <- function(id, AppData) {
+mod_board_server <- function(id, AppData, config) {
     moduleServer(id, function(input, output, session) {
         ns <- session$ns
         
@@ -118,7 +118,8 @@ mod_board_server <- function(id, AppData) {
         role_gets_transfered <- mod_role_transfer_server(
             id = "role_transfer_1",
             AppData = AppData,
-            trigger = reactive(input$role_transfer)
+            trigger = reactive(input$role_transfer),
+            config
         )
         
         # Reactives ----
@@ -413,7 +414,7 @@ mod_board_apptest <- function(email = "dgco93@mininter.gob.pe") {
     id = ids::random_id()
     quick_bs4dash(
         modUI = mod_board_ui(id = id),
-        modServer = mod_board_server(id = id, AppData)
+        modServer = mod_board_server(id = id, AppData, config = fake_config(AppData))
     )
 }
 
