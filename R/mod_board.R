@@ -61,6 +61,14 @@ mod_board_ui <- function(id) {
                     width = 12,
                     class = "cw cw-sm",
                     icon = icon("eye"),
+                    dropdownMenu = bs4Dash::boxDropdown(
+                        icon = fontawesome::fa("fas fa-ellipsis"),
+                        bs4Dash::boxDropdownItem(
+                            "Transferir cargo",
+                            icon = fontawesome::fa("fas fa-id-card-clip"),
+                            id = ns("role_transfer")
+                        )
+                    ),
                     uiOutput(ns("en_revision"))
                 ),
                 bs4Dash::box(
@@ -105,6 +113,12 @@ mod_board_server <- function(id, AppData) {
             id = "task_add_1", 
             AppData = AppData, 
             trigger = reactive(input$task_add)
+        )
+        
+        role_gets_transfered <- mod_role_transfer_server(
+            id = "role_transfer_1",
+            AppData = AppData,
+            trigger = reactive(input$role_transfer)
         )
         
         # Reactives ----
