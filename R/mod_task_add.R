@@ -65,7 +65,7 @@ mod_task_add_server <- function(id, AppData, trigger){
                 col_4(selectInput(
                     inputId = ns("output_unit"), 
                     label = "Unidad de medida",
-                    choices = c("Documento")
+                    choices = c("Informe", "Memorando", "Oficio", "Ayuda memoria", "PPT", "Entregable", "Correo")
                 )),
                 column(shinyWidgets::airDatepickerInput(
                     inputId = ns("time_due"),
