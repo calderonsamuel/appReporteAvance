@@ -3,7 +3,8 @@ fake_config <- function(AppData) {
     group <- get_group_choices(AppData, org)[1] |> unname()
     list(
         org_selected = reactive(org),
-        group_selected = reactive(group)
+        group_selected = reactive(group),
+        is_group_admin = reactive(verify_group_admin(AppData, group))
     )
 }
 
