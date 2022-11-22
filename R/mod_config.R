@@ -23,6 +23,16 @@ mod_config_ui <- function(id, AppData) {
             inputId = ns("groups"),
             label = "Seleccione equipo",
             choices = group_choices
+        ),
+        div(
+            id = ns("div_transfer"),
+            h5("Transferencia de cargo"),
+            selectInput(
+                inputId = ns("users"),
+                label = "Seleccione usuario",
+                choices = get_user_choices(AppData, group_choices[1] |> unname())
+            ),
+            btn_guardar(ns("save"))
         )
     )
 }
@@ -33,6 +43,8 @@ mod_config_ui <- function(id, AppData) {
 mod_config_server <- function(id, AppData, trigger) {
     moduleServer(id, function(input, output, session) {
         ns <- session$ns
+        
+        is_group_admin <- reactive(verify_group_admin(AppData, input$groups))
         
         observe({
             updateSelectInput(
@@ -52,13 +64,68 @@ mod_config_server <- function(id, AppData, trigger) {
         }) |> 
             bindEvent(input$orgs)
         
+        observe({
+            if (is_group_admin()) {
+                shinyjs::show("div_transfer")
+                updateSelectInput(
+                    session = session,
+                    inputId = "users",
+                    choices = get_user_choices(AppData, input$groups)
+                )
+            } else {
+                shinyjs::hide("div_transfer")
+                
+            }
+        }) |> 
+            bindEvent(input$groups)
+        
+        observe({
+            shinyWidgets::ask_confirmation(
+                inputId = ns("confirm_transfer"),
+                title = "Transfiriendo cargo",
+                text = "Una vez transferido el cargo ya no tendrá privilegios de responsable de equipo",
+                type = "warning",
+                btn_labels = c("Cancelar", "Confirmar"),
+                btn_colors = c("#6e7d88", "#ff5964")
+            )
+        }) |> 
+            bindEvent(input$save)
+        
+        observe({
+            tryCatch(expr = {
+                if(isTRUE(input$confirm_transfer)) {
+                    # Name new admin
+                    AppData$group_user_edit(
+                        org_id = input$orgs,
+                        group_id = input$groups,
+                        user_id = input$users,
+                        group_role = "admin"
+                    )
+                    # Get user role
+                    ap$group_user_edit(
+                        org_id = input$orgs,
+                        group_id = input$groups,
+                        user_id = AppData$user$user_id,
+                        group_role = "user"
+                    )
+                    
+                    alert_info(session, "Se transfirió el cargo")
+                    
+                    session$reload()
+                    
+                }
+            }, error = \(e) alert_error(session, e))
+            
+        }) |> 
+            bindEvent(input$confirm_transfer)
+        
         
         # output ----
         
         list(
             org_selected = reactive(input$orgs),
             group_selected = reactive(input$groups),
-            is_group_admin = reactive(is_group_admin(AppData, input$groups))
+            is_group_admin = is_group_admin
         )
         
     })
@@ -98,5 +165,5 @@ get_user_choices <- function(AppData, group_id) {
     
 }
 
-is_group_admin <- function(AppData, group_id) AppData$groups[[group_id]]$group_role == "admin"
+verify_group_admin <- function(AppData, group_id) AppData$groups[[group_id]]$group_role == "admin"
 
