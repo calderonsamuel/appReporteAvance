@@ -395,9 +395,10 @@ mod_board_server <- function(id, AppData, config) {
         })
         
         # Debug ----
-        
+        # 
         # output$debug <- renderPrint({
-        #     rv$task_to_delete
+        #     config |>
+        #         purrr::map(~.x())
         # })
         
     })
