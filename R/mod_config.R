@@ -58,7 +58,7 @@ mod_config_server <- function(id, AppData, trigger) {
         list(
             org_selected = reactive(input$orgs),
             group_selected = reactive(input$groups),
-            is_group_admin = reactive(AppData$groups[[input$groups]]$group_role == "admin")
+            is_group_admin = reactive(is_group_admin(AppData, input$groups))
         )
         
     })

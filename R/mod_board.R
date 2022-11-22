@@ -357,27 +357,27 @@ mod_board_server <- function(id, AppData, config) {
         # Outputs ----
         
         output$pendientes <- renderUI({
-            task_box_by_status(tasks(), "Pendiente", ns, AppData$groups)
+            task_box_by_status(tasks(), "Pendiente", ns, config$is_group_admin())
         }) 
         
         output$en_proceso <- renderUI({
-            task_box_by_status(tasks(), "En proceso", ns, AppData$groups)
+            task_box_by_status(tasks(), "En proceso", ns, config$is_group_admin())
         })
         
         output$pausado <- renderUI({
-            task_box_by_status(tasks(), "Pausado", ns, AppData$groups)
+            task_box_by_status(tasks(), "Pausado", ns, config$is_group_admin())
         })
         
         output$en_revision <- renderUI({
-            task_box_by_status(tasks(), "En revisión", ns, AppData$groups)
+            task_box_by_status(tasks(), "En revisión", ns, config$is_group_admin())
         })
         
         output$observado <- renderUI({
-            task_box_by_status(tasks(), "Observado", ns, AppData$groups)
+            task_box_by_status(tasks(), "Observado", ns, config$is_group_admin())
         })
         
         output$terminado <- renderUI({
-            task_box_by_status(tasks(), "Terminado", ns, AppData$groups)
+            task_box_by_status(tasks(), "Terminado", ns, config$is_group_admin())
         })
         
         
@@ -431,13 +431,13 @@ task_get_status_choices <- function(status) {
     )
 }
 
-task_box_by_status <- function(tasks, status, ns, groups) {
+task_box_by_status <- function(tasks, status, ns, is_group_admin) {
     tasks |> 
         purrr::keep(~ .x$status_current == status) |> 
         purrr::map(~ task_box(
             task = .x,
             ns = ns, 
-            is_group_admin = groups[[.x$group_id]]$group_role == "admin"
+            is_group_admin = is_group_admin
         )) |>
         tagList()
 }
