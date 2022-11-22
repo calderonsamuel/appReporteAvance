@@ -23,17 +23,19 @@ app_server <- function(input, output, session) {
         set_providers(# define providers
             # email = TRUE,
             google = TRUE)$launch()
+    
+    AppData <- reactive(AppData$new(f$get_signed_in()$response$email)) |> bindEvent(f$req_sign_in())
 
   output$my_ui <- renderUI({
       # f$req_sign_in() # https://firebase.google.com/docs/reference/rest/auth#section-sign-in-with-oauth-credential
       
-      mod_secure_ui("secure_1")
+      mod_secure_ui("secure_1", AppData())
   }) |>
       bindEvent(f$req_sign_in())
   
   observe({
       shinyWidgets::closeSweetAlert(session)
-      mod_secure_server("secure_1", AppData = AppData$new(f$get_signed_in()$response$email))
+      mod_secure_server("secure_1", AppData())
   }) |>
       bindEvent(f$req_sign_in())
   

@@ -7,25 +7,22 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-mod_config_ui <- function(id) {
+mod_config_ui <- function(id, AppData) {
     ns <- NS(id)
+    
+    org_choices <- get_org_choices(AppData)
+    group_choices <- get_group_choices(AppData, org_choices[1])
     
     tagList(
         selectInput(
             inputId = ns("orgs"), 
             label = "Seleccione organización", 
-            choices = setNames(
-                object = head(letters), 
-                nm = head(LETTERS)
-            )
+            choices = org_choices
         ),
         selectInput(
             inputId = ns("groups"),
             label = "Seleccione equipo",
-            choices = setNames(
-                object = head(letters), 
-                nm = head(LETTERS)
-            )
+            choices = group_choices
         )
     )
 }

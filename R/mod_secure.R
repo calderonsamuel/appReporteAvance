@@ -45,7 +45,7 @@ mod_secure_ui <- function(id, AppData){
           bs4Dash::controlbarMenu(
               bs4Dash::controlbarItem(
                   title = "Configuración",
-                  mod_config_ui(ns("config_1"))
+                  mod_config_ui(ns("config_1"), AppData)
               )
           )
       )
