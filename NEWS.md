@@ -1,3 +1,7 @@
+# appReporteAvance 0.3.2
+
+- Se arregló un bug que mostraba "00" en lugar del número de mes en la interfaz de añadir tarea
+
 # appReporteAvance 0.3.1
 
 - Todos los usuarios ahora pueden explorar el historial de progreso de sus tareas (#62)
