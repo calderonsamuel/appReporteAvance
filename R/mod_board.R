@@ -95,7 +95,7 @@ mod_board_ui <- function(id) {
 #' board Server Functions
 #'
 #' @noRd
-mod_board_server <- function(id, AppData) {
+mod_board_server <- function(id, AppData, config) {
     moduleServer(id, function(input, output, session) {
         ns <- session$ns
         
@@ -123,7 +123,8 @@ mod_board_server <- function(id, AppData) {
             task_to_report = list(),
             task_has_been_reported = 0L,
             task_to_edit = list(),
-            task_has_been_edited = 0L
+            task_has_been_edited = 0L,
+            task_to_history = list()
         )
         
         
@@ -149,7 +150,15 @@ mod_board_server <- function(id, AppData) {
                 purrr::map_chr(~paste0(.x, "-task-edit"))
             
             ids 
-        })
+        }) 
+        
+        history_btns <- reactive({
+            ids <- tasks() |> 
+                purrr::map_chr("task_id") |> 
+                purrr::map_chr(~paste0(.x, "-task-history"))
+            
+            ids 
+        }) 
         
         # Observers ----
         
@@ -303,37 +312,78 @@ mod_board_server <- function(id, AppData) {
         }) |> 
             bindEvent(input$save_edition)
         
+        ## See history ----
+        
+        observe({
+            history_btns() |> 
+                purrr::walk(~
+                                observe({
+                                    task_id <- stringr::str_remove(.x, "-task-history")
+                                    rv$task_to_history <- tasks()[[task_id]]
+                                    
+                                    showModal(modalDialog(
+                                        
+                                        h1("Historial de progreso"),
+                                        
+                                        tags$p("Tarea:", rv$task_to_history$task_title),
+                                        tags$p("Unidad de medida:", rv$task_to_history$output_unit),
+                                        
+                                        reactable:::reactableOutput(ns("table_history")),
+                                        
+                                        footer = tagList(
+                                            modalButton("Cerrar")
+                                        )
+                                    ))
+                                }) |> bindEvent(input[[.x]], ignoreInit = TRUE)
+                )
+        })
+        
         
         # Outputs ----
         
         output$pendientes <- renderUI({
-            task_box_by_status(tasks(), "Pendiente", ns, AppData$groups)
+            task_box_by_status(tasks(), "Pendiente", ns, config$is_group_admin())
         }) 
         
         output$en_proceso <- renderUI({
-            task_box_by_status(tasks(), "En proceso", ns, AppData$groups)
+            task_box_by_status(tasks(), "En proceso", ns, config$is_group_admin())
         })
         
         output$pausado <- renderUI({
-            task_box_by_status(tasks(), "Pausado", ns, AppData$groups)
+            task_box_by_status(tasks(), "Pausado", ns, config$is_group_admin())
         })
         
         output$en_revision <- renderUI({
-            task_box_by_status(tasks(), "En revisión", ns, AppData$groups)
+            task_box_by_status(tasks(), "En revisión", ns, config$is_group_admin())
         })
         
         output$observado <- renderUI({
-            task_box_by_status(tasks(), "Observado", ns, AppData$groups)
+            task_box_by_status(tasks(), "Observado", ns, config$is_group_admin())
         })
         
         output$terminado <- renderUI({
-            task_box_by_status(tasks(), "Terminado", ns, AppData$groups)
+            task_box_by_status(tasks(), "Terminado", ns, config$is_group_admin())
+        })
+        
+        
+        output$table_history <- reactable::renderReactable({
+            AppData$task_get_history(rv$task_to_history$task_id) |> 
+                purrr::pmap(list) |> 
+                purrr::map_dfr(~data.frame(
+                    "Fecha" = format(.x$time_reported, "%d/%m/%Y %H:%M:%S"),
+                    "Por" = .x$user_names,
+                    "Estado" = .x$status,
+                    "Progreso" = .x$output_progress,
+                    "Detalle" = .x$details
+                )) |> 
+                reactable::reactable()
         })
         
         # Debug ----
-        
+        # 
         # output$debug <- renderPrint({
-        #     rv$task_to_delete
+        #     config |>
+        #         purrr::map(~.x())
         # })
         
     })
@@ -345,12 +395,12 @@ mod_board_server <- function(id, AppData) {
 ## To be copied in the server
 # mod_board_server("board_1")
 
-mod_board_apptest <- function(email = "dgco93@mininter.gob.pe") {
+mod_board_apptest <- function(email = Sys.getenv("REPORTES_EMAIL")) {
     AppData <- AppData$new(email)
     id = ids::random_id()
     quick_bs4dash(
         modUI = mod_board_ui(id = id),
-        modServer = mod_board_server(id = id, AppData)
+        modServer = mod_board_server(id = id, AppData, config = fake_config(AppData))
     )
 }
 
@@ -366,13 +416,13 @@ task_get_status_choices <- function(status) {
     )
 }
 
-task_box_by_status <- function(tasks, status, ns, groups) {
+task_box_by_status <- function(tasks, status, ns, is_group_admin) {
     tasks |> 
         purrr::keep(~ .x$status_current == status) |> 
         purrr::map(~ task_box(
             task = .x,
             ns = ns, 
-            is_group_admin = groups[[.x$group_id]]$group_role == "admin"
+            is_group_admin = is_group_admin
         )) |>
         tagList()
 }
