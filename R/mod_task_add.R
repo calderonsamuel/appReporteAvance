@@ -72,7 +72,7 @@ mod_task_add_server <- function(id, AppData, trigger){
                     label = "Plazo máximo",
                     value = computeMinTimeDue(tzone = "America/Lima"), 
                     timepicker = TRUE,
-                    dateFormat = "dd/mm/yyyy", 
+                    dateFormat = "dd/MM/yyyy", 
                     language = "es",
                     minDate = computeMinDateDue(tzone = "America/Lima"),
                     maxDate = computeMinDateDue(tzone = "America/Lima") + lubridate::weeks(4),
