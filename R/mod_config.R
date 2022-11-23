@@ -102,7 +102,7 @@ mod_config_server <- function(id, AppData, trigger) {
                         group_role = "admin"
                     )
                     # Get user role
-                    ap$group_user_edit(
+                    AppData$group_user_edit(
                         org_id = input$orgs,
                         group_id = input$groups,
                         user_id = AppData$user$user_id,

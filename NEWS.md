@@ -1,3 +1,11 @@
+# appReporteAvance 0.3.1
+
+- Todos los usuarios ahora pueden explorar el historial de progreso de sus tareas (#62)
+- Los responsables de equipo ahora pueden transferir su cargo a otro miembro del grupo (#90)
+- Las tareas con modificaciones recientes aparecen primero en su respectivo listado (#91)
+- Las tareas ahora tienen más opciones de unidad de resultado (#93)
+- La clase R6 para el manejo de la base de datos se trabaja ahora aparte en [`{reportesAPI}`](https://github.com/calderonsamuel/reportesAPI)
+
 # appReporteAvance 0.3.0
 
 ## UI 
