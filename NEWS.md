@@ -1,3 +1,24 @@
+# appReporteAvance 0.3.3
+
+## Card layout
+
+La tarjeta de tarea tiene nueva distribución. Antes:
+
+![image](https://user-images.githubusercontent.com/19418298/212998759-feb7a699-5888-4319-8ba3-2db27ec8a5fe.png)
+
+Ahora:
+
+![image](https://user-images.githubusercontent.com/19418298/212998535-3c43f9ab-1ef3-4904-8308-b546a5eee959.png)
+
+- La fecha límite es mostrada como etiqueta
+- El color de la etiqueta es relativo a la fecha límite (verde antes, amarillo durante, y rojo después)
+- El avance y unidad de medida de meta se muestran en la parte inferior derecha
+- Si el responsable de tarea y el asignador son la misma persona, el nombre aparece solo una vez
+
+## Adición de tarea
+
+- Ya no es necesario escoger organización y grupo para cada tarea nueva. La elección hecha en Configuración se aplica a las nuevas tareas. Esto significa que el tablero solo mostrará tareas de un solo grupo a la vez.
+
 # appReporteAvance 0.3.2
 
 - Se arregló un bug que mostraba "00" en lugar del número de mes en la interfaz de añadir tarea
