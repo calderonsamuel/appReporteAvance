@@ -25,21 +25,8 @@ mod_task_add_server <- function(id, AppData, trigger, config){
         added = 0L
     )
     
-    rvalues <- rv()
-    rvalues$org_choices <- get_org_choices(AppData)
-    rvalues$group_choices <- get_group_choices(AppData, isolate(rvalues$org_choices[[1]]))
-    rvalues$user_choices <- get_user_choices(AppData, isolate(rvalues$group_choices[[1]]))
-    
-    org_choices <- reactive({
-        ids <- AppData$orgs |> purrr::map_chr("org_id")
-        titles <- AppData$orgs |> purrr::map_chr("org_title")
-        setNames(ids, titles)
-    })
-    
-    group_choices <- reactive({
-        ids <- AppData$groups |> purrr::map_chr("group_id")
-        titles <- AppData$groups |> purrr::map_chr("group_title")
-        setNames(ids, titles)
+    user_choices <- reactive({
+        get_user_choices(AppData, config$group_selected())
     })
     
     observe({
@@ -85,21 +72,10 @@ mod_task_add_server <- function(id, AppData, trigger, config){
                     )
                 ), width = 5)
             ),
-            
             selectInput(
-                inputId = ns("org_id"), 
-                label = "Organización", 
-                choices = rvalues$org_choices),
-            
-            fluidRow(
-                col_6(selectInput(
-                    inputId = ns("group_id"), 
-                    label = "Equipo", 
-                    choices = rvalues$group_choices)),
-                col_6(selectInput(
-                    inputId = ns("user_id"),
-                    label = "Encargado",
-                    choices = rvalues$user_choices))
+                inputId = ns("user_id"),
+                label = "Encargado",
+                choices = user_choices()
             ),
             
             footer = tagList(
@@ -110,20 +86,10 @@ mod_task_add_server <- function(id, AppData, trigger, config){
     }) |> bindEvent(trigger())
     
     observe({
-        rvalues$group_choices <- get_group_choices(AppData, input$org_id)
-        updateSelectInput(session, inputId = "group_id",  choices = rvalues$group_choices)
-    }) |> bindEvent(input$org_id)
-    
-    observe({
-        rvalues$user_choices <- get_user_choices(AppData, input$group_id)
-        updateSelectInput(session, inputId = "user_id",  choices = rvalues$user_choices)
-    }) |> bindEvent(input$group_id)
-    
-    observe({
         tryCatch(expr = {
             AppData$task_add(
-                org_id = input$org_id,
-                group_id = input$group_id,
+                org_id = config$org_selected(),
+                group_id = config$group_selected(),
                 task_title = input$title,
                 task_description = input$description,
                 assignee = input$user_id,
