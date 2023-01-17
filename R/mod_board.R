@@ -104,7 +104,8 @@ mod_board_server <- function(id, AppData, config) {
         task_gets_added <- mod_task_add_server(
             id = "task_add_1", 
             AppData = AppData, 
-            trigger = reactive(input$task_add)
+            trigger = reactive(input$task_add),
+            config = config
         )
         
         # Reactives ----

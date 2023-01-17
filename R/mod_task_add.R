@@ -17,7 +17,7 @@ mod_task_add_ui <- function(id){
 #' task_add Server Functions
 #'
 #' @noRd 
-mod_task_add_server <- function(id, AppData, trigger){
+mod_task_add_server <- function(id, AppData, trigger, config){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
