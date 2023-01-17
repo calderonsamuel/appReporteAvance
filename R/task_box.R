@@ -18,12 +18,6 @@ task_box <- function(task, ns = NULL, is_group_admin = FALSE) {
         dropdownMenu = dropdown,
         tags$p(task$task_description),
         task_assignee_div(task),
-        # tags$div(
-        #     tags$span(fontawesome::fa("far fa-user"), glue::glue("{task$assignee_name} {task$assignee_last_name}"))
-        # ),
-        # tags$div(
-        #     tags$span(fontawesome::fa("far fa-thumbs-up"), glue::glue("{task$assigned_by_name} {task$assigned_by_last_name}"))
-        # ),
         tags$div(
             tags$span(fontawesome::fa("far fa-clock"), format(task$time_due, "%H:%M:%S")),
             tags$span(fontawesome::fa("fas fa-bullseye"), glue::glue("{task$output_current}/{task$output_goal} {task$output_unit}"), style = "float: right;")
