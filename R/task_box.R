@@ -2,7 +2,7 @@ task_box <- function(task, ns = NULL, is_group_admin = FALSE) {
     id <- ns_safe(task$task_id, ns)
     
     dropdown <- task_dropdown(id, task$status_current, is_group_admin)
-        
+    
     bs4Dash::box(
         id = id,
         title = task$task_title,
@@ -11,21 +11,22 @@ task_box <- function(task, ns = NULL, is_group_admin = FALSE) {
         headerBorder = FALSE,
         background = task$user_color,
         label = bs4Dash::boxLabel(
-            text = glue::glue("{task$output_current}/{task$output_goal}"), 
-            status = "primary",
+            text = format(task$time_due, "%d %b"), 
+            status = task_status_from_time_due(task$time_due),
             tooltip = task$output_unit
         ),
         dropdownMenu = dropdown,
         tags$p(task$task_description),
+        task_assignee_div(task),
+        # tags$div(
+        #     tags$span(fontawesome::fa("far fa-user"), glue::glue("{task$assignee_name} {task$assignee_last_name}"))
+        # ),
+        # tags$div(
+        #     tags$span(fontawesome::fa("far fa-thumbs-up"), glue::glue("{task$assigned_by_name} {task$assigned_by_last_name}"))
+        # ),
         tags$div(
-            tags$span(fontawesome::fa("far fa-user"), glue::glue("{task$assignee_name} {task$assignee_last_name}"))
-        ),
-        tags$div(
-            tags$span(fontawesome::fa("far fa-thumbs-up"), glue::glue("{task$assigned_by_name} {task$assigned_by_last_name}"))
-        ),
-        tags$div(
-            tags$span(fontawesome::fa("far fa-calendar"), format(task$time_due, "%d/%m/%Y")),
-            tags$span(fontawesome::fa("far fa-clock"), format(task$time_due, "%H:%M:%S"))
+            tags$span(fontawesome::fa("far fa-clock"), format(task$time_due, "%H:%M:%S")),
+            tags$span(fontawesome::fa("fas fa-bullseye"), glue::glue("{task$output_current}/{task$output_goal} {task$output_unit}"), style = "float: right;")
         )
     )
 }
@@ -82,4 +83,29 @@ task_dropdown <- function(id, status, is_group_admin) {
         icon = fontawesome::fa("fas fa-ellipsis"), dd_items
         
     )
+}
+
+task_status_from_time_due <- function(time_due) {
+    if (as.Date(time_due) > lubridate::today("America/Lima")) {
+        "success"
+    } else if (as.Date(time_due) == lubridate::today("America/Lima")) {
+        "warning"
+    } else  "danger"
+}
+
+task_assignee_div <- function(task) {
+    if (task$assignee == task$assigned_by) {
+        tags$div(
+            tags$span(fontawesome::fa("far fa-user"), fontawesome::fa("far fa-thumbs-up"), glue::glue("{task$assignee_name} {task$assignee_last_name}"))
+        )
+    } else {
+        tagList(
+            tags$div(
+                tags$span(fontawesome::fa("far fa-user"), glue::glue("{task$assignee_name} {task$assignee_last_name}"))
+            ),
+            tags$div(
+                tags$span(fontawesome::fa("far fa-thumbs-up"), glue::glue("{task$assigned_by_name} {task$assigned_by_last_name}"))
+            )
+        )
+    }
 }
