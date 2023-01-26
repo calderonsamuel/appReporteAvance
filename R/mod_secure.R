@@ -13,9 +13,13 @@ mod_secure_ui <- function(id, AppData){
   tagList(
     bs4Dash::dashboardPage(
         freshTheme = custom_theme(),
+        dark = NULL,
         # preloader = list(html = tagList(waiter::spin_pixel(), "Cargando ..."), color = "#3c8dbc"),
       header = bs4Dash::dashboardHeader(
           title = "Reporte", 
+          rightUi = tags$li(class = "nav-item dropdown", 
+            tags$a("Ver manual", class = "nav-link", href="https://manualreportes.productosdedatos.com", target="_blank")
+          ),
           controlbarIcon = fontawesome::fa("fas fa-gear")
       ),
       sidebar = bs4Dash::dashboardSidebar(
