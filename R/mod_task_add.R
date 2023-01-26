@@ -57,7 +57,7 @@ mod_task_add_server <- function(id, AppData, trigger, config){
                 column(shinyWidgets::airDatepickerInput(
                     inputId = ns("time_due"),
                     label = "Plazo máximo",
-                    value = computeMinTimeDue(tzone = "America/Lima"), 
+                    value = computeMinTimeDue(tzone = "America/Lima") + lubridate::weeks(1), 
                     timepicker = TRUE,
                     dateFormat = "dd/MM/yyyy", 
                     language = "es",
