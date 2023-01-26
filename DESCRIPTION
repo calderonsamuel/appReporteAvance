@@ -21,7 +21,7 @@ Imports:
     lubridate,
     purrr,
     reactable,
-    reportesAPI (>= 0.1.4),
+    reportesAPI (>= 0.1.5),
     shiny (>= 1.7.1),
     shinyjs,
     shinyWidgets (>= 0.7.0),
