@@ -1,0 +1,36 @@
+textInputWithMaxLength <- function(inputId, label, value = "", width = NULL, 
+                       placeholder = NULL, maxlength = NULL, maxlengthCounter = FALSE) {
+    
+    tag <- shiny::textInput(
+        inputId = inputId,
+        label = label,
+        value = value,
+        width = width,
+        placeholder = placeholder
+    )
+    
+    if (!is.null(maxlength)) {
+        tq <- htmltools::tagQuery(tag)$
+            children("input")$
+            addAttrs(maxlength=maxlength)
+        
+        if (maxlengthCounter) {
+            tq <- tq$after(div(class = "form-text", id = paste0(inputId, "-mlCounter"), paste0("0/", maxlength)))
+        }
+        tq$allTags()
+    } else {
+        tag
+    }
+    
+}
+
+tagList(
+    textInputWithMaxLength("hi", "hi", maxlength = 25, maxlengthCounter = TRUE),
+    htmltools::htmlDependency(
+        name = "maxlength", 
+        version = "0.1.0",
+        src = "inst/js",
+        script = "maxlength.js"
+    )
+) |> 
+    bslib::page_fluid()
