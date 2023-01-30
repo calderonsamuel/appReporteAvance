@@ -24,13 +24,16 @@ textInputWithMaxLength <- function(inputId, label, value = "", width = NULL,
     
 }
 
-tagList(
-    textInputWithMaxLength("hi", "hi", maxlength = 25, maxlengthCounter = TRUE),
-    htmltools::htmlDependency(
-        name = "maxlength", 
-        version = "0.1.0",
-        src = "inst/js",
-        script = "maxlength.js"
-    )
-) |> 
-    bslib::page_fluid()
+bslib::page_fluid(
+    tags$head(
+        # htmltools::htmlDependency(
+        #     name = "maxlength",
+        #     version = "0.1.0",
+        #     package = "appReporteAvance",
+        #     src = "js",
+        #     script = "maxlength.js"
+        # )
+        includeScript("inst/js/maxlength.js")
+    ),
+    textInputWithMaxLength("hi", "hi", maxlength = 25, maxlengthCounter = TRUE)
+)
