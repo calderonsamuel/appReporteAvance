@@ -110,13 +110,19 @@ mod_board_server <- function(id, AppData, config) {
         
         # Reactives ----
         
-        tasks <- reactive(AppData$tasks) |> 
-            bindEvent(
-                task_gets_added(),
-                rv$task_has_been_deleted,
-                rv$task_has_been_reported,
-                rv$task_has_been_edited
-            )
+        tasks <- reactive({
+            AppData$tasks |> 
+                purrr::keep(\(x) org_and_group_are_selected(x, config))
+            
+        }) |> 
+        bindEvent(
+            task_gets_added(),
+            rv$task_has_been_deleted,
+            rv$task_has_been_reported,
+            rv$task_has_been_edited,
+            config$group_selected(),
+            config$org_selected()
+        )
         
         rv <- reactiveValues(
             task_to_delete = list(),
@@ -426,4 +432,9 @@ task_box_by_status <- function(tasks, status, ns, is_group_admin) {
             is_group_admin = is_group_admin
         )) |>
         tagList()
+}
+
+org_and_group_are_selected <- function(task, config) {
+    task$group_id == config$group_selected() && 
+        task$org_id == config$org_selected()
 }
