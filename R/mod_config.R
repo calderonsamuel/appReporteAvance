@@ -26,13 +26,14 @@ mod_config_ui <- function(id, AppData) {
         ),
         div(
             id = ns("div_transfer"),
-            h5("Transferencia de cargo"),
-            selectInput(
-                inputId = ns("users"),
-                label = "Seleccione usuario",
-                choices = get_user_choices(AppData, group_choices[1] |> unname())
-            ),
-            btn_guardar(ns("save"))
+            mod_groupAdmin_ui(ns("groupAdmin_1"))
+            # h5("Transferencia de cargo"),
+            # selectInput(
+            #     inputId = ns("users"),
+            #     label = "Seleccione usuario",
+            #     choices = get_user_choices(AppData, group_choices[1] |> unname())
+            # ),
+            # btn_guardar(ns("save"))
         )
     )
 }
@@ -45,6 +46,8 @@ mod_config_server <- function(id, AppData, trigger) {
         ns <- session$ns
         
         is_group_admin <- reactive(verify_group_admin(AppData, input$groups))
+        
+        mod_groupAdmin_server("groupAdmin_1", AppData, config_output)
         
         observe({
             updateSelectInput(
@@ -122,11 +125,13 @@ mod_config_server <- function(id, AppData, trigger) {
         
         # output ----
         
-        list(
+        config_output <- list(
             org_selected = reactive(input$orgs),
             group_selected = reactive(input$groups),
             is_group_admin = is_group_admin
         )
+        
+        config_output
         
     })
 }
@@ -136,6 +141,17 @@ mod_config_server <- function(id, AppData, trigger) {
 
 ## To be copied in the server
 # mod_config_server("config_1")
+
+mod_config_apptest <- function(id = "test", user = Sys.getenv("REPORTES_EMAIL")) {
+    
+    AppData <- AppData$new(user)
+    trigger <- isolate(reactive(1))
+    
+    quick_bs4dash(
+        modUI = mod_config_ui(id, AppData),
+        modServer = mod_config_server(id, AppData, trigger = trigger)
+    )
+}
 
 get_org_choices <- function(AppData) {
     ids <- AppData$orgs |> purrr::map_chr("org_id")
