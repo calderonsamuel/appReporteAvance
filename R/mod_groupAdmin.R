@@ -49,17 +49,17 @@ mod_groupAdmin_server <- function(id, AppData, config) {
         
         output$debug <- DT::renderDT({
             data <- group_selected() |> 
-                dplyr::bind_rows() |> 
-                dplyr::rowwise() |> 
-                dplyr::mutate(
-                    display_name = paste(name, last_name),
-                    picker = color_dropdown(
-                        inputId = user_id, 
-                        color_selected = user_color
-                    ) |> as.character()
-                ) |>
-                dplyr::ungroup() |> 
-                dplyr::select(display_name, picker)
+                lapply(\(x) {
+                    data.frame(
+                        display_name = paste(x$name, x$last_name),
+                        picker = color_dropdown(
+                            inputId = x$user_id, 
+                            color_selected = x$user_color
+                        ) |> as.character()
+                    )
+                })
+            
+            data <- do.call(rbind, data)
                 
             data |>     
                 DT::datatable(
