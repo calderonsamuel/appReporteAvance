@@ -70,6 +70,7 @@ mod_task_add_server <- function(id, AppData, trigger, config){
                     minDate = computeMinDateDue(tzone = "America/Lima"),
                     maxDate = computeMinDateDue(tzone = "America/Lima") + lubridate::weeks(4),
                     todayButton = TRUE,
+                    firstDay = 0,
                     addon = 'none',
                     timepickerOpts = shinyWidgets::timepickerOptions(
                         minutesStep = 15,
