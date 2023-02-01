@@ -1,3 +1,9 @@
+# appReporteAvance 0.3.4
+
+- Se añadió un botón en el encabezado que permite acceder al manual
+- Puede seleccionarse un grupo específico para ver las tareas correspondientes solo a ese grupo. Debe hacerse en el panel de configuración
+- El calendario para añadir una nueva tarea tiene como fecha inicial el domingo
+
 # appReporteAvance 0.3.3
 
 ## Card layout
