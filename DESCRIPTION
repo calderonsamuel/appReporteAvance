@@ -11,6 +11,7 @@ BugReports: https://github.com/calderonsamuel/appReporteAvance/issues
 Imports: 
     bs4Dash,
     config (>= 0.3.1),
+    DT,
     firebase,
     fontawesome,
     fresh,
