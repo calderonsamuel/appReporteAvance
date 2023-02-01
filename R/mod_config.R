@@ -9,14 +9,14 @@
 #' @importFrom shiny NS tagList
 mod_config_ui <- function(id, AppData) {
     ns <- NS(id)
-    
+
     org_choices <- get_org_choices(AppData)
     group_choices <- get_group_choices(AppData, org_choices[1])
     
     tagList(
         selectInput(
-            inputId = ns("orgs"), 
-            label = "Seleccione organización", 
+            inputId = ns("orgs"),
+            label = "Seleccione organización",
             choices = org_choices
         ),
         selectInput(
@@ -41,30 +41,19 @@ mod_config_ui <- function(id, AppData) {
 #' config Server Functions
 #'
 #' @noRd
-mod_config_server <- function(id, AppData, trigger) {
+mod_config_server <- function(id, AppData) {
     moduleServer(id, function(input, output, session) {
         ns <- session$ns
         
         is_group_admin <- reactive(verify_group_admin(AppData, input$groups))
-        
-        mod_groupAdmin_server("groupAdmin_1", AppData, config_output)
-        
-        observe({
-            updateSelectInput(
-                session = session,
-                inputId = "orgs",
-                choices = get_org_choices(AppData)
-            )
-        }) |> 
-            bindEvent(trigger())
-        
+
         observe({
             updateSelectInput(
                 session = session,
                 inputId = "groups",
                 choices = get_group_choices(AppData, input$orgs)
             )
-        }) |> 
+        }) |>
             bindEvent(input$orgs)
         
         observe({
@@ -145,11 +134,10 @@ mod_config_server <- function(id, AppData, trigger) {
 mod_config_apptest <- function(id = "test", user = Sys.getenv("REPORTES_EMAIL")) {
     
     AppData <- AppData$new(user)
-    trigger <- isolate(reactive(1))
     
     quick_bs4dash(
         modUI = mod_config_ui(id, AppData),
-        modServer = mod_config_server(id, AppData, trigger = trigger)
+        modServer = mod_config_server(id, AppData)
     )
 }
 
