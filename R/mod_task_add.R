@@ -49,12 +49,18 @@ mod_task_add_server <- function(id, AppData, trigger, config){
                     label = "Meta",
                     value = 1
                 )),
-                col_4(selectInput(
+                column(shinyWidgets::pickerInput(
                     inputId = ns("output_unit"), 
                     label = "Unidad de medida",
-                    choices = c("Informe", "Memorando", "Oficio", "Ayuda memoria", "PPT", "Entregable", "Correo")
-                )),
-                column(shinyWidgets::airDatepickerInput(
+                    width = "100%",
+                    choices = output_unit_choices(),
+                    options = shinyWidgets::pickerOptions(
+                        liveSearch = TRUE
+                    )
+                ), width = 9)
+            ),
+            fluidRow(
+                col_6(shinyWidgets::airDatepickerInput(
                     inputId = ns("time_due"),
                     label = "Plazo máximo",
                     value = computeMinTimeDue(tzone = "America/Lima") + lubridate::weeks(1), 
@@ -70,12 +76,12 @@ mod_task_add_server <- function(id, AppData, trigger, config){
                         minHours = 8,
                         maxHours = 18
                     )
-                ), width = 5)
-            ),
-            selectInput(
-                inputId = ns("user_id"),
-                label = "Encargado",
-                choices = user_choices()
+                )),
+                col_6(selectInput(
+                    inputId = ns("user_id"),
+                    label = "Encargado",
+                    choices = user_choices()
+                ))
             ),
             
             footer = tagList(
@@ -119,3 +125,18 @@ mod_task_add_server <- function(id, AppData, trigger, config){
     
 ## To be copied in the server
 # mod_task_add_server("task_add_1")
+
+output_unit_choices <- function() {
+    list(ADMINISTRATIVO = c("Informe", "Proyecto de informe", "Proyecto de Memorando", 
+                            "Proyecto de Oficio", "Ayuda memoria", "PPT", "Entregable", "Correo"
+    ), DESTRUCCIÓN = c("Informe", "Proyecto de hoja de recomendación", 
+                       "Proyecto de plan de operaciones", "Proyecto de oficio para destrucción (VOI)", 
+                       "Anexo por tipo de droga", "Relación de droga para destrucción", 
+                       "kg de droga destruida, por tipo de droga", "kg de droga destruida, por tipo de droga", 
+                       "Proyecto de Informe de destrucción para VOI", "Informe final de destrucción"
+    ), INTERNAMIENTO = c("Pericias revisadas", "Pericias corregidas", 
+                         "Consolidado de Relación de drogas", "Relación de drogas revisadas", 
+                         "Relación de drogas corregidas", "Hoja de trabajo para internamiento", 
+                         "Proyecto de informe de internamiento", "Kg de droga internada, por tipo de droga", 
+                         "Muestras programadas para recepción", "Bolsas almacenadas"))
+}

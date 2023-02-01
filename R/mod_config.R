@@ -26,14 +26,14 @@ mod_config_ui <- function(id, AppData) {
         ),
         div(
             id = ns("div_transfer"),
-            mod_groupAdmin_ui(ns("groupAdmin_1"))
-            # h5("Transferencia de cargo"),
-            # selectInput(
-            #     inputId = ns("users"),
-            #     label = "Seleccione usuario",
-            #     choices = get_user_choices(AppData, group_choices[1] |> unname())
-            # ),
-            # btn_guardar(ns("save"))
+            # mod_groupAdmin_ui(ns("groupAdmin_1"))
+            h5("Transferencia de cargo"),
+            selectInput(
+                inputId = ns("users"),
+                label = "Seleccione usuario",
+                choices = get_user_choices(AppData, group_choices[1] |> unname())
+            ),
+            btn_guardar(ns("save"))
         )
     )
 }
