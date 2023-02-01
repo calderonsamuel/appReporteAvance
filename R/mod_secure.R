@@ -64,7 +64,8 @@ mod_secure_server <- function(id, AppData){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
-    config <- mod_config_server("config_1", AppData, reactive(input$controlbar))
+    config <- mod_config_server("config_1", AppData)
+    # config <- mod_config_server("config_1", AppData, reactive(input$controlbar))
     
     mod_board_server("board_1", AppData, config)
 
@@ -76,9 +77,13 @@ mod_secure_apptest <-
         
         AppData <- AppData$new(user_iniciado)
         
-        ui <- mod_secure_ui(id = "test", AppData)
+        ui <- tags$div(
+            uiOutput("ui")
+        )
         
         server <- function(input, output, session) {
+            output$ui <- renderUI(mod_secure_ui(id = "test", AppData))
+            
             mod_secure_server(id = "test", AppData)
         }
         
