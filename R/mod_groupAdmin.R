@@ -18,6 +18,13 @@ mod_groupAdmin_ui <- function(id) {
             style = "simple",
             color = "primary"
         )
+        # shinyWidgets::pickerInput(
+        #     inputId = paste0("id", "-role"),
+        #     label = NULL,
+        #     choices = c("admin", "user"),
+        #     selected = "user",
+        #     width = "200px"
+        # )
     )
 }
 
@@ -53,8 +60,15 @@ mod_groupAdmin_server <- function(id, AppData, config) {
                     data.frame(
                         display_name = paste(x$name, x$last_name),
                         picker = color_dropdown(
-                            inputId = x$user_id, 
+                            inputId = paste0(x$user_id, "-color"), 
                             color_selected = x$user_color
+                        ) |> as.character(),
+                        role_selector = shinyWidgets::pickerInput(
+                            inputId = paste0(x$user_id, "-role"),
+                            label = NULL,
+                            choices = c("admin", "user"),
+                            selected = x$group_role, 
+                            width = "200px"
                         ) |> as.character()
                     )
                 })
@@ -70,6 +84,7 @@ mod_groupAdmin_server <- function(id, AppData, config) {
                     ), 
                     rownames = FALSE,
                     selection = 'none',
+                    # style = "bootstrap4",
                     colnames = rep("", ncol(data))
                 )
         })
