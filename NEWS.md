@@ -1,3 +1,8 @@
+# appReporteAvance 0.3.5
+
+- La ventana de reporte de progreso cuenta con inputs más visibles
+- La ventana de historial es más grande, logrando mostrar toda la tabla de historial
+
 # appReporteAvance 0.3.4
 
 - Se añadió un botón en el encabezado que permite acceder al manual
