@@ -219,20 +219,27 @@ mod_board_server <- function(id, AppData, config) {
                         
                         showModal(modalDialog(
                             h1("Reporte de avance"),
+                            tags$p(paste0("Tarea: ", rv$task_to_report$task_title)),
+                            tags$p(paste0("Descripción: ", rv$task_to_report$task_description)),
+                            
                             selectInput(
                                 inputId = ns("report_status_current"),
                                 label =  "Nuevo estado", 
-                                choices = task_get_status_choices(rv$task_to_report$status_current)),
+                                choices = task_get_status_choices(rv$task_to_report$status_current),
+                                width = "100%"
+                            ),
                             numericInput(
                                 inputId = ns("report_output_current"), 
-                                label = paste0("Avance actual (", rv$task_to_report$output_unit, ")"),
+                                label = paste0("Avance actual - ", rv$task_to_report$output_unit),
                                 value = rv$task_to_report$output_current,
                                 min = rv$task_to_report$output_current,
-                                max = rv$task_to_report$output_goal
+                                max = rv$task_to_report$output_goal,
+                                width = "100%"
                             ),
                             textAreaInput(
                                 inputId = ns("report_details"), 
-                                label = "Detalles"
+                                label = "Detalles",
+                                width = "100%"
                             ),
                             
                             footer = tagList(
@@ -340,7 +347,8 @@ mod_board_server <- function(id, AppData, config) {
                                         
                                         footer = tagList(
                                             modalButton("Cerrar")
-                                        )
+                                        ),
+                                        size = "l"
                                     ))
                                 }) |> bindEvent(input[[.x]], ignoreInit = TRUE)
                 )
