@@ -139,5 +139,8 @@ output_unit_choices <- function() {
                          "Consolidado de Relación de drogas", "Relación de drogas revisadas", 
                          "Relación de drogas corregidas", "Hoja de trabajo para internamiento", 
                          "Proyecto de informe de internamiento", "Kg de droga internada, por tipo de droga", 
-                         "Muestras programadas para recepción", "Bolsas almacenadas"))
+                         "Muestras programadas para recepción",
+                         "Muestras observadas en recepción",
+                         "Muestras observadas en almacenamiento",
+                         "Bolsas almacenadas"))
 }
