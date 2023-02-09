@@ -13,18 +13,13 @@ mod_groupAdmin_ui <- function(id) {
     tagList(
         shinyWidgets::actionBttn(
             inputId = ns("modify_group"),
-            label = "Administrar grupo",
+            label = "Administrar miembros",
             size = "md",
             style = "simple",
             color = "primary"
-        )
-        # shinyWidgets::pickerInput(
-        #     inputId = paste0("id", "-role"),
-        #     label = NULL,
-        #     choices = c("admin", "user"),
-        #     selected = "user",
-        #     width = "200px"
-        # )
+        ),
+        btn_user_add("add"),
+        DT::DTOutput(ns("debug"), width = "350"),
     )
 }
 
@@ -37,38 +32,16 @@ mod_groupAdmin_server <- function(id, AppData, config) {
         
         group_selected <- reactive(AppData$group_users[[config$group_selected()]])
         
-        observe({
-            showModal(modalDialog(
-                title = "Panel de grupo",
-                size = "l",
-                # h3(""),
-                DT::DTOutput(ns("debug")),
-                
-                footer = tagList(
-                    modalButton("Cancelar"),
-                    btn_guardar(ns("save"))
-                )
-                    
-            ))
-        }) |> 
-            bindEvent(input$modify_group)
-        
-        
         output$debug <- DT::renderDT({
             data <- group_selected() |> 
                 lapply(\(x) {
                     data.frame(
-                        display_name = paste(x$name, x$last_name),
-                        picker = color_dropdown(
-                            inputId = paste0(x$user_id, "-color"), 
-                            color_selected = x$user_color
-                        ) |> as.character(),
-                        role_selector = shinyWidgets::pickerInput(
-                            inputId = paste0(x$user_id, "-role"),
-                            label = NULL,
-                            choices = c("admin", "user"),
-                            selected = x$group_role, 
-                            width = "200px"
+                        colors = span(class = paste0("badge user-color-badge px-3 mr-1 bg-", x$user_color), " ") |> as.character(),
+                        user = paste(x$name, x$last_name),
+                        # user = div(span(class = paste0("badge user-color-badge px-3 mr-1 bg-", x$user_color), " "), paste(x$name, x$last_name)) |> as.character(),
+                        btns = span(
+                            actionButton(paste0(x$user_id, "-edit"), label = fontawesome::fa("fas fa-pencil")),
+                            actionButton(paste0(x$user_id, "-delete"), label = fontawesome::fa("fas fa-trash"))
                         ) |> as.character()
                     )
                 })
@@ -77,10 +50,18 @@ mod_groupAdmin_server <- function(id, AppData, config) {
                 
             data |>     
                 DT::datatable(
-                    escape = FALSE, 
+                    escape = FALSE,  
                     options = list(
                         dom = "t",
-                        ordering = FALSE
+                        ordering = FALSE,
+                        columnDefs = list(
+                            list(
+                                className = 'dt-right', 
+                                targets = 2
+                            ),
+                            list(className = "dt-left",
+                                 targets = 0:1)
+                        )
                     ), 
                     rownames = FALSE,
                     selection = 'none',

@@ -30,3 +30,12 @@
 .cw-sm {
     height: 38.5vh;
 }
+
+
+.user-color-badge {
+    vertical-align: middle;
+    height: 1.2rem;
+    border-color: black;
+    border-style: solid;
+    border-width: thin;
+}
