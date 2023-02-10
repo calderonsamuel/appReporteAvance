@@ -11,15 +11,8 @@ mod_groupAdmin_ui <- function(id) {
     ns <- NS(id)
     
     tagList(
-        shinyWidgets::actionBttn(
-            inputId = ns("modify_group"),
-            label = "Administrar miembros",
-            size = "md",
-            style = "simple",
-            color = "primary"
-        ),
-        btn_user_add("add"),
-        DT::DTOutput(ns("debug"), width = "350"),
+        btn_user_add(ns("add")),
+        DT::DTOutput(ns("tabla"), width = "350"),
     )
 }
 
@@ -32,13 +25,12 @@ mod_groupAdmin_server <- function(id, AppData, config) {
         
         group_selected <- reactive(AppData$group_users[[config$group_selected()]])
         
-        output$debug <- DT::renderDT({
+        output$tabla <- DT::renderDT({
             data <- group_selected() |> 
                 lapply(\(x) {
                     data.frame(
                         colors = span(class = paste0("badge user-color-badge px-3 mr-1 bg-", x$user_color), " ") |> as.character(),
                         user = paste(x$name, x$last_name),
-                        # user = div(span(class = paste0("badge user-color-badge px-3 mr-1 bg-", x$user_color), " "), paste(x$name, x$last_name)) |> as.character(),
                         btns = span(
                             actionButton(paste0(x$user_id, "-edit"), label = fontawesome::fa("fas fa-pencil")),
                             actionButton(paste0(x$user_id, "-delete"), label = fontawesome::fa("fas fa-trash"))
@@ -69,6 +61,51 @@ mod_groupAdmin_server <- function(id, AppData, config) {
                     colnames = rep("", ncol(data))
                 )
         })
+        
+        observe({
+            showModal(modalDialog(
+                title = "Nuevo miembro",
+                size = "l",
+                
+                fluidRow(
+                    col_6(
+                        selectInput(
+                            inputId = ns("user"), 
+                            label = "Selecciona usuario", 
+                            choices = head(letters),
+                            width = "100%"
+                        )
+                    ),
+                    col_2(
+                        colourpicker::colourInput(
+                            ns("color"), 
+                            "Color", 
+                            palette = "limited", 
+                            allowedCols = reportes_bs_colors() |> unlist(), 
+                            value = "#d2d6de",
+                            showColour = "background",
+                            closeOnClick = TRUE
+                        )
+                    ),
+                    col_4(
+                        selectInput(
+                            inputId = ns("role"),
+                            label = "Rol",
+                            choices = c(Usuario = "user", Responsable = "admin")
+                        )
+                    )
+                ),
+                
+                footer = tagList(
+                    modalButton("Cancelar"),
+                    btn_guardar(ns("save"))
+                )
+            ))
+        }) |> 
+            bindEvent(input$add)
+        
+        
+        
     })
 }
 
