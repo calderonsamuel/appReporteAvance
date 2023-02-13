@@ -1,17 +1,16 @@
-ns <- shiny::NS("test")
-
 custom_shiny_btn_dep <- function() {
     htmltools::htmlDependency(
-        name = "user-delete", 
+        name = "multiBtnShinyInput", 
         version = "1.0",
         package = "appReporteAvance",
         src = "js",
-        script = "user-delete.js"
+        script = "multiBtnShinyInput.js"
     )
 }
 
 custom_shiny_btn <- function(
-    inputId, label, selectorClass, 
+    inputId, label, 
+    selectorClass, 
     idForSelection = "",
     colorClass = ""
     ) {
@@ -19,7 +18,7 @@ custom_shiny_btn <- function(
         id = inputId, 
         type = "button",
         label, 
-        idForSelection = idForSelection,
+        `id-for-selection` = idForSelection,
         class = "btn",
         class = colorClass,
         class = selectorClass
@@ -28,21 +27,39 @@ custom_shiny_btn <- function(
     tagList(custom_shiny_btn_dep(), input_tag)
 }
 
+ns_safe <- function(id, ns = NULL) if (is.null(ns)) id else ns(id)
+
+admin_user_toolbar <- function(inputId, ns = NULL, class = "float-right") {
+    div(
+        class = "btn-group float-right", 
+        role = "group",
+        custom_shiny_btn(
+            inputId = ns_safe(inputId, ns),
+            label = fontawesome::fa("fas fa-pencil"),
+            idForSelection = inputId,
+            colorClass = "btn-warning",
+            selector = "user-edit"
+        ),
+        custom_shiny_btn(
+            inputId = ns_safe(inputId, ns),
+            label = fontawesome::fa("fas fa-trash"),
+            idForSelection = inputId,
+            colorClass = "btn-danger",
+            selector = "user-delete"
+        )
+    )
+}
+
 custom_input_UI <- function(id) {
   ns <- NS(id)
   tagList(
-      shiny::tagList(
-          lapply(ids::random_id(4), \(x) {
-              custom_shiny_btn(
-                  inputId = ns(x),
-                  label = fontawesome::fa("fas fa-trash"),
-                  idForSelection = x,
-                  colorClass = "btn-danger",
-                  selector = "user-delete"
-              )
-          })
-      ),
-      
+      lapply(ids::random_id(4), \(x) {
+          shiny::fluidRow(
+              style = "max-width: 350px;",
+              column("Nombre", x, width = 8),
+              column(admin_user_toolbar(x, ns), width = 4)
+          )
+      }),
       shiny::verbatimTextOutput(ns("info"))
   )
 }
@@ -51,18 +68,26 @@ custom_input_Server <- function(id) {
   moduleServer(
     id,
     function(input, output, session) {
+        ns <- session$ns
+        
         output$info <- shiny::renderPrint({
-            input[["isMac"]]
+            list(
+                edit = input$userToEdit,
+                delete = input$userToDelete
+            )
         })
     }
   )
 }
 
 ui <- shiny::fluidPage(
-    custom_input_UI("test")
+    theme = bslib::bs_theme(version = 5),
+    # custom_input_UI("test")
+    shiny::uiOutput("ui")
 )
 
 server <- function(input, output, session) {
+    output$ui <- shiny::renderUI(custom_input_UI("test"))
     custom_input_Server("test")
 }
 
