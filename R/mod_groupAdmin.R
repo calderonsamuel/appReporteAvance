@@ -13,7 +13,9 @@ mod_groupAdmin_ui <- function(id) {
     tagList(
         btn_user_add(ns("add")),
         uiOutput(ns("users")),
-        DT::DTOutput(ns("tabla"), width = "350"),
+        
+        verbatimTextOutput(ns("debug"))
+        # DT::DTOutput(ns("tabla"), width = "350"),
     )
 }
 
@@ -42,48 +44,48 @@ mod_groupAdmin_server <- function(id, AppData, config) {
                         ),
                         div(
                             class = "col d-flex align-items-center",
-                            admin_toolbar(x$user_id, ns, "userToEdit", "userToDelete")
+                            admin_toolbar(x$user_id, ns, "user-edit", "user-delete")
                         )
                     )
                 })
         })
         
-        output$tabla <- DT::renderDT({
-            data <- group_selected() |> 
-                lapply(\(x) {
-                    data.frame(
-                        colors = span(class = paste0("badge user-color-badge px-3 mr-1 bg-", x$user_color), " ") |> as.character(),
-                        user = paste(x$name, x$last_name),
-                        btns = span(
-                            actionButton(paste0(x$user_id, "-edit"), label = fontawesome::fa("fas fa-pencil")),
-                            actionButton(paste0(x$user_id, "-delete"), label = fontawesome::fa("fas fa-trash"))
-                        ) |> as.character()
-                    )
-                })
-            
-            data <- do.call(rbind, data)
-                
-            data |>     
-                DT::datatable(
-                    escape = FALSE,  
-                    options = list(
-                        dom = "t",
-                        ordering = FALSE,
-                        columnDefs = list(
-                            list(
-                                className = 'dt-right', 
-                                targets = 2
-                            ),
-                            list(className = "dt-left",
-                                 targets = 0:1)
-                        )
-                    ), 
-                    rownames = FALSE,
-                    selection = 'none',
-                    # style = "bootstrap4",
-                    colnames = rep("", ncol(data))
-                )
-        })
+        # output$tabla <- DT::renderDT({
+        #     data <- group_selected() |> 
+        #         lapply(\(x) {
+        #             data.frame(
+        #                 colors = span(class = paste0("badge user-color-badge px-3 mr-1 bg-", x$user_color), " ") |> as.character(),
+        #                 user = paste(x$name, x$last_name),
+        #                 btns = span(
+        #                     actionButton(paste0(x$user_id, "-edit"), label = fontawesome::fa("fas fa-pencil")),
+        #                     actionButton(paste0(x$user_id, "-delete"), label = fontawesome::fa("fas fa-trash"))
+        #                 ) |> as.character()
+        #             )
+        #         })
+        #     
+        #     data <- do.call(rbind, data)
+        #         
+        #     data |>     
+        #         DT::datatable(
+        #             escape = FALSE,  
+        #             options = list(
+        #                 dom = "t",
+        #                 ordering = FALSE,
+        #                 columnDefs = list(
+        #                     list(
+        #                         className = 'dt-right', 
+        #                         targets = 2
+        #                     ),
+        #                     list(className = "dt-left",
+        #                          targets = 0:1)
+        #                 )
+        #             ), 
+        #             rownames = FALSE,
+        #             selection = 'none',
+        #             # style = "bootstrap4",
+        #             colnames = rep("", ncol(data))
+        #         )
+        # })
         
         observe({
             showModal(modalDialog(
@@ -126,6 +128,13 @@ mod_groupAdmin_server <- function(id, AppData, config) {
             ))
         }) |> 
             bindEvent(input$add)
+        
+        output$debug <- renderPrint({
+            list(
+                edit = input$userToEdit,
+                delete = input$userToDelete
+            )
+        })
         
         
         
