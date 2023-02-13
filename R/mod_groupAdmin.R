@@ -12,6 +12,7 @@ mod_groupAdmin_ui <- function(id) {
     
     tagList(
         btn_user_add(ns("add")),
+        uiOutput(ns("users")),
         DT::DTOutput(ns("tabla"), width = "350"),
     )
 }
@@ -24,6 +25,28 @@ mod_groupAdmin_server <- function(id, AppData, config) {
         ns <- session$ns
         
         group_selected <- reactive(AppData$group_users[[config$group_selected()]])
+        
+        output$users <- renderUI({
+            group_selected() |> 
+                lapply(\(x) {
+                    fluidRow(
+                        class = "py-1",
+                        style = "max-width: 350px",
+                        div(
+                            class = "col-md-auto d-flex align-items-center",
+                            span(class = paste0("badge user-color-badge px-3 bg-", x$user_color), " ")
+                        ),
+                        div(
+                            class = "col d-flex align-items-center",
+                            paste(x$name, x$last_name)
+                        ),
+                        div(
+                            class = "col d-flex align-items-center",
+                            admin_toolbar(x$user_id, ns, "userToEdit", "userToDelete")
+                        )
+                    )
+                })
+        })
         
         output$tabla <- DT::renderDT({
             data <- group_selected() |> 
