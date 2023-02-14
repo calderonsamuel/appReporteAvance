@@ -8,7 +8,7 @@ function setMultiBtnShinyInput(shinyInputId, classSelector) {
         let idForSelection = $(this).attr("id-for-selection")
         let ns = getNS(this.id)
         
-        Shiny.setInputValue(ns + shinyInputId, idForSelection);
+        Shiny.setInputValue(ns + shinyInputId, idForSelection, {priority: "event"});
     })
 }
 
