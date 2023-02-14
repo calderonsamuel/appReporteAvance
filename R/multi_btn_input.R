@@ -2,8 +2,10 @@ multi_btn_input <- function(
         inputId, label, 
         selectorClass, 
         idForSelection = "",
-        colorClass = ""
+        colorClass = "",
+        tooltip = NULL
 ) {
+    
     input_tag <-  htmltools::tags$button(
         id = inputId, 
         type = "button",
@@ -13,6 +15,15 @@ multi_btn_input <- function(
         class = colorClass,
         class = selectorClass
     )
+    
+    if (!is.null(tooltip)) {
+        input_tag <- input_tag |> 
+            tagAppendAttributes(
+                `data-toggle`="tooltip",
+                `data-placement`="top",
+                title=tooltip
+            )
+    }
     
     tagList(
         multi_btn_input_dep(), 
