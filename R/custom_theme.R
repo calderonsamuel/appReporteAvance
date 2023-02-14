@@ -1,5 +1,8 @@
 custom_theme <- function() {
     fresh::create_theme(
+        fresh::bs4dash_layout(
+            control_sidebar_width = "350px"
+        ),
         do.call(fresh::bs4dash_color, reportes_bs_colors())
     )
 }
