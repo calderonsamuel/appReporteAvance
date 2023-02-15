@@ -228,11 +228,34 @@ mod_groupAdmin_server <- function(id, AppData, config) {
                 
                 footer = tagList(
                     modalButton("Cancelar"),
-                    btn_guardar(ns("save"))
+                    btn_guardar(ns("save_editing"))
                 )
             ))
         }) |> 
             bindEvent(input$userToEdit)
+        
+        observe({
+            tryCatch({
+                user_selected <- group_selected()[[input$userToEdit]]
+                color_selected <- reportes_bs_colors()[reportes_bs_colors() == input$color_editing] |> names()
+                
+                AppData$group_user_edit(
+                    org_id = config$org_selected(), 
+                    group_id = config$group_selected(),
+                    user_id = input$userToEdit,
+                    user_color = color_selected,
+                    group_role = input$role
+                )
+                
+                removeModal(session)
+                
+                rv$user_edited <- rv$user_edited + 1L
+                
+                alert_info(session, "Usuario editado")
+                
+            }, error = \(e) alert_error(session, e))
+        }) |> 
+            bindEvent(input$save_editing)
         
     })
 }
