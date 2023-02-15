@@ -26,14 +26,7 @@ mod_config_ui <- function(id, AppData) {
         ),
         div(
             id = ns("div_transfer"),
-            # mod_groupAdmin_ui(ns("groupAdmin_1"))
-            h5("Transferencia de cargo"),
-            selectInput(
-                inputId = ns("users"),
-                label = "Seleccione usuario",
-                choices = get_user_choices(AppData, group_choices[1] |> unname())
-            ),
-            btn_guardar(ns("save"))
+            mod_groupAdmin_ui(ns("groupAdmin_1"))
         )
     )
 }
@@ -44,6 +37,8 @@ mod_config_ui <- function(id, AppData) {
 mod_config_server <- function(id, AppData) {
     moduleServer(id, function(input, output, session) {
         ns <- session$ns
+        
+        mod_groupAdmin_server("groupAdmin_1", AppData, config_output)
         
         is_group_admin <- reactive(verify_group_admin(AppData, input$groups))
 
@@ -57,6 +52,8 @@ mod_config_server <- function(id, AppData) {
             bindEvent(input$orgs)
         
         observe({
+            AppData$group_select(input$groups)
+            
             if (is_group_admin()) {
                 shinyjs::show("div_transfer")
                 updateSelectInput(
@@ -68,7 +65,7 @@ mod_config_server <- function(id, AppData) {
                 shinyjs::hide("div_transfer")
                 
             }
-        }) |> 
+        }, priority = 100) |> 
             bindEvent(input$groups)
         
         observe({

@@ -111,9 +111,7 @@ mod_board_server <- function(id, AppData, config) {
         # Reactives ----
         
         tasks <- reactive({
-            group_for_filtering <- ifelse(is.null(config$group_selected()), "none", config$group_selected())
-            AppData$tasks |> 
-                purrr::keep(\(x) x$group_id == group_for_filtering)
+            AppData$tasks 
             
         }) |> 
         bindEvent(
