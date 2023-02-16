@@ -24,6 +24,8 @@ task_box <- function(task, ns = NULL, is_group_admin = FALSE) {
         )
     )
     
+    # This hacks the validation that bs4Dash makes on its background colors. 
+    # Allows to use all the colors specified in fresh::create_theme()
     box_tag |> 
         tagAppendAttributes(class = paste0("bg-", task$user_color), .cssSelector = ".bs4Dash")
 }
