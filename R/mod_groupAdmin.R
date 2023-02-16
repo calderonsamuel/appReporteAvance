@@ -35,13 +35,15 @@ mod_groupAdmin_server <- function(id, AppData, config) {
         
         rv <- reactiveValues(
             user_added = 0L,
-            user_deleted = 0L
+            user_deleted = 0L,
+            user_edited = 0L
         )
         
         group_selected <- reactive(AppData$group_users[[config$group_selected()]]) |> 
             bindEvent(
                 rv$user_added,
-                rv$user_deleted
+                rv$user_deleted,
+                rv$user_edited
             )
         
         org_users <- reactive({
@@ -61,13 +63,8 @@ mod_groupAdmin_server <- function(id, AppData, config) {
             group_selected() |> 
                 lapply(\(x) {
                     fluidRow(
-                        class = "p-1 mx-0 mb-2",
-                        style = "
-                            max-width: 500px; 
-                            min-width: 300px;
-                            background-color: rgb(255 255 255 / 20%);
-                            border-radius: 5px;
-                        ",
+                        class = "p-1 mx-0 mb-2 mw-100",
+                        style = "min-width: 300px; background-color: rgb(255 255 255 / 20%); border-radius: 5px;",
                         div(
                             class = "col-xs-auto d-flex align-items-center",
                             span(class = paste0("badge user-color-badge px-3 bg-", x$user_color), " ")
@@ -87,6 +84,7 @@ mod_groupAdmin_server <- function(id, AppData, config) {
                 })
         })
         
+        ## Adding user ----
         observe({
             showModal(modalDialog(
                 title = "Nuevo miembro",
@@ -107,7 +105,7 @@ mod_groupAdmin_server <- function(id, AppData, config) {
                             "Color", 
                             palette = "limited", 
                             allowedCols = reportes_bs_colors() |> unlist(), 
-                            value = "#d2d6de",
+                            value = "#D2D6DE",
                             showColour = "background",
                             closeOnClick = TRUE
                         )
@@ -129,15 +127,16 @@ mod_groupAdmin_server <- function(id, AppData, config) {
         }) |> 
             bindEvent(input$add)
         
-        ## Adding user ----
         
         observe({
             tryCatch({
+                color_selected <- reportes_bs_colors()[reportes_bs_colors() == input$color] |> names()
+                
                 AppData$group_user_add(
                     org_id = config$org_selected(), 
                     group_id = config$group_selected(),
                     user_id = input$user,
-                    user_color = input$color,
+                    user_color = color_selected,
                     group_role = input$role
                 )
                 
@@ -171,7 +170,7 @@ mod_groupAdmin_server <- function(id, AppData, config) {
         observe({
             tryCatch({
                 if(isTRUE(input$confirm_delete)) {
-                    ap$group_user_delete(
+                    AppData$group_user_delete(
                         org_id = config$org_selected(),
                         group_id = config$group_selected(),
                         user_id = input$userToDelete
@@ -182,7 +181,7 @@ mod_groupAdmin_server <- function(id, AppData, config) {
                     alert_info(session, "Usuario eliminado")
                 }
                 
-            }, error = \(x) alert_error(session, e))
+            }, error = \(e) alert_error(session, e))
         }) |> 
             bindEvent(input$confirm_delete)
         
@@ -244,7 +243,7 @@ mod_groupAdmin_server <- function(id, AppData, config) {
                     group_id = config$group_selected(),
                     user_id = input$userToEdit,
                     user_color = color_selected,
-                    group_role = input$role
+                    group_role = input$role_editing
                 )
                 
                 removeModal(session)
