@@ -3,13 +3,13 @@ task_box <- function(task, ns = NULL, is_group_admin = FALSE) {
     
     dropdown <- task_dropdown(id, task$status_current, is_group_admin)
     
-    bs4Dash::box(
+    box_tag <- bs4Dash::box(
         id = id,
         title = task$task_title,
         width = 12,
         collapsed = TRUE,
         headerBorder = FALSE,
-        background = task$user_color,
+        # background = task$user_color,
         label = bs4Dash::boxLabel(
             text = format(task$time_due, "%d %b"), 
             status = task_status_from_time_due(task$time_due),
@@ -23,6 +23,9 @@ task_box <- function(task, ns = NULL, is_group_admin = FALSE) {
             tags$span(fontawesome::fa("fas fa-bullseye"), glue::glue("{task$output_current}/{task$output_goal} {task$output_unit}"), style = "float: right;")
         )
     )
+    
+    box_tag |> 
+        tagAppendAttributes(class = paste0("bg-", task$user_color), .cssSelector = ".bs4Dash")
 }
 
 ns_safe <- function(id, ns = NULL) if (is.null(ns)) id else ns(id)
