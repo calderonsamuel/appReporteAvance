@@ -26,7 +26,7 @@ mod_config_ui <- function(id, AppData) {
         ),
         div(
             id = ns("div_transfer"),
-            mod_groupAdmin_ui(ns("groupAdmin_1"))
+            mod_group_users_ui(ns("group_users_1"))
         )
     )
 }
@@ -38,7 +38,7 @@ mod_config_server <- function(id, AppData) {
     moduleServer(id, function(input, output, session) {
         ns <- session$ns
         
-        group_admin_output <- mod_groupAdmin_server("groupAdmin_1", AppData, config_output)
+        group_admin_output <- mod_group_users_server("group_users_1", AppData, config_output)
         
         group_selected <- reactive(input$groups) |> 
             bindEvent(

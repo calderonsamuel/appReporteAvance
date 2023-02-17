@@ -1,4 +1,4 @@
-#' groupAdmin UI Function
+#' group_users UI Function
 #'
 #' @description A shiny Module.
 #'
@@ -7,7 +7,7 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-mod_groupAdmin_ui <- function(id) {
+mod_group_users_ui <- function(id) {
     ns <- NS(id)
     
     tagList(
@@ -26,10 +26,10 @@ mod_groupAdmin_ui <- function(id) {
     )
 }
 
-#' groupAdmin Server Functions
+#' group_users Server Functions
 #'
 #' @noRd
-mod_groupAdmin_server <- function(id, AppData, config) {
+mod_group_users_server <- function(id, AppData, config) {
     moduleServer(id, function(input, output, session) {
         ns <- session$ns
         
@@ -268,19 +268,19 @@ mod_groupAdmin_server <- function(id, AppData, config) {
 }
 
 ## To be copied in the UI
-# mod_groupAdmin_ui("groupAdmin_1")
+# mod_group_users_ui("group_users_1")
 
 ## To be copied in the server
-# mod_groupAdmin_server("groupAdmin_1")
+# mod_group_users_server("group_users_1")
 
-mod_groupAdmin_apptest <- function(id = "test") {
+mod_group_users_apptest <- function(id = "test") {
     
     AppData <- AppData$new()
     config <- fake_config(AppData)
     
     quick_bs4dash(
-        modUI = mod_groupAdmin_ui(id),
-        modServer = mod_groupAdmin_server(id, AppData, config)
+        modUI = mod_group_users_ui(id),
+        modServer = mod_group_users_server(id, AppData, config)
     )
 }
 
