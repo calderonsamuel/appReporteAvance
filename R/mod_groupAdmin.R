@@ -46,6 +46,10 @@ mod_groupAdmin_server <- function(id, AppData, config) {
                 rv$user_edited
             )
         
+        module_output <- reactiveValues(
+            group_colors_modified = 0L
+        )
+        
         org_users <- reactive({
             org_users_list <- AppData$org_users[[config$org_selected()]]
             current_group_users_ids <- purrr::map_chr(group_selected(), "user_id")
@@ -249,12 +253,16 @@ mod_groupAdmin_server <- function(id, AppData, config) {
                 removeModal(session)
                 
                 rv$user_edited <- rv$user_edited + 1L
+                module_output$group_colors_modified <- module_output$group_colors_modified + 1L
                 
                 alert_info(session, "Usuario editado")
                 
             }, error = \(e) alert_error(session, e))
         }) |> 
             bindEvent(input$save_editing)
+        
+        ## output ----
+        module_output
         
     })
 }

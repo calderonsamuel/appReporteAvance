@@ -38,7 +38,13 @@ mod_config_server <- function(id, AppData) {
     moduleServer(id, function(input, output, session) {
         ns <- session$ns
         
-        mod_groupAdmin_server("groupAdmin_1", AppData, config_output)
+        group_admin_output <- mod_groupAdmin_server("groupAdmin_1", AppData, config_output)
+        
+        group_selected <- reactive(input$groups) |> 
+            bindEvent(
+                input$groups,
+                group_admin_output$group_colors_modified
+            )
         
         is_group_admin <- reactive(verify_group_admin(AppData, input$groups))
 
@@ -113,7 +119,7 @@ mod_config_server <- function(id, AppData) {
         
         config_output <- list(
             org_selected = reactive(input$orgs),
-            group_selected = reactive(input$groups),
+            group_selected = group_selected,
             is_group_admin = is_group_admin
         )
         
