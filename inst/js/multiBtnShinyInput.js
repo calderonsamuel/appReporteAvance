@@ -14,3 +14,5 @@ function setMultiBtnShinyInput(shinyInputId, classSelector) {
 
 setMultiBtnShinyInput("userToDelete", ".user-delete")
 setMultiBtnShinyInput("userToEdit", ".user-edit")
+setMultiBtnShinyInput("unitToEdit", ".unit-edit")
+setMultiBtnShinyInput("unitToDelete", ".unit-delete")
