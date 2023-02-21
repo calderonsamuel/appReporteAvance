@@ -43,7 +43,8 @@ mod_group_users_server <- function(id, AppData, config) {
             bindEvent(
                 rv$user_added,
                 rv$user_deleted,
-                rv$user_edited
+                rv$user_edited,
+                config$group_selected()
             )
         
         module_output <- reactiveValues(

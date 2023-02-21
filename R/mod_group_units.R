@@ -28,7 +28,7 @@ mod_group_units_ui <- function(id) {
 #' group_units Server Functions
 #'
 #' @noRd
-mod_group_units_server <- function(id, AppData) {
+mod_group_units_server <- function(id, AppData, group_selection) {
     moduleServer(id, function(input, output, session) {
         ns <- session$ns
         
@@ -44,7 +44,8 @@ mod_group_units_server <- function(id, AppData) {
             bindEvent(
                 rv$unit_added,
                 rv$unit_deleted,
-                rv$unit_edited
+                rv$unit_edited,
+                group_selection$group_selected()
             )
         
         output$units <- renderUI({
