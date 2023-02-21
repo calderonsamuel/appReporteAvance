@@ -55,25 +55,26 @@ mod_controlbar_server <- function(id, AppData) {
                 group_selection$group_selected()
             )
         
+        is_admin <- reactive(group_info()$group_role == "admin")
+        
         observe({
-            is_admin <- group_info()$group_role == "admin"
-            
-            if (is_admin) {
+            if (is_admin()) {
                 shinyjs::show(selector = ".nav-item-hideable")
             } else {
                 shinyjs::hide(selector = ".nav-item-hideable")
             }
         }) |> 
-            bindEvent(group_info())
+            bindEvent(is_admin())
         
        
         
         # output ----
         
         list(
-            group_selection,
-            users_admin,
-            units_admin
+            org_selected = group_selection$org_selected,
+            group_selected = group_selection$group_selected,
+            group_colors_modified = reactive(users_admin$group_colors_modified),
+            is_admin = is_admin
         )
         
     })
