@@ -120,7 +120,7 @@ mod_board_server <- function(id, AppData, config) {
             rv$task_has_been_reported,
             rv$task_has_been_edited,
             config$group_selected(),
-            config$org_selected()
+            config$group_colors_modified()
         )
         
         rv <- reactiveValues(
