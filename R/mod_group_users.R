@@ -29,7 +29,7 @@ mod_group_users_ui <- function(id) {
 #' group_users Server Functions
 #'
 #' @noRd
-mod_group_users_server <- function(id, AppData, config) {
+mod_group_users_server <- function(id, AppData, controlbar) {
     moduleServer(id, function(input, output, session) {
         ns <- session$ns
         
@@ -39,12 +39,12 @@ mod_group_users_server <- function(id, AppData, config) {
             user_edited = 0L
         )
         
-        group_selected <- reactive(AppData$group_users[[config$group_selected()]]) |> 
+        group_selected <- reactive(AppData$group_users[[controlbar$group_selected()]]) |> 
             bindEvent(
                 rv$user_added,
                 rv$user_deleted,
                 rv$user_edited,
-                config$group_selected()
+                controlbar$group_selected()
             )
         
         module_output <- reactiveValues(
@@ -52,7 +52,7 @@ mod_group_users_server <- function(id, AppData, config) {
         )
         
         org_users <- reactive({
-            org_users_list <- AppData$org_users[[config$org_selected()]]
+            org_users_list <- AppData$org_users[[controlbar$org_selected()]]
             current_group_users_ids <- purrr::map_chr(group_selected(), "user_id")
             
             remaining_users <- org_users_list |> 
@@ -138,8 +138,8 @@ mod_group_users_server <- function(id, AppData, config) {
                 color_selected <- reportes_bs_colors()[reportes_bs_colors() == input$color] |> names()
                 
                 AppData$group_user_add(
-                    org_id = config$org_selected(), 
-                    group_id = config$group_selected(),
+                    org_id = controlbar$org_selected(), 
+                    group_id = controlbar$group_selected(),
                     user_id = input$user,
                     user_color = color_selected,
                     group_role = input$role
@@ -176,8 +176,8 @@ mod_group_users_server <- function(id, AppData, config) {
             tryCatch({
                 if(isTRUE(input$confirm_delete)) {
                     AppData$group_user_delete(
-                        org_id = config$org_selected(),
-                        group_id = config$group_selected(),
+                        org_id = controlbar$org_selected(),
+                        group_id = controlbar$group_selected(),
                         user_id = input$userToDelete
                     )
                     
@@ -244,8 +244,8 @@ mod_group_users_server <- function(id, AppData, config) {
                 color_selected <- reportes_bs_colors()[reportes_bs_colors() == input$color_editing] |> names()
                 
                 AppData$group_user_edit(
-                    org_id = config$org_selected(), 
-                    group_id = config$group_selected(),
+                    org_id = controlbar$org_selected(), 
+                    group_id = controlbar$group_selected(),
                     user_id = input$userToEdit,
                     user_color = color_selected,
                     group_role = input$role_editing
@@ -277,11 +277,11 @@ mod_group_users_server <- function(id, AppData, config) {
 mod_group_users_apptest <- function(id = "test") {
     
     AppData <- AppData$new()
-    config <- fake_config(AppData)
+    controlbar <- fake_controlbar(AppData)
     
     quick_bs4dash(
         modUI = mod_group_users_ui(id),
-        modServer = mod_group_users_server(id, AppData, config)
+        modServer = mod_group_users_server(id, AppData, controlbar)
     )
 }
 
