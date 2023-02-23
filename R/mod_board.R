@@ -95,7 +95,7 @@ mod_board_ui <- function(id) {
 #' board Server Functions
 #'
 #' @noRd
-mod_board_server <- function(id, AppData, config) {
+mod_board_server <- function(id, AppData, controlbar) {
     moduleServer(id, function(input, output, session) {
         ns <- session$ns
         
@@ -105,15 +105,13 @@ mod_board_server <- function(id, AppData, config) {
             id = "task_add_1", 
             AppData = AppData, 
             trigger = reactive(input$task_add),
-            config = config
+            controlbar = controlbar
         )
         
         # Reactives ----
         
         tasks <- reactive({
-            group_for_filtering <- ifelse(is.null(config$group_selected()), "none", config$group_selected())
-            AppData$tasks |> 
-                purrr::keep(\(x) x$group_id == group_for_filtering)
+            AppData$tasks 
             
         }) |> 
         bindEvent(
@@ -121,8 +119,8 @@ mod_board_server <- function(id, AppData, config) {
             rv$task_has_been_deleted,
             rv$task_has_been_reported,
             rv$task_has_been_edited,
-            config$group_selected(),
-            config$org_selected()
+            controlbar$group_selected(),
+            controlbar$group_colors_modified()
         )
         
         rv <- reactiveValues(
@@ -358,27 +356,27 @@ mod_board_server <- function(id, AppData, config) {
         # Outputs ----
         
         output$pendientes <- renderUI({
-            task_box_by_status(tasks(), "Pendiente", ns, config$is_group_admin())
+            task_box_by_status(tasks(), "Pendiente", ns, controlbar$is_admin())
         }) 
         
         output$en_proceso <- renderUI({
-            task_box_by_status(tasks(), "En proceso", ns, config$is_group_admin())
+            task_box_by_status(tasks(), "En proceso", ns, controlbar$is_admin())
         })
         
         output$pausado <- renderUI({
-            task_box_by_status(tasks(), "Pausado", ns, config$is_group_admin())
+            task_box_by_status(tasks(), "Pausado", ns, controlbar$is_admin())
         })
         
         output$en_revision <- renderUI({
-            task_box_by_status(tasks(), "En revisión", ns, config$is_group_admin())
+            task_box_by_status(tasks(), "En revisión", ns, controlbar$is_admin())
         })
         
         output$observado <- renderUI({
-            task_box_by_status(tasks(), "Observado", ns, config$is_group_admin())
+            task_box_by_status(tasks(), "Observado", ns, controlbar$is_admin())
         })
         
         output$terminado <- renderUI({
-            task_box_by_status(tasks(), "Terminado", ns, config$is_group_admin())
+            task_box_by_status(tasks(), "Terminado", ns, controlbar$is_admin())
         })
         
         
@@ -444,6 +442,6 @@ task_box_by_status <- function(tasks, status, ns, is_group_admin) {
 }
 
 org_and_group_are_selected <- function(task, config) {
-    task$group_id == config$group_selected() && 
-        task$org_id == config$org_selected()
+    task$group_id == controlbar$group_selected() && 
+        task$org_id == controlbar$org_selected()
 }

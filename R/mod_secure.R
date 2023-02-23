@@ -46,12 +46,7 @@ mod_secure_ui <- function(id, AppData){
       ),
       controlbar = bs4Dash::dashboardControlbar(
           id = ns("controlbar"),
-          bs4Dash::controlbarMenu(
-              bs4Dash::controlbarItem(
-                  title = "Configuración",
-                  mod_config_ui(ns("config_1"), AppData)
-              )
-          )
+          mod_controlbar_ui(ns("controlbar_1"), AppData)
       )
     )
   )
@@ -64,10 +59,9 @@ mod_secure_server <- function(id, AppData){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
-    config <- mod_config_server("config_1", AppData)
-    # config <- mod_config_server("config_1", AppData, reactive(input$controlbar))
+    controlbar <- mod_controlbar_server("controlbar_1", AppData)
     
-    mod_board_server("board_1", AppData, config)
+    mod_board_server("board_1", AppData, controlbar)
 
   })
 }

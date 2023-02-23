@@ -17,7 +17,7 @@ mod_task_add_ui <- function(id){
 #' task_add Server Functions
 #'
 #' @noRd 
-mod_task_add_server <- function(id, AppData, trigger, config){
+mod_task_add_server <- function(id, AppData, trigger, controlbar){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
@@ -26,7 +26,7 @@ mod_task_add_server <- function(id, AppData, trigger, config){
     )
     
     user_choices <- reactive({
-        get_user_choices(AppData, config$group_selected())
+        get_user_choices(AppData, controlbar$group_selected())
     })
     
     observe({
@@ -95,8 +95,8 @@ mod_task_add_server <- function(id, AppData, trigger, config){
     observe({
         tryCatch(expr = {
             AppData$task_add(
-                org_id = config$org_selected(),
-                group_id = config$group_selected(),
+                org_id = controlbar$org_selected(),
+                group_id = controlbar$group_selected(),
                 task_title = input$title,
                 task_description = input$description,
                 assignee = input$user_id,
