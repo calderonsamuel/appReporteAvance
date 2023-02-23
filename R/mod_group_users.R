@@ -80,10 +80,11 @@ mod_group_users_server <- function(id, AppData, controlbar) {
                         ),
                         div(
                             class = "col-xs-auto d-flex align-items-center",
-                            # Input mapping UI ----
-                            # Add a toolbar that allows to map input$userToEdit and input$userToDelete in the module server
-                            # This is needs to be handled in "inst/js/multiBtnShinyInput.js"
-                            admin_toolbar(x$user_id, ns, "user-edit", "user-delete")
+                            admin_toolbar(
+                                editInputId = ns("userToEdit"),
+                                deleteInputId = ns("userToDelete"),
+                                value = x$user_id
+                            )
                         )
                     )
                 })
