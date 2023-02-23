@@ -97,3 +97,33 @@ mod_controlbar_apptest <- function(user = Sys.getenv("REPORTES_EMAIL")) {
         modServer = mod_controlbar_server("test", AppData)
     )
 }
+
+get_org_choices <- function(AppData) {
+    ids <- AppData$orgs |> purrr::map_chr("org_id")
+    titles <- AppData$orgs |> purrr::map_chr("org_title")
+    setNames(ids, titles)
+}
+
+get_group_choices <- function(AppData, org_id) {
+    groups <- AppData$groups |> 
+        purrr::keep(~.x$org_id == org_id)
+    ids <- groups |> purrr::map_chr("group_id")
+    titles <- groups |> purrr::map_chr("group_title")
+    setNames(ids, titles)
+}
+
+get_user_choices <- function(AppData, group_id) {
+    is_admin <- AppData$groups[[group_id]]$group_role == "admin"
+    if (is_admin) {
+        users <- AppData$group_users[[group_id]]
+        ids <- users |> purrr::map_chr("user_id")
+        titles <- users |> purrr::map_chr(~paste(.x$name, .x$last_name))
+        setNames(ids, titles)
+    } else {
+        setNames(object = AppData$user$user_id, 
+                 nm = paste(AppData$user$name, AppData$user$last_name))
+    }
+    
+}
+
+verify_group_admin <- function(AppData, group_id) AppData$groups[[group_id]]$group_role == "admin"
