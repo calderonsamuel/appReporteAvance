@@ -7,17 +7,23 @@
 #' @noRd 
 #'
 #' @importFrom shiny NS tagList 
-mod_task_add_ui <- function(id){
-  ns <- NS(id)
-  tagList(
- 
-  )
+mod_task_add_ui <- function(id) {
+    ns <- NS(id)
+    tagList(
+        htmltools::a(
+            class = "dropdown-item action-button",
+            href = "#",
+            id = ns("add"),
+            fontawesome::fa("fas fa-list-check"),
+            "Nueva tarea"
+        )
+    )
 }
     
 #' task_add Server Functions
 #'
 #' @noRd 
-mod_task_add_server <- function(id, AppData, trigger, config){
+mod_task_add_server <- function(id, AppData, controlbar){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
@@ -26,7 +32,7 @@ mod_task_add_server <- function(id, AppData, trigger, config){
     )
     
     user_choices <- reactive({
-        get_user_choices(AppData, config$group_selected())
+        get_user_choices(AppData, controlbar$group_selected())
     })
     
     observe({
@@ -90,13 +96,13 @@ mod_task_add_server <- function(id, AppData, trigger, config){
                 btn_guardar(ns("save"))
             )
         ))
-    }) |> bindEvent(trigger())
+    }) |> bindEvent(input$add)
     
     observe({
         tryCatch(expr = {
             AppData$task_add(
-                org_id = config$org_selected(),
-                group_id = config$group_selected(),
+                org_id = controlbar$org_selected(),
+                group_id = controlbar$group_selected(),
                 task_title = input$title,
                 task_description = input$description,
                 assignee = input$user_id,

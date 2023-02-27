@@ -22,11 +22,7 @@ mod_board_ui <- function(id) {
                 icon = icon("calendar"),
                 dropdownMenu = bs4Dash::boxDropdown(
                     icon = fontawesome::fa("fas fa-ellipsis"),
-                    bs4Dash::boxDropdownItem(
-                        "Nueva tarea",
-                        icon = fontawesome::fa("fas fa-list-check"),
-                        id = ns("task_add")
-                    )
+                    mod_task_add_ui(ns("task_add_1")) # this is a dropdown-item
                 ),
                 uiOutput(ns("pendientes"))
             ),
@@ -95,34 +91,26 @@ mod_board_ui <- function(id) {
 #' board Server Functions
 #'
 #' @noRd
-mod_board_server <- function(id, AppData, config) {
+mod_board_server <- function(id, AppData, controlbar) {
     moduleServer(id, function(input, output, session) {
         ns <- session$ns
         
         # Modules ----
         
-        task_gets_added <- mod_task_add_server(
-            id = "task_add_1", 
-            AppData = AppData, 
-            trigger = reactive(input$task_add),
-            config = config
-        )
+        task_gets_added <- mod_task_add_server("task_add_1", AppData, controlbar)
         
         # Reactives ----
         
         tasks <- reactive({
-            group_for_filtering <- ifelse(is.null(config$group_selected()), "none", config$group_selected())
-            AppData$tasks |> 
-                purrr::keep(\(x) x$group_id == group_for_filtering)
-            
+            AppData$tasks 
         }) |> 
         bindEvent(
             task_gets_added(),
             rv$task_has_been_deleted,
             rv$task_has_been_reported,
             rv$task_has_been_edited,
-            config$group_selected(),
-            config$org_selected()
+            controlbar$group_selected(),
+            controlbar$group_colors_modified()
         )
         
         rv <- reactiveValues(
@@ -135,61 +123,22 @@ mod_board_server <- function(id, AppData, config) {
             task_to_history = list()
         )
         
-        
-        delete_btns <- reactive({
-            ids <- tasks() |> 
-                purrr::map_chr("task_id") |> 
-                purrr::map_chr(~paste0(.x, "-task-delete"))
-            
-            ids 
-        })
-        
-        report_btns <- reactive({
-            ids <- tasks() |> 
-                purrr::map_chr("task_id") |> 
-                purrr::map_chr(~paste0(.x, "-task-report"))
-            
-            ids 
-        })
-        
-        edit_btns <- reactive({
-            ids <- tasks() |> 
-                purrr::map_chr("task_id") |> 
-                purrr::map_chr(~paste0(.x, "-task-edit"))
-            
-            ids 
-        }) 
-        
-        history_btns <- reactive({
-            ids <- tasks() |> 
-                purrr::map_chr("task_id") |> 
-                purrr::map_chr(~paste0(.x, "-task-history"))
-            
-            ids 
-        }) 
-        
         # Observers ----
         
         ## Deleting task ----
         
         observe({
-            delete_btns() |> 
-                purrr::walk(~
-                    observe({
-                        task_id <- stringr::str_remove(.x, "-task-delete")
-                        rv$task_to_delete <- tasks()[[task_id]]
-                        
-                        shinyWidgets::ask_confirmation(
-                            inputId = ns("confirm_delete"),
-                            title = "Eliminar tarea", 
-                            text = "Se eliminará también cualquier progreso asociado. No se podrá recuperar la información.", 
-                            type = "warning", 
-                            btn_labels = c("Cancelar", "Confirmar"),
-                            btn_colors = c("#6e7d88", "#ff5964")
-                        )
-                    }) |> bindEvent(input[[.x]])
-                )
-        })
+            rv$task_to_delete <- tasks()[[input$taskToDelete]]
+            
+            shinyWidgets::ask_confirmation(
+                inputId = ns("confirm_delete"),
+                title = "Eliminar tarea", 
+                text = "Se eliminará también cualquier progreso asociado. No se podrá recuperar la información.", 
+                type = "warning", 
+                btn_labels = c("Cancelar", "Confirmar"),
+                btn_colors = c("#6e7d88", "#ff5964")
+            )
+        }) |> bindEvent(input$taskToDelete)
         
         observe({
             tryCatch(expr = {
@@ -202,6 +151,8 @@ mod_board_server <- function(id, AppData, config) {
                         task_id = rv$task_to_delete$task_id)
                     
                     rv$task_has_been_deleted <- rv$task_has_been_deleted + 1L
+                    
+                    showNotification(session = session, "Tarea eliminada", duration = 3, type = "message")
                 }
             }, error = \(e) alert_error(session, e))
             
@@ -211,45 +162,39 @@ mod_board_server <- function(id, AppData, config) {
         ## Reporting progress ----
         
         observe({
-            report_btns() |> 
-                purrr::walk(~
-                    observe({
-                        task_id <- stringr::str_remove(.x, "-task-report")
-                        rv$task_to_report <- tasks()[[task_id]]
-                        
-                        showModal(modalDialog(
-                            h1("Reporte de avance"),
-                            tags$p(paste0("Tarea: ", rv$task_to_report$task_title)),
-                            tags$p(paste0("Descripción: ", rv$task_to_report$task_description)),
-                            
-                            selectInput(
-                                inputId = ns("report_status_current"),
-                                label =  "Nuevo estado", 
-                                choices = task_get_status_choices(rv$task_to_report$status_current),
-                                width = "100%"
-                            ),
-                            numericInput(
-                                inputId = ns("report_output_current"), 
-                                label = paste0("Avance actual - ", rv$task_to_report$output_unit),
-                                value = rv$task_to_report$output_current,
-                                min = rv$task_to_report$output_current,
-                                max = rv$task_to_report$output_goal,
-                                width = "100%"
-                            ),
-                            textAreaInput(
-                                inputId = ns("report_details"), 
-                                label = "Detalles",
-                                width = "100%"
-                            ),
-                            
-                            footer = tagList(
-                                modalButton("Cancelar"),
-                                btn_guardar(ns("save_report"))
-                            )
-                        ))
-                    }) |> bindEvent(input[[.x]], ignoreInit = TRUE)
+            rv$task_to_report <- tasks()[[input$taskToReport]]
+            
+            showModal(modalDialog(
+                h1("Reporte de avance"),
+                tags$p(paste0("Tarea: ", rv$task_to_report$task_title)),
+                tags$p(paste0("Descripción: ", rv$task_to_report$task_description)),
+                
+                selectInput(
+                    inputId = ns("report_status_current"),
+                    label =  "Nuevo estado", 
+                    choices = task_get_status_choices(rv$task_to_report$status_current),
+                    width = "100%"
+                ),
+                numericInput(
+                    inputId = ns("report_output_current"), 
+                    label = paste0("Avance actual - ", rv$task_to_report$output_unit),
+                    value = rv$task_to_report$output_current,
+                    min = rv$task_to_report$output_current,
+                    max = rv$task_to_report$output_goal,
+                    width = "100%"
+                ),
+                textAreaInput(
+                    inputId = ns("report_details"), 
+                    label = "Detalles",
+                    width = "100%"
+                ),
+                
+                footer = tagList(
+                    modalButton("Cancelar"),
+                    btn_guardar(ns("save_report"))
                 )
-        })
+            ))
+        }) |> bindEvent(input$taskToReport)
         
         observe({
             tryCatch(expr = {
@@ -276,35 +221,29 @@ mod_board_server <- function(id, AppData, config) {
         ## Editing task metadata
         
         observe({
-            edit_btns() |> 
-                purrr::walk(~
-                    observe({
-                        task_id <- stringr::str_remove(.x, "-task-edit")
-                        rv$task_to_edit <- tasks()[[task_id]]
-                        
-                        showModal(modalDialog(
-                            
-                            h1("Editar tarea"),
-                            
-                            textInput(
-                                inputId = ns("edit_title"),
-                                label = "Título de tarea",
-                                value = rv$task_to_edit$task_title
-                            ),
-                            textAreaInput(
-                                inputId = ns("edit_description"),
-                                label = "Descripción de tarea",
-                                value = rv$task_to_edit$task_description
-                            ),
-                            
-                            footer = tagList(
-                                modalButton("Cancelar"),
-                                btn_guardar(ns("save_edition"))
-                            )
-                        ))
-                    }) |> bindEvent(input[[.x]], ignoreInit = TRUE)
+            rv$task_to_edit <- tasks()[[input$taskToEdit]]
+            
+            showModal(modalDialog(
+                
+                h1("Editar tarea"),
+                
+                textInput(
+                    inputId = ns("edit_title"),
+                    label = "Título de tarea",
+                    value = rv$task_to_edit$task_title
+                ),
+                textAreaInput(
+                    inputId = ns("edit_description"),
+                    label = "Descripción de tarea",
+                    value = rv$task_to_edit$task_description
+                ),
+                
+                footer = tagList(
+                    modalButton("Cancelar"),
+                    btn_guardar(ns("save_edition"))
                 )
-        })
+            ))
+        }) |> bindEvent(input$taskToEdit)
         
         observe({
             tryCatch(expr = {
@@ -330,55 +269,48 @@ mod_board_server <- function(id, AppData, config) {
         ## See history ----
         
         observe({
-            history_btns() |> 
-                purrr::walk(~
-                                observe({
-                                    task_id <- stringr::str_remove(.x, "-task-history")
-                                    rv$task_to_history <- tasks()[[task_id]]
-                                    
-                                    showModal(modalDialog(
-                                        
-                                        h1("Historial de progreso"),
-                                        
-                                        tags$p("Tarea:", rv$task_to_history$task_title),
-                                        tags$p("Unidad de medida:", rv$task_to_history$output_unit),
-                                        
-                                        reactable:::reactableOutput(ns("table_history")),
-                                        
-                                        footer = tagList(
-                                            modalButton("Cerrar")
-                                        ),
-                                        size = "l"
-                                    ))
-                                }) |> bindEvent(input[[.x]], ignoreInit = TRUE)
-                )
-        })
-        
+            rv$task_to_history <- tasks()[[input$taskToHistory]]
+            
+            showModal(modalDialog(
+                
+                h1("Historial de progreso"),
+                
+                tags$p("Tarea:", rv$task_to_history$task_title),
+                tags$p("Unidad de medida:", rv$task_to_history$output_unit),
+                
+                reactable:::reactableOutput(ns("table_history")),
+                
+                footer = tagList(
+                    modalButton("Cerrar")
+                ),
+                size = "l"
+            ))
+        }) |> bindEvent(input$taskToHistory)
         
         # Outputs ----
         
         output$pendientes <- renderUI({
-            task_box_by_status(tasks(), "Pendiente", ns, config$is_group_admin())
+            task_box_by_status(tasks(), "Pendiente", ns, controlbar$is_admin())
         }) 
         
         output$en_proceso <- renderUI({
-            task_box_by_status(tasks(), "En proceso", ns, config$is_group_admin())
+            task_box_by_status(tasks(), "En proceso", ns, controlbar$is_admin())
         })
         
         output$pausado <- renderUI({
-            task_box_by_status(tasks(), "Pausado", ns, config$is_group_admin())
+            task_box_by_status(tasks(), "Pausado", ns, controlbar$is_admin())
         })
         
         output$en_revision <- renderUI({
-            task_box_by_status(tasks(), "En revisión", ns, config$is_group_admin())
+            task_box_by_status(tasks(), "En revisión", ns, controlbar$is_admin())
         })
         
         output$observado <- renderUI({
-            task_box_by_status(tasks(), "Observado", ns, config$is_group_admin())
+            task_box_by_status(tasks(), "Observado", ns, controlbar$is_admin())
         })
         
         output$terminado <- renderUI({
-            task_box_by_status(tasks(), "Terminado", ns, config$is_group_admin())
+            task_box_by_status(tasks(), "Terminado", ns, controlbar$is_admin())
         })
         
         
@@ -416,7 +348,7 @@ mod_board_apptest <- function(email = Sys.getenv("REPORTES_EMAIL")) {
     id = ids::random_id()
     quick_bs4dash(
         modUI = mod_board_ui(id = id),
-        modServer = mod_board_server(id = id, AppData, config = fake_config(AppData))
+        modServer = mod_board_server(id = id, AppData, controlbar = fake_config(AppData))
     )
 }
 
@@ -441,9 +373,4 @@ task_box_by_status <- function(tasks, status, ns, is_group_admin) {
             is_group_admin = is_group_admin
         )) |>
         tagList()
-}
-
-org_and_group_are_selected <- function(task, config) {
-    task$group_id == config$group_selected() && 
-        task$org_id == config$org_selected()
 }
