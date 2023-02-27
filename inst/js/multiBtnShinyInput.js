@@ -1,18 +1,6 @@
-let getNS = (str) => {
-    let strWithoutId = str.replace(/[a-f0-9]{32}$/, "")
-    return strWithoutId.length > 0 ? strWithoutId : ""
-}
-
-function setMultiBtnShinyInput(shinyInputId, classSelector) {
-    $(document).on('click', classSelector, function(event) {
-        let idForSelection = $(this).attr("id-for-selection")
-        let ns = getNS(this.id)
-        
-        Shiny.setInputValue(ns + shinyInputId, idForSelection, {priority: "event"});
-    })
-}
-
-setMultiBtnShinyInput("userToDelete", ".user-delete")
-setMultiBtnShinyInput("userToEdit", ".user-edit")
-setMultiBtnShinyInput("unitToEdit", ".unit-edit")
-setMultiBtnShinyInput("unitToDelete", ".unit-delete")
+$(document).on('click', ".multi-btn", function(event) {
+    let shinyInputId = $(this).attr("id-for-selection")
+    let value = $(this).attr("multi-value")
+    
+    Shiny.setInputValue(shinyInputId, value, {priority: "event"});
+})

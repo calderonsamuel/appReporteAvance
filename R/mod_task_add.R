@@ -7,17 +7,23 @@
 #' @noRd 
 #'
 #' @importFrom shiny NS tagList 
-mod_task_add_ui <- function(id){
-  ns <- NS(id)
-  tagList(
- 
-  )
+mod_task_add_ui <- function(id) {
+    ns <- NS(id)
+    tagList(
+        htmltools::a(
+            class = "dropdown-item action-button",
+            href = "#",
+            id = ns("add"),
+            fontawesome::fa("fas fa-list-check"),
+            "Nueva tarea"
+        )
+    )
 }
     
 #' task_add Server Functions
 #'
 #' @noRd 
-mod_task_add_server <- function(id, AppData, trigger, controlbar){
+mod_task_add_server <- function(id, AppData, controlbar){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
@@ -90,7 +96,7 @@ mod_task_add_server <- function(id, AppData, trigger, controlbar){
                 btn_guardar(ns("save"))
             )
         ))
-    }) |> bindEvent(trigger())
+    }) |> bindEvent(input$add)
     
     observe({
         tryCatch(expr = {

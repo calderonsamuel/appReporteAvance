@@ -1,7 +1,7 @@
 task_box <- function(task, ns = NULL, is_group_admin = FALSE) {
     id <- ns_safe(task$task_id, ns)
     
-    dropdown <- task_dropdown(id, task$status_current, is_group_admin)
+    dropdown <- task_dropdown(ns, task$task_id, task$status_current, is_group_admin)
     
     box_tag <- bs4Dash::box(
         id = id,
@@ -32,32 +32,46 @@ task_box <- function(task, ns = NULL, is_group_admin = FALSE) {
 
 ns_safe <- function(id, ns = NULL) if (is.null(ns)) id else ns(id)
 
-task_dropdown <- function(id, status, is_group_admin) {
-    item_avanzar <- 
-        bs4Dash::boxDropdownItem("Avanzar", 
-            id = paste0(id, "-task-report"), 
-            icon = fontawesome::fa("fas fa-forward"))
+task_dropdown <- function(ns, value, status, is_group_admin) {
+    item_avanzar <- multiBtnInput(
+        inputId = ns_safe("taskToReport", ns), 
+        value = value,
+        label = "Avanzar",
+        icon = fontawesome::fa("fas fa-forward"),
+        class = "dropdown-item"
+    )
     
-    item_editar <- 
-        bs4Dash::boxDropdownItem("Editar", 
-            id = paste0(id, "-task-edit"), 
-            icon = fontawesome::fa("fas fa-pen-to-square"))
+    item_editar <- multiBtnInput(
+        inputId = ns_safe("taskToEdit", ns), 
+        value = value,
+        label = "Editar",
+        icon = fontawesome::fa("fas fa-pen-to-square"),
+        class = "dropdown-item"
+    )
     
-    item_eliminar <- 
-        bs4Dash::boxDropdownItem(
-            tags$span(fontawesome::fa("fas fa-trash", fill = "#cf222e"), 
-                      "Eliminar", style = "color: #cf222e;"),
-            id = paste0(id, "-task-delete"))
+    item_eliminar <- multiBtnInput(
+        inputId = ns_safe("taskToDelete", ns), 
+        value = value,
+        label = tags$span(fontawesome::fa("fas fa-trash", fill = "#cf222e"), 
+                          "Eliminar", style = "color: #cf222e;"),
+        class = "dropdown-item"
+    )
     
-    item_historia <- 
-        bs4Dash::boxDropdownItem("Ver historia", 
-            id = paste0(id, "-task-history"), 
-            icon = fontawesome::fa("fas fa-clock-rotate-left"))
+    item_historia <- multiBtnInput(
+        inputId = ns_safe("taskToHistory", ns), 
+        value = value,
+        label = "Ver historia",
+        icon = fontawesome::fa("fas fa-clock-rotate-left"),
+        class = "dropdown-item"
+    )
     
-    item_revisar <- 
-        bs4Dash::boxDropdownItem("Revisar", 
-            id = paste0(id, "-task-report"), 
-            icon = fontawesome::fa("fas fa-book-open-reader"))
+    item_revisar <- multiBtnInput(
+        inputId = ns_safe("taskToReport", ns), 
+        value = value,
+        label = "Revisar",
+        icon = fontawesome::fa("fas fa-book-open-reader"),
+        class = "dropdown-item"
+    )
     
     dd_items <- 
         if (status %in% c("Pendiente", "En proceso", "Pausado")) {

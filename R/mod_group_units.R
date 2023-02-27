@@ -70,10 +70,11 @@ mod_group_units_server <- function(id, AppData, group_selection) {
                         ),
                         div(
                             class = "col-xs-auto d-flex align-items-center",
-                            # Input mapping UI ----
-                            # Add a toolbar that allows to map input$unitToEdit and input$unitToDelete in the module server
-                            # This is needs to be handled in "inst/js/multiBtnShinyInput.js"
-                            admin_toolbar(x$unit_id, ns, "unit-edit", "unit-delete")
+                            admin_toolbar(
+                                editInputId = ns("unitToEdit"),
+                                deleteInputId = ns("unitToDelete"),
+                                value = x$unit_id
+                            )
                         )
                     )
                 })

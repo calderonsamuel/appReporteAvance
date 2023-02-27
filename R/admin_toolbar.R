@@ -1,7 +1,6 @@
-admin_toolbar <- function(inputId,
-                          ns = NULL, 
-                          edit_class,
-                          delete_class,
+admin_toolbar <- function(editInputId, 
+                          deleteInputId,
+                          value,
                           float_class = "float-right"
                           ) {
     div(
@@ -9,20 +8,18 @@ admin_toolbar <- function(inputId,
         class = float_class,
         role = "group",
         
-        multi_btn_input(
-            inputId = ns_safe(inputId, ns),
+        multiBtnInput(
+            inputId = editInputId,
+            value = value,
             label = fontawesome::fa("fas fa-pencil"),
-            idForSelection = inputId,
-            colorClass = "btn-warning",
-            selector = edit_class,
+            class = "btn-warning",
             tooltip = "Editar"
         ),
-        multi_btn_input(
-            inputId = ns_safe(inputId, ns),
+        multiBtnInput(
+            inputId = deleteInputId,
+            value = value,
             label = fontawesome::fa("fas fa-trash"),
-            idForSelection = inputId,
-            colorClass = "btn-danger",
-            selector = delete_class,
+            class = "btn-danger",
             tooltip = "Eliminar"
         )
     )

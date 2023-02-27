@@ -4,7 +4,8 @@ fake_config <- function(AppData) {
     list(
         org_selected = reactive(org),
         group_selected = reactive(group),
-        is_group_admin = reactive(verify_group_admin(AppData, group))
+        group_colors_modified = reactive(1L),
+        is_admin = reactive(verify_group_admin(AppData, group))
     )
 }
 
