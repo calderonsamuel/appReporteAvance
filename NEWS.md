@@ -1,3 +1,8 @@
+# appReporteAvance 0.3.6
+
+- Arreglado un bug que prevenía seguir reportando progreso de tareas después de haberle hecho un par de modificaciones (#18).
+- Se incluye un panel de administración de grupo, que permite añadir integrantes al grupo, eliminarlos y editar sus roles y colores de tarjeta. Cada modificación se refleja en las tareas mostradas en el tablero.
+
 # appReporteAvance 0.3.5
 
 - La ventana de reporte de progreso cuenta con inputs más visibles
