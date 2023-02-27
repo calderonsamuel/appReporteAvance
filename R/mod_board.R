@@ -22,7 +22,8 @@ mod_board_ui <- function(id) {
                 icon = icon("calendar"),
                 dropdownMenu = bs4Dash::boxDropdown(
                     icon = fontawesome::fa("fas fa-ellipsis"),
-                    mod_task_add_ui(ns("task_add_1")) # this is a dropdown-item
+                    mod_task_add_ui(ns("task_add_1")), # this is a dropdown-item
+                    mod_report_add_ui(ns("report_add_1"))
                 ),
                 uiOutput(ns("pendientes"))
             ),
@@ -98,6 +99,7 @@ mod_board_server <- function(id, AppData, controlbar) {
         # Modules ----
         
         task_gets_added <- mod_task_add_server("task_add_1", AppData, controlbar)
+        report_gets_added <- mod_report_add_server("report_add_1", AppData, controlbar)
         
         # Reactives ----
         
