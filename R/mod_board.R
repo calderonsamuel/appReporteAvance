@@ -356,7 +356,7 @@ mod_board_apptest <- function(email = Sys.getenv("REPORTES_EMAIL")) {
     id = ids::random_id()
     quick_bs4dash(
         modUI = mod_board_ui(id = id),
-        modServer = mod_board_server(id = id, AppData, config = fake_config(AppData))
+        modServer = mod_board_server(id = id, AppData, controlbar = fake_config(AppData))
     )
 }
 
@@ -381,9 +381,4 @@ task_box_by_status <- function(tasks, status, ns, is_group_admin) {
             is_group_admin = is_group_admin
         )) |>
         tagList()
-}
-
-org_and_group_are_selected <- function(task, config) {
-    task$group_id == controlbar$group_selected() && 
-        task$org_id == controlbar$org_selected()
 }
