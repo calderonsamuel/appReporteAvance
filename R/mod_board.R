@@ -151,6 +151,8 @@ mod_board_server <- function(id, AppData, controlbar) {
                         task_id = rv$task_to_delete$task_id)
                     
                     rv$task_has_been_deleted <- rv$task_has_been_deleted + 1L
+                    
+                    showNotification(session = session, "Tarea eliminada", duration = 3, type = "message")
                 }
             }, error = \(e) alert_error(session, e))
             
