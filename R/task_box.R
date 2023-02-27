@@ -73,32 +73,6 @@ task_dropdown <- function(ns, value, status, is_group_admin) {
         class = "dropdown-item"
     )
     
-    # item_avanzar <- 
-    #     bs4Dash::boxDropdownItem("Avanzar", 
-    #         id = paste0(id, "-task-report"), 
-    #         icon = fontawesome::fa("fas fa-forward"))
-    # 
-    # item_editar <- 
-    #     bs4Dash::boxDropdownItem("Editar", 
-    #         id = paste0(id, "-task-edit"), 
-    #         icon = fontawesome::fa("fas fa-pen-to-square"))
-    # 
-    # item_eliminar <- 
-    #     bs4Dash::boxDropdownItem(
-    #         tags$span(fontawesome::fa("fas fa-trash", fill = "#cf222e"), 
-    #                   "Eliminar", style = "color: #cf222e;"),
-    #         id = paste0(id, "-task-delete"))
-    # 
-    # item_historia <- 
-    #     bs4Dash::boxDropdownItem("Ver historia", 
-    #         id = paste0(id, "-task-history"), 
-    #         icon = fontawesome::fa("fas fa-clock-rotate-left"))
-    # 
-    # item_revisar <- 
-    #     bs4Dash::boxDropdownItem("Revisar", 
-    #         id = paste0(id, "-task-report"), 
-    #         icon = fontawesome::fa("fas fa-book-open-reader"))
-    
     dd_items <- 
         if (status %in% c("Pendiente", "En proceso", "Pausado")) {
             tagList(
