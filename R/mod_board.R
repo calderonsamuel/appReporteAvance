@@ -22,11 +22,7 @@ mod_board_ui <- function(id) {
                 icon = icon("calendar"),
                 dropdownMenu = bs4Dash::boxDropdown(
                     icon = fontawesome::fa("fas fa-ellipsis"),
-                    bs4Dash::boxDropdownItem(
-                        "Nueva tarea",
-                        icon = fontawesome::fa("fas fa-list-check"),
-                        id = ns("task_add")
-                    )
+                    mod_task_add_ui(ns("task_add_1")) # this is a dropdown-item
                 ),
                 uiOutput(ns("pendientes"))
             ),
@@ -101,18 +97,12 @@ mod_board_server <- function(id, AppData, controlbar) {
         
         # Modules ----
         
-        task_gets_added <- mod_task_add_server(
-            id = "task_add_1", 
-            AppData = AppData, 
-            trigger = reactive(input$task_add),
-            controlbar = controlbar
-        )
+        task_gets_added <- mod_task_add_server("task_add_1", AppData, controlbar)
         
         # Reactives ----
         
         tasks <- reactive({
             AppData$tasks 
-            
         }) |> 
         bindEvent(
             task_gets_added(),
