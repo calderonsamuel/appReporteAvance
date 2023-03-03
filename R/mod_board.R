@@ -143,12 +143,7 @@ mod_board_server <- function(id, AppData, controlbar) {
         observe({
             tryCatch(expr = {
                 if(isTRUE(input$confirm_delete)) {
-                    AppData$task_delete(
-                        process_id = rv$task_to_delete$process_id, 
-                        activity_id = rv$task_to_delete$activity_id, 
-                        org_id = rv$task_to_delete$org_id, 
-                        group_id = rv$task_to_delete$group_id, 
-                        task_id = rv$task_to_delete$task_id)
+                    AppData$task_delete(task_id = rv$task_to_delete$task_id)
                     
                     rv$task_has_been_deleted <- rv$task_has_been_deleted + 1L
                     
@@ -199,10 +194,6 @@ mod_board_server <- function(id, AppData, controlbar) {
         observe({
             tryCatch(expr = {
                 AppData$task_report_progress(
-                    process_id = rv$task_to_report$process_id, 
-                    activity_id = rv$task_to_report$activity_id, 
-                    org_id = rv$task_to_report$org_id, 
-                    group_id = rv$task_to_report$group_id, 
                     task_id = rv$task_to_report$task_id,
                     status_current = input$report_status_current,
                     output_current = input$report_output_current,
@@ -248,10 +239,6 @@ mod_board_server <- function(id, AppData, controlbar) {
         observe({
             tryCatch(expr = {
                 AppData$task_edit_metadata(
-                    process_id = rv$task_to_edit$process_id, 
-                    activity_id = rv$task_to_edit$activity_id, 
-                    org_id = rv$task_to_edit$org_id, 
-                    group_id = rv$task_to_edit$group_id, 
                     task_id = rv$task_to_edit$task_id,
                     task_title = input$edit_title,
                     task_description = input$edit_description)
