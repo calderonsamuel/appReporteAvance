@@ -139,7 +139,6 @@ mod_group_users_server <- function(id, AppData, controlbar) {
                 color_selected <- reportes_bs_colors()[reportes_bs_colors() == input$color] |> names()
                 
                 AppData$group_user_add(
-                    org_id = controlbar$org_selected(), 
                     group_id = controlbar$group_selected(),
                     user_id = input$user,
                     user_color = color_selected,
@@ -177,7 +176,6 @@ mod_group_users_server <- function(id, AppData, controlbar) {
             tryCatch({
                 if(isTRUE(input$confirm_delete)) {
                     AppData$group_user_delete(
-                        org_id = controlbar$org_selected(),
                         group_id = controlbar$group_selected(),
                         user_id = input$userToDelete
                     )
@@ -245,7 +243,6 @@ mod_group_users_server <- function(id, AppData, controlbar) {
                 color_selected <- reportes_bs_colors()[reportes_bs_colors() == input$color_editing] |> names()
                 
                 AppData$group_user_edit(
-                    org_id = controlbar$org_selected(), 
                     group_id = controlbar$group_selected(),
                     user_id = input$userToEdit,
                     user_color = color_selected,

@@ -36,11 +36,9 @@ mod_task_add_server <- function(id, AppData, controlbar){
     })
     
     unit_choices <- reactive({
-        units <- AppData$group_units |> purrr::keep(~ .x$type == "task")
-        ids <- units |> purrr::map_chr("unit_id")
-        titles <- units |> purrr::map_chr("unit_title")
-        
-        setNames(ids, titles)
+        AppData$group_units |> 
+            purrr::map_chr("unit_title") |>
+            unname()
     }) |> 
         bindEvent(input$add)
     
@@ -111,7 +109,6 @@ mod_task_add_server <- function(id, AppData, controlbar){
     observe({
         tryCatch(expr = {
             AppData$task_add(
-                org_id = controlbar$org_selected(),
                 group_id = controlbar$group_selected(),
                 task_title = input$title,
                 task_description = input$description,
