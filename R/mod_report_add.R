@@ -136,27 +136,48 @@ mod_report_add_server <- function(id, AppData, controlbar) {
         
         observe({
             tryCatch({
+                units <- purrr::map_chr(input_names()$unit, ~input[[.x]])
+                quantities <- purrr::map_dbl(input_names()$quantity, ~input[[.x]])
                 
-                # AppData$db_execute_statement(
-                #     "
-                #     INSERT INTO reports
-                #     SET
-                #         report_id = {ids::random_id()},
-                #         report_title = {input$title},
-                #         details = {input$details},
-                #         reported_by = {AppData$user$user_id},
-                #         group_id = {AppData$group_selected}
-                #     "
-                # , .envir = rlang::current_env())
+                report_id <- ids::random_id()
+                
+                all_values <- glue::glue("('{report_id}', '{units}', {quantities})")
+                collapsed <- glue::glue_collapse(all_values, sep = ", ")
                 
                 
+                AppData$db_execute_statement(
+                    "
+                    INSERT INTO reports
+                    SET
+                        `report_id` = {report_id},
+                        `report_title` = {input$title},
+                        `details` = {input$details},
+                        `reported_by` = {AppData$user$user_id},
+                        `group_id` = {AppData$group_selected};
+                    "
+                , .envir = rlang::current_env())
+                
+                AppData$db_execute_statement(
+                    "
+                    INSERT INTO report_quantities(report_id, output_unit, output_progress)
+                    VALUES
+                        {collapsed};
+                    "
+                , .envir = rlang::current_env())
+                
+                
+                
+                # showNotification(collapsed, session = session)
                 
                 removeModal(session)
                 module_output$added <- module_output$added + 1L
                 showNotification("Reporte agregado", duration = 3, 
                                  type = "message", session = session)
                 
-            }, error = \(e) alert_error(session, e))
+            }, error = \(e) {
+                print(e)
+                alert_error(session, e)
+            })
         }) |> 
             bindEvent(input$save)
         
