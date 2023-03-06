@@ -32,17 +32,75 @@ mod_report_add_server <- function(id, AppData, controlbar) {
         )
         
         unit_choices <- reactive({
-            units <- AppData$group_units |> purrr::keep(~ .x$type == "report")
-            ids <- units |> purrr::map_chr("unit_id")
-            titles <- units |> purrr::map_chr("unit_title")
-            
-            setNames(ids, titles)
+            AppData$group_units |> 
+                purrr::keep(~.x$type == "report") |> 
+                purrr::map_chr("unit_title") |>
+                unname()
         }) |> 
             bindEvent(input$add)
         
+        ## counter for forms ----
+        
+        counter <- reactiveVal(value = 1L, label = "counter")
+        
         observe({
+            counter(counter() + 1)
+        }) |> bindEvent(input$unit_add)
+        
+        observe({
+            if (counter() > 1L) {
+                counter(counter() - 1)
+            }
+        }) |> bindEvent(input$unit_delete)
+        
+        ## input_names ----
+        
+        input_names <- reactive({
+            num_seq <- seq_len(counter())
+            
+            list(
+                unit = paste0("form_", num_seq, "_unit"),
+                quantity = paste0("form_", num_seq, "_quantity")
+            )
+        })
+        
+        
+        observe({
+            
+            counter(1L)
+            
             showModal(modalDialog(
                 title = "Nuevo reporte",
+                size = "l",
+                
+                textInput(
+                    inputId = ns("title"), 
+                    label = "Título de reporte",
+                    width = "100%"
+                ),
+                textAreaInput(
+                    inputId = ns("details"), 
+                    label = "Detalles", 
+                    placeholder = "Opcional",
+                    width = "100%"
+                ),
+                
+                div(tags$label(class = "control-label", "Unidades de medición")),
+                
+                btn_custom(
+                    inputId = ns("unit_add"),
+                    label = "Añadir",
+                    icon = fontawesome::fa("fas fa-plus"),
+                    class = "btn-success btn-sm mb-2"
+                ),
+                btn_custom(
+                    inputId = ns("unit_delete"),
+                    label = "Remover último",
+                    icon = fontawesome::fa("fas fa-minus"),
+                    class = "btn-danger btn-sm mb-2"
+                ),
+                
+                uiOutput(ns("form")),
                 
                 footer = tagList(
                     modalButton("Cancelar"),
@@ -52,12 +110,51 @@ mod_report_add_server <- function(id, AppData, controlbar) {
         }) |> 
             bindEvent(input$add)
         
+        output$form <- renderUI({
+            purrr::map2(input_names()$unit, input_names()$quantity, ~{
+                fluidRow(
+                    col_8(
+                        selector_units(
+                            inputId = ns(.x),
+                            choices = unit_choices(),
+                            selected = isolate(input[[.x]]),
+                            width = "100%"
+                        )
+                    ),
+                    col_4(
+                        numericInput(
+                            inputId = ns(.y),
+                            label = NULL,
+                            value = input[[.y]] %||% 0L,
+                            min = 0,
+                            width = "100%"
+                        )
+                    )
+                )
+            })
+        })
+        
         observe({
             tryCatch({
                 
+                # AppData$db_execute_statement(
+                #     "
+                #     INSERT INTO reports
+                #     SET
+                #         report_id = {ids::random_id()},
+                #         report_title = {input$title},
+                #         details = {input$details},
+                #         reported_by = {AppData$user$user_id},
+                #         group_id = {AppData$group_selected}
+                #     "
+                # , .envir = rlang::current_env())
+                
+                
+                
                 removeModal(session)
                 module_output$added <- module_output$added + 1L
-                alert_success(session, "Reporte agregado")
+                showNotification("Reporte agregado", duration = 3, 
+                                 type = "message", session = session)
                 
             }, error = \(e) alert_error(session, e))
         }) |> 
@@ -74,3 +171,16 @@ mod_report_add_server <- function(id, AppData, controlbar) {
 
 ## To be copied in the server
 # mod_report_add_server("report_add_1")
+
+selector_units <- function(inputId, choices, selected, width = NULL) {
+    shinyWidgets::pickerInput(
+        inputId = inputId,
+        label = NULL,
+        width = width,
+        choices = choices,
+        selected = selected,
+        options = shinyWidgets::pickerOptions(
+            liveSearch = TRUE
+        )
+    )
+}
