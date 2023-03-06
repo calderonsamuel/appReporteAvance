@@ -11,15 +11,11 @@ mod_group_units_ui <- function(id) {
     ns <- NS(id)
     tagList(
         h5("Gestión de mediciones"),
-        tags$button(
-            id = ns("add"), 
-            type = "button",
-            class = "btn btn-success btn-sm mb-2 action-button", 
-            `data-val` = shiny::restoreInput(ns("add"), NULL),
-            list(
-                fontawesome::fa("fas fa-plus"),
-                "Agregar"
-            )
+        btn_custom(
+          inputId = ns("add"),
+          label = "Agregar",
+          icon = fontawesome::fa("fas fa-plus"),
+          class = "btn-success btn-sm mb-2"
         ),
         uiOutput(ns("units"))
     )

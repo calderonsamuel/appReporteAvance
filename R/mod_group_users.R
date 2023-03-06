@@ -12,15 +12,11 @@ mod_group_users_ui <- function(id) {
     
     tagList(
         h5("Gestión de usuarios"),
-        tags$button(
-            id = ns("add"), 
-            type = "button",
-            class = "btn btn-success btn-sm mb-2 action-button", 
-            `data-val` = shiny::restoreInput(ns("add"), NULL),
-            list(
-                fontawesome::fa("fas fa-user-plus"),
-                "Agregar"
-            )
+        btn_custom(
+            inputId = ns("add"),
+            label = "Agregar",
+            icon = fontawesome::fa("fas fa-user-plus"),
+            class = "btn-success btn-sm mb-2"
         ),
         uiOutput(ns("users"))
     )
