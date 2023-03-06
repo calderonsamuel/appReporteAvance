@@ -1,3 +1,7 @@
+# appReporteAvance 0.3.8
+
+- Remueve un botón que se mostraba y que no cumplía ninguna función.
+
 # appReporteAvance 0.3.7
 
 - Parche para asegurar consistencia con la nueva estructura de la base de datos, reportado en [`{reportesAPI}`](https://github.com/calderonsamuel/reportesAPI/releases/tag/v0.3.0)
