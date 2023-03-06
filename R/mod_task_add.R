@@ -37,6 +37,7 @@ mod_task_add_server <- function(id, AppData, controlbar){
     
     unit_choices <- reactive({
         AppData$group_units |> 
+            purrr::keep(~.x$type == "task") |> 
             purrr::map_chr("unit_title") |>
             unname()
     }) |> 
