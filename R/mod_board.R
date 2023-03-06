@@ -83,7 +83,6 @@ mod_board_ui <- function(id) {
         ),
         
         
-        mod_task_add_ui(ns("task_add_1")),
         verbatimTextOutput(ns("debug"))
     )
 }
