@@ -141,22 +141,19 @@ mod_report_add_server <- function(id, AppData, controlbar) {
                 
                 report_id <- ids::random_id()
                 
-                all_values <- glue::glue("('{report_id}', '{units}', {quantities})")
-                collapsed <- glue::glue_collapse(all_values, sep = ", ")
+                all_values <- glue::glue_sql("({report_id}, {units}, {quantities})", .con = AppData$.__enclos_env__$private$con)
+                collapsed <- glue::glue_sql_collapse(all_values, sep = ", ")
                 
+                DBI::dbBegin(AppData$.__enclos_env__$private$con)
                 
                 AppData$db_execute_statement(
                     "
-                    INSERT INTO reports
-                    SET
-                        `report_id` = {report_id},
-                        `report_title` = {input$title},
-                        `details` = {input$details},
-                        `reported_by` = {AppData$user$user_id},
-                        `group_id` = {AppData$group_selected};
+                    INSERT INTO reports(report_id, report_title, details, reported_by, group_id)
+                    VALUES
+                        ({report_id}, {input$title}, {input$details}, {AppData$user$user_id}, {AppData$group_selected});
                     "
                 , .envir = rlang::current_env())
-                
+
                 AppData$db_execute_statement(
                     "
                     INSERT INTO report_quantities(report_id, output_unit, output_progress)
@@ -165,9 +162,7 @@ mod_report_add_server <- function(id, AppData, controlbar) {
                     "
                 , .envir = rlang::current_env())
                 
-                
-                
-                # showNotification(collapsed, session = session)
+                DBI::dbCommit(AppData$.__enclos_env__$private$con)
                 
                 removeModal(session)
                 module_output$added <- module_output$added + 1L
