@@ -12,15 +12,11 @@ mod_group_users_ui <- function(id) {
     
     tagList(
         h5("Gestión de usuarios"),
-        tags$button(
-            id = ns("add"), 
-            type = "button",
-            class = "btn btn-success btn-sm mb-2 action-button", 
-            `data-val` = shiny::restoreInput(ns("add"), NULL),
-            list(
-                fontawesome::fa("fas fa-user-plus"),
-                "Agregar"
-            )
+        btn_custom(
+            inputId = ns("add"),
+            label = "Agregar",
+            icon = fontawesome::fa("fas fa-user-plus"),
+            class = "btn-success btn-sm mb-2"
         ),
         uiOutput(ns("users"))
     )
@@ -139,7 +135,6 @@ mod_group_users_server <- function(id, AppData, controlbar) {
                 color_selected <- reportes_bs_colors()[reportes_bs_colors() == input$color] |> names()
                 
                 AppData$group_user_add(
-                    org_id = controlbar$org_selected(), 
                     group_id = controlbar$group_selected(),
                     user_id = input$user,
                     user_color = color_selected,
@@ -177,7 +172,6 @@ mod_group_users_server <- function(id, AppData, controlbar) {
             tryCatch({
                 if(isTRUE(input$confirm_delete)) {
                     AppData$group_user_delete(
-                        org_id = controlbar$org_selected(),
                         group_id = controlbar$group_selected(),
                         user_id = input$userToDelete
                     )
@@ -245,7 +239,6 @@ mod_group_users_server <- function(id, AppData, controlbar) {
                 color_selected <- reportes_bs_colors()[reportes_bs_colors() == input$color_editing] |> names()
                 
                 AppData$group_user_edit(
-                    org_id = controlbar$org_selected(), 
                     group_id = controlbar$group_selected(),
                     user_id = input$userToEdit,
                     user_color = color_selected,

@@ -35,9 +35,18 @@ mod_task_add_server <- function(id, AppData, controlbar){
         get_user_choices(AppData, controlbar$group_selected())
     })
     
+    unit_choices <- reactive({
+        AppData$group_units |> 
+            purrr::keep(~.x$type == "task") |> 
+            purrr::map_chr("unit_title") |>
+            unname()
+    }) |> 
+        bindEvent(input$add)
+    
     observe({
         showModal(modalDialog(
             h1("Añadir tarea"),
+            size = "l",
             textInput(
                 inputId = ns("title"), 
                 label = "Título de tarea",
@@ -59,7 +68,7 @@ mod_task_add_server <- function(id, AppData, controlbar){
                     inputId = ns("output_unit"), 
                     label = "Unidad de medida",
                     width = "100%",
-                    choices = output_unit_choices(),
+                    choices = unit_choices(),
                     options = shinyWidgets::pickerOptions(
                         liveSearch = TRUE
                     )
@@ -101,7 +110,6 @@ mod_task_add_server <- function(id, AppData, controlbar){
     observe({
         tryCatch(expr = {
             AppData$task_add(
-                org_id = controlbar$org_selected(),
                 group_id = controlbar$group_selected(),
                 task_title = input$title,
                 task_description = input$description,
