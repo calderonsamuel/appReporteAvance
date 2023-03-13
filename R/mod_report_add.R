@@ -139,40 +139,19 @@ mod_report_add_server <- function(id, AppData, controlbar) {
                 units <- purrr::map_chr(input_names()$unit, ~input[[.x]])
                 quantities <- purrr::map_dbl(input_names()$quantity, ~input[[.x]])
                 
-                report_id <- ids::random_id()
-                
-                all_values <- glue::glue_sql("({report_id}, {units}, {quantities})", .con = AppData$.__enclos_env__$private$con)
-                collapsed <- glue::glue_sql_collapse(all_values, sep = ", ")
-                
-                DBI::dbBegin(AppData$.__enclos_env__$private$con)
-                
-                AppData$db_execute_statement(
-                    "
-                    INSERT INTO reports(report_id, report_title, details, reported_by, group_id)
-                    VALUES
-                        ({report_id}, {input$title}, {input$details}, {AppData$user$user_id}, {AppData$group_selected});
-                    "
-                , .envir = rlang::current_env())
-
-                AppData$db_execute_statement(
-                    "
-                    INSERT INTO report_quantities(report_id, output_unit, output_progress)
-                    VALUES
-                        {collapsed};
-                    "
-                , .envir = rlang::current_env())
-                
-                DBI::dbCommit(AppData$.__enclos_env__$private$con)
+                ap$report_add(
+                    report_title = input$title,
+                    details = input$details,
+                    units = units,
+                    quantities = quantities
+                )
                 
                 removeModal(session)
                 module_output$added <- module_output$added + 1L
                 showNotification("Reporte agregado", duration = 3, 
                                  type = "message", session = session)
                 
-            }, error = \(e) {
-                print(e)
-                alert_error(session, e)
-            })
+            }, error = \(e) alert_error(session, e))
         }) |> 
             bindEvent(input$save)
         

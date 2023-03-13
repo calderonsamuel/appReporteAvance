@@ -23,7 +23,7 @@ Imports:
     purrr,
     RColorBrewer,
     reactable,
-    reportesAPI (>= 0.3.1),
+    reportesAPI (>= 0.3.3),
     sass,
     shiny (>= 1.7.1),
     shinyjs,
