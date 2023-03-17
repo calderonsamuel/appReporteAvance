@@ -79,7 +79,8 @@ mod_board_ui <- function(id) {
                 width = 3,
                 class = "cw cw-lg",
                 icon = icon("check-circle"),
-                uiOutput(ns("terminado"))
+                uiOutput(ns("terminado")),
+                uiOutput(ns("reports"))
             )
         ),
         
@@ -306,9 +307,12 @@ mod_board_server <- function(id, app_data, controlbar) {
         
         output$terminado <- renderUI({
             tagList(
-                task_box_by_status(tasks(), "Terminado", ns, controlbar$is_admin()),
-                reports() |> purrr::map(report_box)
+                task_box_by_status(tasks(), "Terminado", ns, controlbar$is_admin())
             )
+        })
+        
+        output$reports <- renderUI({
+                reports() |> purrr::map(report_box)
         })
         
         
