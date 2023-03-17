@@ -139,7 +139,7 @@ mod_report_add_server <- function(id, AppData, controlbar) {
                 units <- purrr::map_chr(input_names()$unit, ~input[[.x]])
                 quantities <- purrr::map_dbl(input_names()$quantity, ~input[[.x]])
                 
-                ap$report_add(
+                AppData$report_add(
                     report_title = input$title,
                     details = input$details,
                     units = units,

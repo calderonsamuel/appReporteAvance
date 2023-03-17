@@ -105,14 +105,21 @@ mod_board_server <- function(id, AppData, controlbar) {
         tasks <- reactive({
             AppData$tasks 
         }) |> 
-        bindEvent(
-            task_gets_added(),
-            rv$task_has_been_deleted,
-            rv$task_has_been_reported,
-            rv$task_has_been_edited,
-            controlbar$group_selected(),
-            controlbar$group_colors_modified()
-        )
+            bindEvent(
+                task_gets_added(),
+                rv$task_has_been_deleted,
+                rv$task_has_been_reported,
+                rv$task_has_been_edited,
+                controlbar$group_selected(),
+                controlbar$group_colors_modified()
+            )
+        
+        reports <- reactive({
+            AppData$reports
+        }) |> 
+            bindEvent(
+                report_gets_added()
+            )
         
         rv <- reactiveValues(
             task_to_delete = list(),
@@ -298,7 +305,10 @@ mod_board_server <- function(id, AppData, controlbar) {
         })
         
         output$terminado <- renderUI({
-            task_box_by_status(tasks(), "Terminado", ns, controlbar$is_admin())
+            tagList(
+                task_box_by_status(tasks(), "Terminado", ns, controlbar$is_admin()),
+                reports() |> purrr::map(report_box)
+            )
         })
         
         
