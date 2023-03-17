@@ -24,7 +24,7 @@ mod_group_units_ui <- function(id) {
 #' group_units Server Functions
 #'
 #' @noRd
-mod_group_units_server <- function(id, AppData, group_selection) {
+mod_group_units_server <- function(id, app_data, group_selection) {
     moduleServer(id, function(input, output, session) {
         ns <- session$ns
         
@@ -35,7 +35,7 @@ mod_group_units_server <- function(id, AppData, group_selection) {
         )
         
         group_units <- reactive({
-            AppData$group_units
+            app_data$group_units
         }) |> 
             bindEvent(
                 rv$unit_added,
@@ -101,7 +101,7 @@ mod_group_units_server <- function(id, AppData, group_selection) {
         
         observe({
             tryCatch({
-                AppData$group_unit_add(
+                app_data$group_unit_add(
                     unit_title = input$title,
                     unit_description = input$description,
                     unit_type = input$type,
@@ -135,7 +135,7 @@ mod_group_units_server <- function(id, AppData, group_selection) {
         observe({
             tryCatch({
                 if(isTRUE(input$confirm_delete)) {
-                    AppData$group_unit_delete(
+                    app_data$group_unit_delete(
                         unit_id = input$unitToDelete
                     )
                     
@@ -178,7 +178,7 @@ mod_group_units_server <- function(id, AppData, group_selection) {
         
         observe({
             tryCatch({
-                AppData$group_unit_edit(
+                app_data$group_unit_edit(
                     unit_id = input$unitToEdit,
                     unit_title = input$title,
                     unit_description = input$description,
@@ -207,11 +207,11 @@ mod_group_units_server <- function(id, AppData, group_selection) {
 
 mod_group_units_apptest <- function(id = "test") {
     
-    AppData <- AppData$new()
+    app_data <- AppData$new()
     
     quick_bs4dash(
         modUI = mod_group_units_ui(id),
-        modServer = mod_group_units_server(id, AppData)
+        modServer = mod_group_units_server(id, app_data)
     )
 }
 
