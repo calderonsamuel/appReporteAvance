@@ -98,14 +98,23 @@ mod_board_server <- function(id, app_data, controlbar) {
         
         # Modules ----
         
-        task_gets_added <- mod_task_add_server("task_add_1", app_data, controlbar)
-        report_gets_added <- mod_report_add_server("report_add_1", app_data, controlbar)
+        task_gets_added <- mod_task_add_server(
+            id = "task_add_1",
+            app_data = app_data,
+            controlbar = controlbar
+        )
+
+        report_gets_added <- mod_report_add_server(
+            id = "report_add_1",
+            app_data =  app_data,
+            controlbar = controlbar
+        )
         
         # Reactives ----
         
         tasks <- reactive({
-            app_data$tasks 
-        }) |> 
+            app_data$tasks
+        }) |>
             bindEvent(
                 task_gets_added(),
                 rv$task_has_been_deleted,
@@ -117,9 +126,10 @@ mod_board_server <- function(id, app_data, controlbar) {
         
         reports <- reactive({
             app_data$reports
-        }) |> 
+        }) |>
             bindEvent(
-                report_gets_added()
+                report_gets_added(),
+                rv$reports_modified
             )
         
         rv <- reactiveValues(
@@ -129,7 +139,8 @@ mod_board_server <- function(id, app_data, controlbar) {
             task_has_been_reported = 0L,
             task_to_edit = list(),
             task_has_been_edited = 0L,
-            task_to_history = list()
+            task_to_history = list(),
+            reports_modified = 0L
         )
         
         # Observers ----
@@ -142,7 +153,10 @@ mod_board_server <- function(id, app_data, controlbar) {
             shinyWidgets::ask_confirmation(
                 inputId = ns("confirm_delete"),
                 title = "Eliminar tarea", 
-                text = "Se eliminará también cualquier progreso asociado. No se podrá recuperar la información.", 
+                text = paste0(
+                    "Se eliminará también cualquier progreso asociado. ",
+                    "No se podrá recuperar la información."
+                ),
                 type = "warning", 
                 btn_labels = c("Cancelar", "Confirmar"),
                 btn_colors = c("#6e7d88", "#ff5964")
@@ -156,7 +170,12 @@ mod_board_server <- function(id, app_data, controlbar) {
                     
                     rv$task_has_been_deleted <- rv$task_has_been_deleted + 1L
                     
-                    showNotification(session = session, "Tarea eliminada", duration = 3, type = "message")
+                    showNotification(
+                        session = session,
+                        ui =  "Tarea eliminada",
+                        duration = 3,
+                        type = "message"
+                    )
                 }
             }, error = \(e) alert_error(session, e))
             
@@ -282,6 +301,81 @@ mod_board_server <- function(id, app_data, controlbar) {
                 size = "l"
             ))
         }) |> bindEvent(input$taskToHistory)
+
+        # Reports ----
+
+        ## Delete report ----
+
+        observe({
+            shinyWidgets::ask_confirmation(
+                inputId = ns("confirm_delete_report"),
+                title = "Eliminar reporte", 
+                text = paste0(
+                    "Se eliminará también cualquier progreso asociado. ",
+                    "No se podrá recuperar la información."
+                ),
+                type = "warning", 
+                btn_labels = c("Cancelar", "Confirmar"),
+                btn_colors = c("#6e7d88", "#ff5964")
+            )
+        }) |>
+            bindEvent(input$reportToDelete)
+
+        observe({
+            tryCatch(expr = {
+                if(isTRUE(input$confirm_delete_report)) {
+                    app_data$report_delete(input$reportToDelete)
+                    
+                    rv$reports_modified <- rv$reports_modified + 1L
+                    
+                    showNotification(
+                        session = session,
+                        ui =  "Reporte eliminado",
+                        duration = 3,
+                        type = "message"
+                    )
+                }
+            }, error = \(e) alert_error(session, e))
+            
+        }) |> 
+            bindEvent(input$confirm_delete_report)
+
+        ## Archive report ----
+
+        observe({
+            shinyWidgets::ask_confirmation(
+                inputId = ns("confirm_archive_report"),
+                title = "Archivar reporte",
+                text = paste0(
+                    "Se archivará reporte. ",
+                    "No será posible modificar la información posteriormente",
+                    "Podrá consultar la información en analítica."
+                ),
+                type = "warning", 
+                btn_labels = c("Cancelar", "Confirmar"),
+                btn_colors = c("#6e7d88", "#ff5964")
+            )
+        }) |>
+            bindEvent(input$reportToArchive)
+
+        observe({
+            tryCatch(expr = {
+                if(isTRUE(input$confirm_archive_report)) {
+                    app_data$report_archive(input$reportToArchive)
+                    
+                    rv$reports_modified <- rv$reports_modified + 1L
+                    
+                    showNotification(
+                        session = session,
+                        ui =  "Reporte archivado",
+                        duration = 3,
+                        type = "message"
+                    )
+                }
+            }, error = \(e) alert_error(session, e))
+            
+        }) |> 
+            bindEvent(input$confirm_archive_report)
         
         # Outputs ----
         
@@ -312,7 +406,7 @@ mod_board_server <- function(id, app_data, controlbar) {
         })
         
         output$reports <- renderUI({
-                reports() |> purrr::map(report_box)
+                reports() |> purrr::map(~report_box(.x, ns))
         })
         
         
