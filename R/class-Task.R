@@ -145,6 +145,35 @@ Task <- R6::R6Class(
                 cli::cli_alert_warning("task_id: {task_id}")
             }
         },
+
+        #' @description Archive a task
+        task_archive = function(task_id) {
+            task_st <- glue::glue_sql(
+                "UPDATE tasks
+                SET
+                    status_current = 'Archivado'
+                WHERE task_id = {task_id}
+                ",
+                .con = private$con
+            )
+
+            progress_st  <- glue::glue_sql(
+                "INSERT INTO progress
+                SET
+                    task_id = {task_id},
+                    reported_by = {self$user$user_id},
+                    output_progress = 0,
+                    status = 'Archivado',
+                    details = 'Archivado manualmente'
+                ",
+                .con = private$con
+            )
+
+            DBI::dbBegin(private$con)
+            DBI::dbExecute(private$con, task_st)
+            DBI::dbExecute(private$con, progress_st)
+            DBI::dbCommit(private$con)
+        },
         
         #' @description Insert progress info on some task
         progress_add = function(task_id,
@@ -252,12 +281,8 @@ Task <- R6::R6Class(
                 FROM tasks
                 WHERE 
                     group_id = {group_id} AND
-                    assignee IN ({assignees*}) AND
-                        (status_current != 'Terminado' OR (
-                            status_current = 'Terminado' AND
-                            time_last_modified BETWEEN date_sub(now(), INTERVAL 2 WEEK) AND now()
-                            )
-                        )
+                    assignee IN ({assignees*}) AND 
+                    status_current != 'Archivado'
                 ",
                 group_id = self$group_selected,
                 assignees = private$get_assignees()

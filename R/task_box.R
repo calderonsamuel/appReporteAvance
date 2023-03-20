@@ -49,6 +49,14 @@ task_dropdown <- function(ns, value, status, is_group_admin) {
         class = "dropdown-item"
     )
     
+    item_archivar <- multiBtnInput(
+        inputId = ns_safe("taskToArchive", ns), 
+        value = value,
+        label = "Archivar",
+        icon = fontawesome::fa("fas fa-box-archive"),
+        class = "dropdown-item"
+    )
+    
     item_eliminar <- multiBtnInput(
         inputId = ns_safe("taskToDelete", ns), 
         value = value,
@@ -88,7 +96,7 @@ task_dropdown <- function(ns, value, status, is_group_admin) {
             )
         } else {
             tagList(
-                item_historia
+                item_historia, item_archivar
             )
         }
 

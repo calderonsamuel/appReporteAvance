@@ -120,6 +120,7 @@ mod_board_server <- function(id, app_data, controlbar) {
                 rv$task_has_been_deleted,
                 rv$task_has_been_reported,
                 rv$task_has_been_edited,
+                rv$tasks_modified,
                 controlbar$group_selected(),
                 controlbar$group_colors_modified()
             )
@@ -140,7 +141,8 @@ mod_board_server <- function(id, app_data, controlbar) {
             task_to_edit = list(),
             task_has_been_edited = 0L,
             task_to_history = list(),
-            reports_modified = 0L
+            reports_modified = 0L,
+            tasks_modified = 0L
         )
         
         # Observers ----
@@ -302,6 +304,43 @@ mod_board_server <- function(id, app_data, controlbar) {
             ))
         }) |> bindEvent(input$taskToHistory)
 
+        ## Archive task ----
+
+        observe({
+            shinyWidgets::ask_confirmation(
+                inputId = ns("confirm_archive_task"),
+                title = "Archivar tarea",
+                text = paste0(
+                    "Se archivará tarea. ",
+                    "No será posible modificar la información posteriormente. ",
+                    "Podrá consultar la información en analítica."
+                ),
+                type = "warning", 
+                btn_labels = c("Cancelar", "Confirmar"),
+                btn_colors = c("#6e7d88", "#ff5964")
+            )
+        }) |>
+            bindEvent(input$taskToArchive)
+
+        observe({
+            tryCatch(expr = {
+                if(isTRUE(input$confirm_archive_task)) {
+                    app_data$task_archive(input$taskToArchive)
+                    
+                    rv$tasks_modified <- rv$tasks_modified + 1L
+                    
+                    showNotification(
+                        session = session,
+                        ui =  "Tarea archivada",
+                        duration = 3,
+                        type = "message"
+                    )
+                }
+            }, error = \(e) alert_error(session, e))
+            
+        }) |> 
+            bindEvent(input$confirm_archive_task)
+
         # Reports ----
 
         ## Delete report ----
@@ -348,7 +387,7 @@ mod_board_server <- function(id, app_data, controlbar) {
                 title = "Archivar reporte",
                 text = paste0(
                     "Se archivará reporte. ",
-                    "No será posible modificar la información posteriormente",
+                    "No será posible modificar la información posteriormente. ",
                     "Podrá consultar la información en analítica."
                 ),
                 type = "warning", 
