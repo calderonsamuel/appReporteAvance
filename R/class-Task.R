@@ -38,7 +38,7 @@ Task <- R6::R6Class(
 
             task_id <- ids::random_id()
 
-            statement <-
+            task_st <- glue::glue_sql(
                 "INSERT INTO tasks
                 SET
                     group_id = {group_id},
@@ -52,8 +52,26 @@ Task <- R6::R6Class(
                     output_goal = {output_goal},
                     output_current = 0,
                     status_current = 'Pendiente'
-                "
-            super$db_execute_statement(statement, .envir = rlang::current_env())
+                ",
+                .con = private$con
+            )
+
+            progress_st <- glue::glue_sql(
+                "INSERT INTO progress
+                SET
+                    task_id = {task_id},
+                    reported_by = {self$user$user_id},
+                    output_progress = 0,
+                    status = 'Pendiente',
+                    details = 'Tarea creada'
+                ",
+                .con = private$con
+            )
+
+            DBI::dbBegin(private$con)
+            DBI::dbExecute(private$con, task_st)
+            DBI::dbExecute(private$con, progress_st)
+            DBI::dbCommit(private$con)
             
             if (interactive()) {
                 cli::cli_h2("Task added")
@@ -82,8 +100,8 @@ Task <- R6::R6Class(
 
         #' @description Report progress on an assigned task
         task_report_progress = function(task_id,
-                                        status_current, 
-                                        output_current, 
+                                        status_current,
+                                        output_current,
                                         details) {
 
             statement <-
