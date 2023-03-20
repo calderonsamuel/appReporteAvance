@@ -11,12 +11,14 @@ report_box <- function(report, ns = NULL) {
         width = 12,
         collapsed = TRUE,
         dropdownMenu = dropdown,
+        status = "success",
         
         report$details,
         
         lapply(report$quantities, \(x){
             tags$p(
-                glue::glue("{output_unit}: {output_progress}", .envir = x)
+                strong(x$output_unit, ": "),
+                x$output_progress
             )
         }),
         
