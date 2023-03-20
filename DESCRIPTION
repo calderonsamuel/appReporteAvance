@@ -23,7 +23,6 @@ Imports:
     purrr,
     RColorBrewer,
     reactable,
-    reportesAPI (>= 0.3.3),
     sass,
     shiny (>= 1.7.1),
     shinyjs,
@@ -33,7 +32,6 @@ Suggests:
     spelling,
     testthat (>= 3.0.0)
 Remotes: 
-    calderonsamuel/reportesAPI,
     JohnCoene/firebase
 Config/testthat/edition: 3
 Encoding: UTF-8

@@ -6,8 +6,9 @@
 #' @param group_id The id of the group on which the statement will be executed
 #' @param user_id The id of the user on which the statement will be executed
 #' @param task_id The id of the task on which the statement will be executed
-#' @param task_title The new title of the group
-#' @param task_description The new description of the group
+#' @param report_id The id of the report on which the statement will be executed
+#' @param task_title Title for the task
+#' @param task_description Long description of the task
 #' @param assignee The id of the user responsible for the task
 #' @param time_due Deadline for the task completion. Datetime
 #' @param output_unit Unit of measurement of the task output
@@ -17,6 +18,9 @@
 #' @param output_progress Quantity of the progress being reported. Is measured in the unit specified in the creation of the task
 #' @param status The status of the task once the new progress is added
 #' @param details Explanation of the progress made
+#' @param report_title The title of the report
+#' @param units Units of the report. Must have the same size as quantities.
+#' @param quantities Quantities of the report. Must have the same size as units.
 #' @importFrom cli cli_alert_success cli_h2
 #' @importFrom purrr pmap keep map reduce
 Task <- R6::R6Class(
@@ -282,6 +286,7 @@ Task <- R6::R6Class(
         tasks = function() {
             private$get_tasks()
         },
+        #' @field reports List containing the reports an User can interact with
         reports = function() {
             statement <- glue::glue_sql(
                 "SELECT 
