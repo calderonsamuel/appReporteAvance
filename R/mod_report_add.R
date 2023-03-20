@@ -23,7 +23,7 @@ mod_report_add_ui <- function(id) {
 #' report_add Server Functions
 #'
 #' @noRd
-mod_report_add_server <- function(id, AppData, controlbar) {
+mod_report_add_server <- function(id, app_data, controlbar) {
     moduleServer(id, function(input, output, session) {
         ns <- session$ns
         
@@ -32,7 +32,7 @@ mod_report_add_server <- function(id, AppData, controlbar) {
         )
         
         unit_choices <- reactive({
-            AppData$group_units |> 
+            app_data$group_units |> 
                 purrr::keep(~.x$type == "report") |> 
                 purrr::map_chr("unit_title") |>
                 unname()
@@ -139,7 +139,7 @@ mod_report_add_server <- function(id, AppData, controlbar) {
                 units <- purrr::map_chr(input_names()$unit, ~input[[.x]])
                 quantities <- purrr::map_dbl(input_names()$quantity, ~input[[.x]])
                 
-                ap$report_add(
+                app_data$report_add(
                     report_title = input$title,
                     details = input$details,
                     units = units,
