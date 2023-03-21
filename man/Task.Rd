@@ -31,6 +31,7 @@ R6 class that allows to get the Group information.
 \item \href{#method-Task-task_delete}{\code{Task$task_delete()}}
 \item \href{#method-Task-task_report_progress}{\code{Task$task_report_progress()}}
 \item \href{#method-Task-task_edit_metadata}{\code{Task$task_edit_metadata()}}
+\item \href{#method-Task-task_archive}{\code{Task$task_archive()}}
 \item \href{#method-Task-progress_add}{\code{Task$progress_add()}}
 \item \href{#method-Task-task_get_history}{\code{Task$task_get_history()}}
 \item \href{#method-Task-report_add}{\code{Task$report_add()}}
@@ -182,6 +183,23 @@ Edit a task metadata
 \item{\code{task_title}}{Title for the task}
 
 \item{\code{task_description}}{Long description of the task}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Task-task_archive"></a>}}
+\if{latex}{\out{\hypertarget{method-Task-task_archive}{}}}
+\subsection{Method \code{task_archive()}}{
+Archive a task
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Task$task_archive(task_id)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{task_id}}{The id of the task on which the statement will be executed}
 }
 \if{html}{\out{</div>}}
 }
