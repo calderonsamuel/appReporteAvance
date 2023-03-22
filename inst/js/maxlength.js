@@ -1,22 +1,19 @@
-// works when copied and pasted in browser console. needs a document.onload()
-
-function textInputCounter(elementId) {
-    let textInput = document.getElementById(elementId)
-    let counter = document.getElementById(elementId + "-mlCounter")
-    // https://stackabuse.com/character-counter-for-text-areas-with-vanilla-javascript/
-    
-    textInput.addEventListener('keydown', () => {
-        counter.innerText = textInput.value.length + "/" + textInput.attributes.maxlength.value
-    })
-}
-
-console.log('hi external')
-
-window.onload = (event) => {
-    textInputCounter('hi')
-    console.log('hi internal')
-};
-
-// textInputCounter('hi')
-
-// document.onload = (event) => textInputCounter('hi')
+$(document).on('keyup', "input", function(event) {
+    if ($(this).attr("type") === "text") {
+      let $charCounter = $('#' + $(this).attr("id") + 'MlCounter');
+      let currentLength = $(this).val().length;
+      let maxLength = $(this).attr('maxlength')
+      let ratio = currentLength / maxLength
+      
+      // Update the text of the small tag
+      $charCounter.text(currentLength + ' / ' + maxLength);
+      
+      if (currentLength == maxLength) {
+        $charCounter.removeClass("text-muted text-info").addClass("text-danger");
+      } else if (ratio > 0.8) {
+        $charCounter.removeClass("text-muted text-danger").addClass("text-info");
+      } else {
+        $charCounter.removeClass("text-info text-danger").addClass("text-muted");
+      }
+    }
+  })
