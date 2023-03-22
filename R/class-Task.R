@@ -291,10 +291,8 @@ Task <- R6::R6Class(
             db_data <- super$db_get_query(
                 "SELECT
                     lhs.*,
-                    rhs.name AS assignee_name,
-                    rhs.last_name AS assignee_last_name,
-                    rhs2.name AS assigned_by_name,
-                    rhs2.last_name AS assigned_by_last_name,
+                    CONCAT(rhs.name, ' ', rhs.last_name) AS assignee_dn,
+                    CONCAT(rhs2.name, ' ', rhs2.last_name) AS assigned_by_dn,
                     rhs3.user_color AS user_color
                 FROM ({query_tasks}) AS lhs
                 LEFT JOIN users rhs ON
