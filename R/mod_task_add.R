@@ -47,10 +47,12 @@ mod_task_add_server <- function(id, app_data, controlbar){
         showModal(modalDialog(
             h1("Añadir tarea"),
             size = "l",
-            textInput(
+            textInputPro(
                 inputId = ns("title"), 
                 label = "Título de tarea",
-                width = "100%"
+                width = "100%",
+                maxlength = 100,
+                maxlengthCounter = TRUE
             ),
             textAreaInput(
                 inputId = ns("description"), 
