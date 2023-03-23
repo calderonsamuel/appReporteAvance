@@ -80,8 +80,20 @@ mod_group_units_server <- function(id, app_data, group_selection) {
             showModal(modalDialog(
                 title = "Nueva unidad de medida",
                 
-                textInput(ns("title"), "Título de unidad de medida", width = "100%"),
-                textAreaInput(ns("description"), "Descripción", width = "100%"),
+                textInputPro(
+                    inputId = ns("title"),
+                    label = "Título de unidad de medida",
+                    width = "100%",
+                    maxlength = 125,
+                    maxlengthCounter = TRUE
+                ),
+                textAreaInputPro(
+                    inputId = ns("description"),
+                    label = "Descripción",
+                    width = "100%",
+                    maxlength = 250,
+                    maxlengthCounter = TRUE
+                ),
                 fluidRow(
                     col_6(
                         selectInput(ns("type"), "Destino", c(Tarea = "task", Reporte = "report"))
@@ -154,10 +166,24 @@ mod_group_units_server <- function(id, app_data, group_selection) {
             unit_selected <- group_units()[[input$unitToEdit]]
             
             showModal(modalDialog(
-                title = "Nueva unidad de medida",
+                title = "Editar unidad de medida",
                 
-                textInput(ns("title"), "Título de unidad de medida", value = unit_selected$unit_title, width = "100%"),
-                textAreaInput(ns("description"), "Descripción", value = unit_selected$unit_description, width = "100%"),
+                textInputPro(
+                    inputId = ns("title"),
+                    label = "Título de unidad de medida",
+                    value = unit_selected$unit_title, 
+                    width = "100%",
+                    maxlength = 125,
+                    maxlengthCounter = TRUE
+                ),
+                textAreaInputPro(
+                    inputId = ns("description"),
+                    label = "Descripción",
+                    value = unit_selected$unit_description,
+                    width = "100%",
+                    maxlength = 250,
+                    maxlengthCounter = TRUE
+                ),
                 fluidRow(
                     col_6(
                         selectInput(ns("type"), "Destino", c(Tarea = "task", Reporte = "report"), selected = unit_selected$type)

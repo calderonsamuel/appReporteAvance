@@ -73,16 +73,20 @@ mod_report_add_server <- function(id, app_data, controlbar) {
                 title = "Nuevo reporte",
                 size = "l",
                 
-                textInput(
+                textInputPro(
                     inputId = ns("title"), 
                     label = "Título de reporte",
-                    width = "100%"
+                    width = "100%",
+                    maxlength = 125,
+                    maxlengthCounter = TRUE
                 ),
-                textAreaInput(
+                textAreaInputPro(
                     inputId = ns("details"), 
                     label = "Detalles", 
                     placeholder = "Opcional",
-                    width = "100%"
+                    width = "100%",
+                    maxlength = 500,
+                    maxlengthCounter = TRUE
                 ),
                 
                 div(tags$label(class = "control-label", "Unidades de medición")),
