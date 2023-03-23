@@ -69,11 +69,11 @@ textAreaInputPro <- function(inputId, label, value = "",
 
 maxlength_dep <- function() {
     htmltools::htmlDependency(
-        name = "maxlength",
+        name = "maxLengthCounter",
         version = "0.1.0",
         package = "appReporteAvance",
         src = "js",
-        script = "maxlength.js"
+        script = "maxLengthCounter.js"
     )
 }
 
