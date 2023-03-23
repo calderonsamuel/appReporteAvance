@@ -87,7 +87,13 @@ mod_group_units_server <- function(id, app_data, group_selection) {
                     maxlength = 125,
                     maxlengthCounter = TRUE
                 ),
-                textAreaInput(ns("description"), "Descripción", width = "100%"),
+                textAreaInputPro(
+                    inputId = ns("description"),
+                    label = "Descripción",
+                    width = "100%",
+                    maxlength = 250,
+                    maxlengthCounter = TRUE
+                ),
                 fluidRow(
                     col_6(
                         selectInput(ns("type"), "Destino", c(Tarea = "task", Reporte = "report"))
@@ -160,7 +166,7 @@ mod_group_units_server <- function(id, app_data, group_selection) {
             unit_selected <- group_units()[[input$unitToEdit]]
             
             showModal(modalDialog(
-                title = "Nueva unidad de medida",
+                title = "Editar unidad de medida",
                 
                 textInputPro(
                     inputId = ns("title"),
@@ -170,7 +176,14 @@ mod_group_units_server <- function(id, app_data, group_selection) {
                     maxlength = 125,
                     maxlengthCounter = TRUE
                 ),
-                textAreaInput(ns("description"), "Descripción", value = unit_selected$unit_description, width = "100%"),
+                textAreaInputPro(
+                    inputId = ns("description"),
+                    label = "Descripción",
+                    value = unit_selected$unit_description,
+                    width = "100%",
+                    maxlength = 250,
+                    maxlengthCounter = TRUE
+                ),
                 fluidRow(
                     col_6(
                         selectInput(ns("type"), "Destino", c(Tarea = "task", Reporte = "report"), selected = unit_selected$type)

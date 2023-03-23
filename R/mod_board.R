@@ -208,10 +208,12 @@ mod_board_server <- function(id, app_data, controlbar) {
                     max = rv$task_to_report$output_goal,
                     width = "100%"
                 ),
-                textAreaInput(
+                textAreaInputPro(
                     inputId = ns("report_details"), 
                     label = "Detalles",
-                    width = "100%"
+                    width = "100%",
+                    maxlength = 500,
+                    maxlengthCounter = TRUE
                 ),
                 
                 footer = tagList(
@@ -255,10 +257,12 @@ mod_board_server <- function(id, app_data, controlbar) {
                     maxlength = 250,
                     maxlengthCounter = TRUE
                 ),
-                textAreaInput(
+                textAreaInputPro(
                     inputId = ns("edit_description"),
                     label = "Descripción de tarea",
-                    value = rv$task_to_edit$task_description
+                    value = rv$task_to_edit$task_description,
+                    maxlength = 500,
+                    maxlengthCounter = TRUE
                 ),
                 
                 footer = tagList(

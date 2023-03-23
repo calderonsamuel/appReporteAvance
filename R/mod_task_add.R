@@ -54,10 +54,12 @@ mod_task_add_server <- function(id, app_data, controlbar){
                 maxlength = 250,
                 maxlengthCounter = TRUE
             ),
-            textAreaInput(
+            textAreaInputPro(
                 inputId = ns("description"), 
                 label = "Descripción de tarea",
-                width = "100%"
+                width = "100%",
+                maxlength = 500,
+                maxlengthCounter = TRUE
             ),
             
             fluidRow(
