@@ -6,7 +6,8 @@
 #' 
 #' @return Returns a text input with the specified parameters.
 textInputPro <- function(inputId, label, value = "", width = NULL,
-        placeholder = NULL, maxlength = NULL, maxlengthCounter = FALSE) {
+        placeholder = NULL, maxlength = NULL, maxlengthCounter = FALSE,
+        readonly = FALSE) {
     
     tag <- shiny::textInput(
         inputId = inputId,
@@ -15,6 +16,10 @@ textInputPro <- function(inputId, label, value = "", width = NULL,
         width = width,
         placeholder = placeholder
     )
+
+    if (readonly) {
+        tag <- tag_add_readonly(tag, "input")
+    }
 
     if (is.null(maxlength)) return(tag)
 
@@ -39,7 +44,8 @@ textInputPro <- function(inputId, label, value = "", width = NULL,
 textAreaInputPro <- function(inputId, label, value = "", 
         width = NULL, height = NULL, cols = NULL, rows = NULL,
         placeholder = NULL, resize = NULL,
-        maxlength = NULL, maxlengthCounter = FALSE) {
+        maxlength = NULL, maxlengthCounter = FALSE,
+        readonly = FALSE) {
 
     tag <- shiny::textAreaInput(
         inputId = inputId,
@@ -52,6 +58,10 @@ textAreaInputPro <- function(inputId, label, value = "",
         placeholder = placeholder,
         resize = resize
     )
+
+    if (readonly) {
+        tag <- tag_add_readonly(tag, "textarea")
+    }
 
     if (is.null(maxlength)) return(tag)
 
@@ -75,6 +85,15 @@ maxlength_dep <- function() {
         src = "js",
         script = "maxLengthCounter.js"
     )
+}
+
+tag_add_readonly <- function(tag, type) {
+    match.arg(type, c("input", "textarea"))
+    
+    htmltools::tagQuery(tag)$
+        children(type)$
+        addAttrs(readonly = "")$
+        allTags()
 }
 
 
