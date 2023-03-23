@@ -80,7 +80,13 @@ mod_group_units_server <- function(id, app_data, group_selection) {
             showModal(modalDialog(
                 title = "Nueva unidad de medida",
                 
-                textInput(ns("title"), "Título de unidad de medida", width = "100%"),
+                textInputPro(
+                    inputId = ns("title"),
+                    label = "Título de unidad de medida",
+                    width = "100%",
+                    maxlength = 125,
+                    maxlengthCounter = TRUE
+                ),
                 textAreaInput(ns("description"), "Descripción", width = "100%"),
                 fluidRow(
                     col_6(
@@ -156,7 +162,14 @@ mod_group_units_server <- function(id, app_data, group_selection) {
             showModal(modalDialog(
                 title = "Nueva unidad de medida",
                 
-                textInput(ns("title"), "Título de unidad de medida", value = unit_selected$unit_title, width = "100%"),
+                textInputPro(
+                    inputId = ns("title"),
+                    label = "Título de unidad de medida",
+                    value = unit_selected$unit_title, 
+                    width = "100%",
+                    maxlength = 125,
+                    maxlengthCounter = TRUE
+                ),
                 textAreaInput(ns("description"), "Descripción", value = unit_selected$unit_description, width = "100%"),
                 fluidRow(
                     col_6(

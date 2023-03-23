@@ -248,10 +248,12 @@ mod_board_server <- function(id, app_data, controlbar) {
                 
                 h1("Editar tarea"),
                 
-                textInput(
+                textInputPro(
                     inputId = ns("edit_title"),
                     label = "Título de tarea",
-                    value = rv$task_to_edit$task_title
+                    value = rv$task_to_edit$task_title,
+                    maxlength = 250,
+                    maxlengthCounter = TRUE
                 ),
                 textAreaInput(
                     inputId = ns("edit_description"),

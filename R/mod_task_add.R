@@ -51,7 +51,7 @@ mod_task_add_server <- function(id, app_data, controlbar){
                 inputId = ns("title"), 
                 label = "Título de tarea",
                 width = "100%",
-                maxlength = 100,
+                maxlength = 250,
                 maxlengthCounter = TRUE
             ),
             textAreaInput(
