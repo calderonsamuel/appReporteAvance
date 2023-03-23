@@ -19,7 +19,7 @@ textInputPro <- function(inputId, label, value = "", width = NULL,
         element_counter <- htmltools::tags$small(
             id = paste0(inputId, "MlCounter"),
             class = "form-text text-muted",
-            paste0("0 / ", maxlength)
+            paste0(nchar(value), " / ", maxlength)
         )
         tq <- tq$after(element_counter)
     }
