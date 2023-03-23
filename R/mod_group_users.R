@@ -197,11 +197,12 @@ mod_group_users_server <- function(id, app_data, controlbar) {
                 
                 fluidRow(
                     col_6(
-                        textInput(
+                        textInputPro(
                             inputId = ns("user_editing"), 
                             label = "Selecciona usuario", 
                             value = paste(user_selected$name, user_selected$last_name),
-                            width = "100%"
+                            width = "100%",
+                            readonly = TRUE
                         )
                     ),
                     col_2(
