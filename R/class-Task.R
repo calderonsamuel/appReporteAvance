@@ -25,7 +25,7 @@
 #' @importFrom purrr pmap keep map reduce
 Task <- R6::R6Class(
     classname = "Task",
-    inherit = Group,
+    inherit = Process,
     public = list(
         #' @description Start a Task based on an user email
         initialize = function(email) {
