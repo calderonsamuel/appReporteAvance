@@ -22,3 +22,12 @@ $(document).on('click', '.icon-picker', function(event) {
     // style the selected icon as bootstrap text-primary
     $element.removeClass("text-muted").addClass("text-primary icon-last-clicked");
 })
+
+// send the initial selection to the input object
+$(document).on("shiny:sessioninitialized", function() {
+    let $element = $(".icon-picker.icon-last-clicked")
+    let shinyInputId = $element.attr("id-for-selection")
+    let value = $element.attr("multi-value")
+
+    Shiny.setInputValue(shinyInputId, value);
+})
