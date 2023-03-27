@@ -3,7 +3,7 @@
 #' @description Create an icon picker element.
 #'
 #' @param inputId chr: the ID of the input element.
-#' @param label chr: the label of the icon picker's dropdown button.
+#' @param label chr: the label of the icon picker.
 #' @param selected chr: the name of the selected fontawesome icon. Must have the form 'fas fa-name'.
 #' @param btn_class chr: the class of the button element.
 #'
@@ -15,11 +15,19 @@
 #' @importFrom htmltools tagList div tags
 #'
 input_icon_picker <- function(inputId, label,
-                              selected = NULL, btn_class = NULL) {
+    selected = NULL, btn_class = "btn-outline-secondary") {
+
   icon_names <- reportes_icon_names()
 
   tagList(
+    tags$label(
+      class = "control-label",
+      id = paste0(inputId, "-label"),
+      `for` = paste0(inputId, "-dropdown-btn"),
+      label
+    ),
     div(
+      id = paste0(inputId, "-dropdown-btn"),
       class = "dropdown",
       tags$button(
         class = "btn dropdown-toggle",
@@ -30,8 +38,7 @@ input_icon_picker <- function(inputId, label,
         `data-toggle` = "dropdown",
         `aria-haspopup` = "true",
         `aria-expanded` = "false",
-        fontawesome::fa(selected) %||% NULL,
-        label
+        fontawesome::fa(selected) %||% NULL
       ),
       div(
         class = "dropdown-menu p-1",

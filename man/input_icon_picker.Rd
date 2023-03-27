@@ -4,12 +4,17 @@
 \alias{input_icon_picker}
 \title{Icon Picker}
 \usage{
-input_icon_picker(inputId, label, selected = NULL, btn_class = NULL)
+input_icon_picker(
+  inputId,
+  label,
+  selected = NULL,
+  btn_class = "btn-outline-secondary"
+)
 }
 \arguments{
 \item{inputId}{chr: the ID of the input element.}
 
-\item{label}{chr: the label of the icon picker's dropdown button.}
+\item{label}{chr: the label of the icon picker.}
 
 \item{selected}{chr: the name of the selected fontawesome icon. Must have the form 'fas fa-name'.}
 
