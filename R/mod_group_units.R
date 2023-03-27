@@ -99,7 +99,7 @@ mod_group_units_server <- function(id, app_data, group_selection) {
                         selectInput(ns("type"), "Destino", c(Tarea = "task", Reporte = "report"))
                     ),
                     col_6(
-                        selectInput(ns("icon"), "Ícono", c("file", "user")),
+                        input_icon_picker(ns("icon"), "Ícono", "fas fa-file")
                     )
                 ),
                 
@@ -189,7 +189,7 @@ mod_group_units_server <- function(id, app_data, group_selection) {
                         selectInput(ns("type"), "Destino", c(Tarea = "task", Reporte = "report"), selected = unit_selected$type)
                     ),
                     col_6(
-                        selectInput(ns("icon"), "Ícono", c("file", "user"), selected = unit_selected$icon),
+                        input_icon_picker(ns("icon"), "Ícono", selected = unit_selected$icon)
                     )
                 ),
                 
