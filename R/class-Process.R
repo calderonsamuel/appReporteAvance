@@ -37,6 +37,71 @@ Process <- R6::R6Class(
             )
             
             DBI::dbExecute(private$con, st)
+        },
+
+        #' @description Add a measurement unit for a process
+        unit_add = function(process_id, unit_title, unit_description = "",
+                            unit_type, unit_icon = "file") {
+            unit_id <- ids::random_id()
+            unit_type <- match.arg(unit_type, c("report", "task"))
+            
+            st <- glue::glue_sql(
+                "INSERT INTO units
+                SET
+                    group_id = {self$group_selected},
+                    process_id = {process_id},
+                    unit_id = {unit_id},
+                    unit_title = {unit_title},
+                    unit_description = {unit_description},
+                    type = {unit_type},
+                    icon = {unit_icon},
+                    creator = {self$user$user_id},
+                    last_modified_by = {self$user$user_id}
+                ",
+                .con = private$con
+            )
+
+            DBI::dbExecute(private$con, st)
+            
+            if (interactive()) cli::cli_alert_info("Inserted unit '{unit_id}' into group '{self$group_selected}'")
+            return(unit_id)
+        },
+
+        #' @description Edit a measurement unit from a process
+        unit_edit = function(unit_id, unit_title, unit_description,
+                            unit_type, unit_icon) {
+            unit_type <- match.arg(unit_type, c("report", "task"))
+            
+            st <- glue::glue_sql("
+                UPDATE units
+                SET 
+                    unit_title = {unit_title},
+                    unit_description = {unit_description},
+                    type = {unit_type},
+                    icon = {unit_icon},
+                    last_modified_by = {self$user$user_id}
+                WHERE
+                    unit_id = {unit_id}
+            ",
+            .con = private$con
+            )
+
+            DBI::dbExecute(private$con, st)
+            
+            if (interactive()) cli::cli_alert_info("Edited unit '{unit_id}' from '{self$group_selected}'")
+        },
+
+        #' @description Delete a measurement unit from a process
+        unit_delete = function(unit_id) {
+            st <- glue::glue_sql(
+                "DELETE FROM units
+                WHERE unit_id = {unit_id}",
+                .con = private$con
+            )
+
+            DBI::dbExecute(private$con, st)
+            
+            if (interactive()) cli::cli_alert_info("Deleted unit '{unit_id}' from group '{self$group_selected}'")
         }
     )
 )
