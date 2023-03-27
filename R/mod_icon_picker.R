@@ -34,7 +34,8 @@ icon_picker <- function(inputId, label, selected = NULL, btn_class = NULL, ...) 
             tags$a(
               `id-for-selection` = inputId,
               `multi-value` = .x,
-              class = "multi-btn icon-picker text-muted",
+              class = "multi-btn icon-picker",
+              class = if (.x == selected) "text-primary icon-last-clicked" else "text-muted",
               fontawesome::fa(.x)
             )
           ) 
