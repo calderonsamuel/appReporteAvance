@@ -14,7 +14,8 @@
 #' @import purrr
 #' @importFrom htmltools tagList div tags
 #'
-icon_picker <- function(inputId, label, selected = NULL, btn_class = NULL) {
+input_icon_picker <- function(inputId, label,
+                              selected = NULL, btn_class = NULL) {
   icon_names <- reportes_icon_names()
 
   tagList(
