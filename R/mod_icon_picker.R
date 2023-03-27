@@ -1,6 +1,20 @@
-#' @example icon_picker("picker", "Ícono", icon = fontawesome::fa("fas fa-icons"))
-#' 
-icon_picker <- function(inputId, label, selected = NULL, btn_class = NULL, ...) {
+#' Icon Picker
+#'
+#' @description Create an icon picker element.
+#'
+#' @param inputId chr: the ID of the input element.
+#' @param label chr: the label of the icon picker's dropdown button.
+#' @param selected chr: the name of the selected fontawesome icon. Must have the form 'fas fa-name'.
+#' @param btn_class chr: the class of the button element.
+#'
+#' @return a dropdown list with icons and a hidden input to hold their values.
+#'
+#' @importFrom fontawesome fa fa_metadata
+#' @importFrom rlang %||%
+#' @import purrr
+#' @importFrom htmltools tagList div tags
+#'
+icon_picker <- function(inputId, label, selected = NULL, btn_class = NULL) {
   icon_names <- reportes_icon_names()
 
   tagList(
@@ -28,7 +42,7 @@ icon_picker <- function(inputId, label, selected = NULL, btn_class = NULL, ...) 
           `max-height` = "200px",
           `overflow-y` = "scroll"
         ),
-        purrr::map(icon_names, ~{
+        lapply(icon_names, \(.x) {
           span(
             style = "min-width: 25px; display: inline-block;",
             tags$a(
@@ -38,7 +52,7 @@ icon_picker <- function(inputId, label, selected = NULL, btn_class = NULL, ...) 
               class = if (.x == selected) "text-primary icon-last-clicked" else "text-muted",
               fontawesome::fa(.x)
             )
-          ) 
+          )
         })
       )
     ),
@@ -47,11 +61,22 @@ icon_picker <- function(inputId, label, selected = NULL, btn_class = NULL, ...) 
   )
 }
 
+#' Get Fontawesome Icons
+#'
+#' @description Get the available solid style icons in the fontawesome package.
+#'
+#' @return a character vector with the names of the available icons.
+#'
 reportes_icon_names <- function() {
   fontawesome::fa_metadata()$icon_names_full_fas
 }
 
-
+#' Icon Picker Dependency
+#'
+#' @description Create a dependency for the icon picker element.
+#'
+#' @return a html dependency named "iconPicker".
+#'
 iconPicker_dep <- function() {
   htmltools::htmlDependency(
         name = "iconPicker", 
