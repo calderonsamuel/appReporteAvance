@@ -1,6 +1,6 @@
 #' @example icon_picker("picker", "Ícono", icon = fontawesome::fa("fas fa-icons"))
 #' 
-icon_picker <- function(inputId, label, icon = NULL, class = NULL, ...) {
+icon_picker <- function(inputId, label, selected = NULL, btn_class = NULL, ...) {
   icon_names <- reportes_icon_names()
 
   tagList(
@@ -8,19 +8,26 @@ icon_picker <- function(inputId, label, icon = NULL, class = NULL, ...) {
       class = "dropdown",
       tags$button(
         class = "btn dropdown-toggle",
-        class = class,
+        class = btn_class,
         type = "button",
         id = paste0(inputId, "-dropdown"),
+        `data-bs-toggle` = "dropdown",
         `data-toggle` = "dropdown",
         `aria-haspopup` = "true",
         `aria-expanded` = "false",
-        icon,
+        fontawesome::fa(selected) %||% NULL,
         label
       ),
       div(
-        class = "dropdown-menu p-2",
+        class = "dropdown-menu p-1",
         `aria-labelledby` = paste0(inputId, "-dropdown"),
-        style = "width: 300px; font-size: large; text-align: center;",
+        style = htmltools::css(
+          width = "310px",
+          `font-size` = "large",
+          `text-align` = "center",
+          `max-height` = "200px",
+          `overflow-y` = "scroll"
+        ),
         purrr::map(icon_names, ~{
           span(
             style = "min-width: 25px; display: inline-block;",
@@ -28,7 +35,7 @@ icon_picker <- function(inputId, label, icon = NULL, class = NULL, ...) {
               `id-for-selection` = inputId,
               `multi-value` = .x,
               class = "multi-btn icon-picker text-muted",
-              fontawesome::fa(paste0("fas fa-", .x))
+              fontawesome::fa(.x)
             )
           ) 
         })
@@ -40,7 +47,7 @@ icon_picker <- function(inputId, label, icon = NULL, class = NULL, ...) {
 }
 
 reportes_icon_names <- function() {
-  fontawesome::fa_metadata()$icon_names_fas |> sample(100)
+  fontawesome::fa_metadata()$icon_names_full_fas
 }
 
 
