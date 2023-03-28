@@ -6,3 +6,4 @@
 .Renviron
 firebase.rds
 .Rprofile
+.vscode/*

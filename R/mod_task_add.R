@@ -34,14 +34,21 @@ mod_task_add_server <- function(id, app_data, controlbar){
     user_choices <- reactive({
         get_user_choices(app_data, controlbar$group_selected())
     })
-    
+
+    processes_choices <- reactive({
+        all_processes = controlbar$processes()
+        values <- purrr::map_chr(all_processes, "process_id")
+        names <- purrr::map_chr(all_processes, "title")
+
+        setNames(values, names)
+    })
+
     unit_choices <- reactive({
-        app_data$group_units |> 
+        app_data$fetch_units(input$process) |> 
             purrr::keep(~.x$type == "task") |> 
             purrr::map_chr("unit_title") |>
             unname()
-    }) |> 
-        bindEvent(input$add)
+    })
     
     observe({
         showModal(modalDialog(
@@ -60,6 +67,12 @@ mod_task_add_server <- function(id, app_data, controlbar){
                 width = "100%",
                 maxlength = 500,
                 maxlengthCounter = TRUE
+            ),
+
+            selectInput(
+                inputId = ns("process"),
+                label = "Proceso",
+                choices = processes_choices()
             ),
             
             fluidRow(
@@ -131,6 +144,16 @@ mod_task_add_server <- function(id, app_data, controlbar){
             
         }, error = \(e) alert_error(session, e))
     }) |> bindEvent(input$save)
+
+    # update unit choices ----
+    observe({
+        shinyWidgets::updatePickerInput(
+            session = session,
+            inputId = "output_unit",
+            choices = unit_choices()
+        )
+    }) |>
+        bindEvent(input$process)
     
     # output
     

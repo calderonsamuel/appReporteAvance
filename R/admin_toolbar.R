@@ -12,14 +12,14 @@ admin_toolbar <- function(editInputId,
             inputId = editInputId,
             value = value,
             label = fontawesome::fa("fas fa-pencil"),
-            class = "btn-warning",
+            class = "btn-warning btn-sm",
             tooltip = "Editar"
         ),
         multiBtnInput(
             inputId = deleteInputId,
             value = value,
             label = fontawesome::fa("fas fa-trash"),
-            class = "btn-danger",
+            class = "btn-danger btn-sm",
             tooltip = "Eliminar"
         )
     )

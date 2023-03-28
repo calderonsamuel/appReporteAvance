@@ -23,6 +23,11 @@ mod_controlbar_ui <- function(id, app_data) {
             mod_group_users_ui(ns("group_users_1"))
         ),
         bs4Dash::controlbarItem(
+            title = fontawesome::fa("diagram-project"),
+            id = ns("section-processes"),
+            mod_processes_ui(ns("processes_1"))
+        ),
+        bs4Dash::controlbarItem(
             title = fontawesome::fa("temperature-low"),
             id = ns("section-group-units"),
             mod_group_units_ui(ns("group_units_1"))
@@ -46,7 +51,8 @@ mod_controlbar_server <- function(id, app_data) {
         
         group_selection <- mod_group_selection_server("group_selection_1", app_data)
         users_admin <- mod_group_users_server("group_users_1", app_data, group_selection)
-        units_admin <- mod_group_units_server("group_units_1", app_data, group_selection)
+        processes_admin <- mod_processes_server("processes_1", app_data, group_selection)
+        units_admin <- mod_group_units_server("group_units_1", app_data, processes_admin$processes)
         
         group_info <- reactive({
             app_data$groups[[group_selection$group_selected()]]
@@ -74,7 +80,8 @@ mod_controlbar_server <- function(id, app_data) {
             org_selected = group_selection$org_selected,
             group_selected = group_selection$group_selected,
             group_colors_modified = reactive(users_admin$group_colors_modified),
-            is_admin = is_admin
+            is_admin = is_admin,
+            processes = processes_admin$processes
         )
         
     })

@@ -30,14 +30,21 @@ mod_report_add_server <- function(id, app_data, controlbar) {
         module_output <- reactiveValues(
             added = 0L
         )
+
+        processes_choices <- reactive({
+            all_processes = controlbar$processes()
+            values <- purrr::map_chr(all_processes, "process_id")
+            names <- purrr::map_chr(all_processes, "title")
+
+            setNames(values, names)
+        })
         
         unit_choices <- reactive({
-            app_data$group_units |> 
+            app_data$fetch_units(input$process) |> 
                 purrr::keep(~.x$type == "report") |> 
                 purrr::map_chr("unit_title") |>
                 unname()
-        }) |> 
-            bindEvent(input$add)
+        })
         
         ## counter for forms ----
         
@@ -88,6 +95,13 @@ mod_report_add_server <- function(id, app_data, controlbar) {
                     maxlength = 500,
                     maxlengthCounter = TRUE
                 ),
+
+                selectInput(
+                    inputId = ns("process"),
+                    label = "Proceso",
+                    choices = processes_choices()
+                ),
+
                 
                 div(tags$label(class = "control-label", "Unidades de medición")),
                 
@@ -158,6 +172,16 @@ mod_report_add_server <- function(id, app_data, controlbar) {
             }, error = \(e) alert_error(session, e))
         }) |> 
             bindEvent(input$save)
+
+        # update unit choices ----
+        observe({
+            shinyWidgets::updatePickerInput(
+                session = session,
+                inputId = "output_unit",
+                choices = unit_choices()
+            )
+        }) |>
+            bindEvent(input$process)
         
         # output ----
         
