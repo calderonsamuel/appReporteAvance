@@ -80,7 +80,8 @@ mod_controlbar_server <- function(id, app_data) {
             org_selected = group_selection$org_selected,
             group_selected = group_selection$group_selected,
             group_colors_modified = reactive(users_admin$group_colors_modified),
-            is_admin = is_admin
+            is_admin = is_admin,
+            processes = processes_admin$processes
         )
         
     })
