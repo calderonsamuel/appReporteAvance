@@ -23,7 +23,7 @@ mod_task_add_ui <- function(id) {
 #' task_add Server Functions
 #'
 #' @noRd 
-mod_task_add_server <- function(id, AppData, controlbar){
+mod_task_add_server <- function(id, app_data, controlbar){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
@@ -32,29 +32,47 @@ mod_task_add_server <- function(id, AppData, controlbar){
     )
     
     user_choices <- reactive({
-        get_user_choices(AppData, controlbar$group_selected())
+        get_user_choices(app_data, controlbar$group_selected())
     })
-    
+
+    processes_choices <- reactive({
+        all_processes = controlbar$processes()
+        values <- purrr::map_chr(all_processes, "process_id")
+        names <- purrr::map_chr(all_processes, "title")
+
+        setNames(values, names)
+    })
+
     unit_choices <- reactive({
-        AppData$group_units |> 
+        app_data$fetch_units(input$process) |> 
+            purrr::keep(~.x$type == "task") |> 
             purrr::map_chr("unit_title") |>
             unname()
-    }) |> 
-        bindEvent(input$add)
+    })
     
     observe({
         showModal(modalDialog(
             h1("Añadir tarea"),
             size = "l",
-            textInput(
+            textInputPro(
                 inputId = ns("title"), 
                 label = "Título de tarea",
-                width = "100%"
+                width = "100%",
+                maxlength = 250,
+                maxlengthCounter = TRUE
             ),
-            textAreaInput(
+            textAreaInputPro(
                 inputId = ns("description"), 
                 label = "Descripción de tarea",
-                width = "100%"
+                width = "100%",
+                maxlength = 500,
+                maxlengthCounter = TRUE
+            ),
+
+            selectInput(
+                inputId = ns("process"),
+                label = "Proceso",
+                choices = processes_choices()
             ),
             
             fluidRow(
@@ -108,7 +126,7 @@ mod_task_add_server <- function(id, AppData, controlbar){
     
     observe({
         tryCatch(expr = {
-            AppData$task_add(
+            app_data$task_add(
                 group_id = controlbar$group_selected(),
                 task_title = input$title,
                 task_description = input$description,
@@ -126,6 +144,16 @@ mod_task_add_server <- function(id, AppData, controlbar){
             
         }, error = \(e) alert_error(session, e))
     }) |> bindEvent(input$save)
+
+    # update unit choices ----
+    observe({
+        shinyWidgets::updatePickerInput(
+            session = session,
+            inputId = "output_unit",
+            choices = unit_choices()
+        )
+    }) |>
+        bindEvent(input$process)
     
     # output
     

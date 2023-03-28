@@ -1,6 +1,6 @@
 Package: appReporteAvance
 Title: Reporte de avances de oficina
-Version: 0.3.8
+Version: 0.4.0
 Authors@R: 
     person("Samuel", "Calderon", , "samuel.calderon@uarm.pe", role = c("cre", "aut"))
 Description: Las personas de la oficina usan esta app para reportar el
@@ -10,8 +10,10 @@ URL: https://github.com/calderonsamuel/appReporteAvance
 BugReports: https://github.com/calderonsamuel/appReporteAvance/issues
 Imports: 
     bs4Dash,
+    cli,
     colourpicker,
     config (>= 0.3.1),
+    DBI,
     firebase (>= 1.0.1.9000),
     fontawesome,
     fresh,
@@ -21,19 +23,20 @@ Imports:
     ids,
     lubridate,
     purrr,
+    R6,
     RColorBrewer,
     reactable,
-    reportesAPI (>= 0.3.1),
+    rlang,
+    RMariaDB,
     sass,
     shiny (>= 1.7.1),
     shinyjs,
     shinyWidgets (>= 0.7.0),
-    stringr
+    tibble
 Suggests: 
     spelling,
     testthat (>= 3.0.0)
 Remotes: 
-    calderonsamuel/reportesAPI,
     JohnCoene/firebase
 Config/testthat/edition: 3
 Encoding: UTF-8

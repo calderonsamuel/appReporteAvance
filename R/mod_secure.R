@@ -7,7 +7,7 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-mod_secure_ui <- function(id, AppData){
+mod_secure_ui <- function(id, app_data){
   ns <- NS(id)
   
   tagList(
@@ -46,7 +46,7 @@ mod_secure_ui <- function(id, AppData){
       ),
       controlbar = bs4Dash::dashboardControlbar(
           id = ns("controlbar"),
-          mod_controlbar_ui(ns("controlbar_1"), AppData)
+          mod_controlbar_ui(ns("controlbar_1"), app_data)
       )
     )
   )
@@ -55,13 +55,13 @@ mod_secure_ui <- function(id, AppData){
 #' secure Server Functions
 #'
 #' @noRd
-mod_secure_server <- function(id, AppData){
+mod_secure_server <- function(id, app_data){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
-    controlbar <- mod_controlbar_server("controlbar_1", AppData)
+    controlbar <- mod_controlbar_server("controlbar_1", app_data)
     
-    mod_board_server("board_1", AppData, controlbar)
+    mod_board_server("board_1", app_data, controlbar)
 
   })
 }
@@ -69,16 +69,16 @@ mod_secure_server <- function(id, AppData){
 mod_secure_apptest <-
     function(user_iniciado = Sys.getenv("REPORTES_EMAIL")) {
         
-        AppData <- AppData$new(user_iniciado)
+        app_data <- AppData$new(user_iniciado)
         
         ui <- tags$div(
             uiOutput("ui")
         )
         
         server <- function(input, output, session) {
-            output$ui <- renderUI(mod_secure_ui(id = "test", AppData))
+            output$ui <- renderUI(mod_secure_ui(id = "test", app_data))
             
-            mod_secure_server(id = "test", AppData)
+            mod_secure_server(id = "test", app_data)
         }
         
         shinyApp(ui, server)

@@ -11,15 +11,14 @@ mod_group_units_ui <- function(id) {
     ns <- NS(id)
     tagList(
         h5("Gestión de mediciones"),
-        tags$button(
-            id = ns("add"), 
-            type = "button",
-            class = "btn btn-success btn-sm mb-2 action-button", 
-            `data-val` = shiny::restoreInput(ns("add"), NULL),
-            list(
-                fontawesome::fa("fas fa-plus"),
-                "Agregar"
-            )
+
+        uiOutput(ns("processes")),
+
+        btn_custom(
+          inputId = ns("add"),
+          label = "Agregar",
+          icon = fontawesome::fa("fas fa-plus"),
+          class = "btn-success btn-sm mb-2"
         ),
         uiOutput(ns("units"))
     )
@@ -28,7 +27,7 @@ mod_group_units_ui <- function(id) {
 #' group_units Server Functions
 #'
 #' @noRd
-mod_group_units_server <- function(id, AppData, group_selection) {
+mod_group_units_server <- function(id, app_data, processes) {
     moduleServer(id, function(input, output, session) {
         ns <- session$ns
         
@@ -37,61 +36,68 @@ mod_group_units_server <- function(id, AppData, group_selection) {
             unit_deleted = 0L,
             unit_edited = 0L
         )
+
+        processes_choices <- reactive({
+            all_processes <- processes()
+            values <- purrr::map_chr(all_processes, "process_id")
+            names <- purrr::map_chr(all_processes, "title")
+
+            setNames(values, names)
+        })
         
         group_units <- reactive({
-            AppData$group_units
+            app_data$fetch_units(input$process)
         }) |> 
             bindEvent(
                 rv$unit_added,
                 rv$unit_deleted,
                 rv$unit_edited,
-                group_selection$group_selected()
+                input$process
             )
+
+        output$processes <- renderUI({
+            selectInput(
+                inputId = ns("process"),
+                label = "Seleccionar proceso",
+                choices = processes_choices(),
+                width = "100%"
+            )
+        })
         
         output$units <- renderUI({
-            group_units() |> 
-                lapply(\(x) {
-                    div(
-                        class = "row p-1 mx-0 mb-2 mw-100",
-                        style = "background-color: #FFFFFF33; border-radius: 5px;",
-                        div(
-                            class = "col-xs-auto d-flex align-items-center",
-                            span(
-                                fontawesome::fa(x$icon),
-                            )
-                        ),
-                        div(
-                            class = "col d-flex align-items-center mx-2",
-                            `data-toggle`= "tooltip",
-                            `data-placement`= "top",
-                            title = paste0("Descripción: ", x$unit_description),
-                            x$unit_title,
-                            badge_unit_type(x$type)
-                        ),
-                        div(
-                            class = "col-xs-auto d-flex align-items-center",
-                            admin_toolbar(
-                                editInputId = ns("unitToEdit"),
-                                deleteInputId = ns("unitToDelete"),
-                                value = x$unit_id
-                            )
-                        )
-                    )
-                })
+            lapply(group_units(), \(x) {
+                unit_display(
+                    item = x,
+                    editInputId = ns("unitToEdit"),
+                    deleteInputId = ns("unitToDelete")
+                )
+            })
         })
         
         observe({
             showModal(modalDialog(
                 title = "Nueva unidad de medida",
                 
-                textInput(ns("title"), "Título de unidad de medida", width = "100%"),
-                textAreaInput(ns("description"), "Descripción", width = "100%"),
+                textInputPro(
+                    inputId = ns("title"),
+                    label = "Título de unidad de medida",
+                    width = "100%",
+                    maxlength = 125,
+                    maxlengthCounter = TRUE
+                ),
+                textAreaInputPro(
+                    inputId = ns("description"),
+                    label = "Descripción",
+                    width = "100%",
+                    maxlength = 250,
+                    maxlengthCounter = TRUE
+                ),
                 fluidRow(
                     col_6(
                         selectInput(ns("type"), "Destino", c(Tarea = "task", Reporte = "report"))
                     ),
                     col_6(
-                        selectInput(ns("icon"), "Ícono", c("file", "user")),
+                        input_icon_picker(ns("icon"), "Ícono", "fas fa-file")
                     )
                 ),
                 
@@ -105,7 +111,8 @@ mod_group_units_server <- function(id, AppData, group_selection) {
         
         observe({
             tryCatch({
-                AppData$group_unit_add(
+                app_data$unit_add(
+                    process_id = input$process,
                     unit_title = input$title,
                     unit_description = input$description,
                     unit_type = input$type,
@@ -139,7 +146,7 @@ mod_group_units_server <- function(id, AppData, group_selection) {
         observe({
             tryCatch({
                 if(isTRUE(input$confirm_delete)) {
-                    AppData$group_unit_delete(
+                    app_data$unit_delete(
                         unit_id = input$unitToDelete
                     )
                     
@@ -158,16 +165,30 @@ mod_group_units_server <- function(id, AppData, group_selection) {
             unit_selected <- group_units()[[input$unitToEdit]]
             
             showModal(modalDialog(
-                title = "Nueva unidad de medida",
+                title = "Editar unidad de medida",
                 
-                textInput(ns("title"), "Título de unidad de medida", value = unit_selected$unit_title, width = "100%"),
-                textAreaInput(ns("description"), "Descripción", value = unit_selected$unit_description, width = "100%"),
+                textInputPro(
+                    inputId = ns("title"),
+                    label = "Título de unidad de medida",
+                    value = unit_selected$unit_title, 
+                    width = "100%",
+                    maxlength = 125,
+                    maxlengthCounter = TRUE
+                ),
+                textAreaInputPro(
+                    inputId = ns("description"),
+                    label = "Descripción",
+                    value = unit_selected$unit_description,
+                    width = "100%",
+                    maxlength = 250,
+                    maxlengthCounter = TRUE
+                ),
                 fluidRow(
                     col_6(
                         selectInput(ns("type"), "Destino", c(Tarea = "task", Reporte = "report"), selected = unit_selected$type)
                     ),
                     col_6(
-                        selectInput(ns("icon"), "Ícono", c("file", "user"), selected = unit_selected$icon),
+                        input_icon_picker(ns("icon"), "Ícono", selected = unit_selected$icon)
                     )
                 ),
                 
@@ -182,7 +203,7 @@ mod_group_units_server <- function(id, AppData, group_selection) {
         
         observe({
             tryCatch({
-                AppData$group_unit_edit(
+                app_data$unit_edit(
                     unit_id = input$unitToEdit,
                     unit_title = input$title,
                     unit_description = input$description,
@@ -211,11 +232,11 @@ mod_group_units_server <- function(id, AppData, group_selection) {
 
 mod_group_units_apptest <- function(id = "test") {
     
-    AppData <- AppData$new()
+    app_data <- AppData$new()
     
     quick_bs4dash(
         modUI = mod_group_units_ui(id),
-        modServer = mod_group_units_server(id, AppData)
+        modServer = mod_group_units_server(id, app_data)
     )
 }
 
@@ -234,5 +255,34 @@ badge_unit_type <- function(type) {
         class = "badge px-1 bg-info mx-2",
         class = bg_class,
         type_translate # content
+    )
+}
+
+unit_display <- function(item, editInputId, deleteInputId) {
+    div(
+        class = "row p-1 mx-0 mb-2 mw-100",
+        style = "background-color: #FFFFFF33; border-radius: 5px;",
+        div(
+            class = "col-xs-auto d-flex align-items-center pl-2",
+            span(
+                fontawesome::fa(item$icon),
+            )
+        ),
+        div(
+            class = "col d-flex align-items-center mx-2",
+            `data-toggle`= "tooltip",
+            `data-placement`= "top",
+            title = paste0("Descripción: ", item$unit_description),
+            item$unit_title,
+            badge_unit_type(item$type)
+        ),
+        div(
+            class = "col-xs-auto d-flex align-items-center",
+            admin_toolbar(
+                editInputId = editInputId,
+                deleteInputId = deleteInputId,
+                value = item$unit_id
+            )
+        )
     )
 }

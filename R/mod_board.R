@@ -22,7 +22,8 @@ mod_board_ui <- function(id) {
                 icon = icon("calendar"),
                 dropdownMenu = bs4Dash::boxDropdown(
                     icon = fontawesome::fa("fas fa-ellipsis"),
-                    mod_task_add_ui(ns("task_add_1")) # this is a dropdown-item
+                    mod_task_add_ui(ns("task_add_1")), # this is a dropdown-item
+                    mod_report_add_ui(ns("report_add_1"))
                 ),
                 uiOutput(ns("pendientes"))
             ),
@@ -78,7 +79,8 @@ mod_board_ui <- function(id) {
                 width = 3,
                 class = "cw cw-lg",
                 icon = icon("check-circle"),
-                uiOutput(ns("terminado"))
+                uiOutput(ns("terminado")),
+                uiOutput(ns("reports"))
             )
         ),
         
@@ -90,27 +92,46 @@ mod_board_ui <- function(id) {
 #' board Server Functions
 #'
 #' @noRd
-mod_board_server <- function(id, AppData, controlbar) {
+mod_board_server <- function(id, app_data, controlbar) {
     moduleServer(id, function(input, output, session) {
         ns <- session$ns
         
         # Modules ----
         
-        task_gets_added <- mod_task_add_server("task_add_1", AppData, controlbar)
+        task_gets_added <- mod_task_add_server(
+            id = "task_add_1",
+            app_data = app_data,
+            controlbar = controlbar
+        )
+
+        report_gets_added <- mod_report_add_server(
+            id = "report_add_1",
+            app_data =  app_data,
+            controlbar = controlbar
+        )
         
         # Reactives ----
         
         tasks <- reactive({
-            AppData$tasks 
-        }) |> 
-        bindEvent(
-            task_gets_added(),
-            rv$task_has_been_deleted,
-            rv$task_has_been_reported,
-            rv$task_has_been_edited,
-            controlbar$group_selected(),
-            controlbar$group_colors_modified()
-        )
+            app_data$tasks
+        }) |>
+            bindEvent(
+                task_gets_added(),
+                rv$task_has_been_deleted,
+                rv$task_has_been_reported,
+                rv$task_has_been_edited,
+                rv$tasks_modified,
+                controlbar$group_selected(),
+                controlbar$group_colors_modified()
+            )
+        
+        reports <- reactive({
+            app_data$reports
+        }) |>
+            bindEvent(
+                report_gets_added(),
+                rv$reports_modified
+            )
         
         rv <- reactiveValues(
             task_to_delete = list(),
@@ -119,7 +140,9 @@ mod_board_server <- function(id, AppData, controlbar) {
             task_has_been_reported = 0L,
             task_to_edit = list(),
             task_has_been_edited = 0L,
-            task_to_history = list()
+            task_to_history = list(),
+            reports_modified = 0L,
+            tasks_modified = 0L
         )
         
         # Observers ----
@@ -132,7 +155,10 @@ mod_board_server <- function(id, AppData, controlbar) {
             shinyWidgets::ask_confirmation(
                 inputId = ns("confirm_delete"),
                 title = "Eliminar tarea", 
-                text = "Se eliminará también cualquier progreso asociado. No se podrá recuperar la información.", 
+                text = paste0(
+                    "Se eliminará también cualquier progreso asociado. ",
+                    "No se podrá recuperar la información."
+                ),
                 type = "warning", 
                 btn_labels = c("Cancelar", "Confirmar"),
                 btn_colors = c("#6e7d88", "#ff5964")
@@ -142,11 +168,16 @@ mod_board_server <- function(id, AppData, controlbar) {
         observe({
             tryCatch(expr = {
                 if(isTRUE(input$confirm_delete)) {
-                    AppData$task_delete(task_id = rv$task_to_delete$task_id)
+                    app_data$task_delete(task_id = rv$task_to_delete$task_id)
                     
                     rv$task_has_been_deleted <- rv$task_has_been_deleted + 1L
                     
-                    showNotification(session = session, "Tarea eliminada", duration = 3, type = "message")
+                    showNotification(
+                        session = session,
+                        ui =  "Tarea eliminada",
+                        duration = 3,
+                        type = "message"
+                    )
                 }
             }, error = \(e) alert_error(session, e))
             
@@ -177,10 +208,12 @@ mod_board_server <- function(id, AppData, controlbar) {
                     max = rv$task_to_report$output_goal,
                     width = "100%"
                 ),
-                textAreaInput(
+                textAreaInputPro(
                     inputId = ns("report_details"), 
                     label = "Detalles",
-                    width = "100%"
+                    width = "100%",
+                    maxlength = 500,
+                    maxlengthCounter = TRUE
                 ),
                 
                 footer = tagList(
@@ -192,7 +225,7 @@ mod_board_server <- function(id, AppData, controlbar) {
         
         observe({
             tryCatch(expr = {
-                AppData$task_report_progress(
+                app_data$task_report_progress(
                     task_id = rv$task_to_report$task_id,
                     status_current = input$report_status_current,
                     output_current = input$report_output_current,
@@ -217,15 +250,19 @@ mod_board_server <- function(id, AppData, controlbar) {
                 
                 h1("Editar tarea"),
                 
-                textInput(
+                textInputPro(
                     inputId = ns("edit_title"),
                     label = "Título de tarea",
-                    value = rv$task_to_edit$task_title
+                    value = rv$task_to_edit$task_title,
+                    maxlength = 250,
+                    maxlengthCounter = TRUE
                 ),
-                textAreaInput(
+                textAreaInputPro(
                     inputId = ns("edit_description"),
                     label = "Descripción de tarea",
-                    value = rv$task_to_edit$task_description
+                    value = rv$task_to_edit$task_description,
+                    maxlength = 500,
+                    maxlengthCounter = TRUE
                 ),
                 
                 footer = tagList(
@@ -237,7 +274,7 @@ mod_board_server <- function(id, AppData, controlbar) {
         
         observe({
             tryCatch(expr = {
-                AppData$task_edit_metadata(
+                app_data$task_edit_metadata(
                     task_id = rv$task_to_edit$task_id,
                     task_title = input$edit_title,
                     task_description = input$edit_description)
@@ -272,6 +309,118 @@ mod_board_server <- function(id, AppData, controlbar) {
                 size = "l"
             ))
         }) |> bindEvent(input$taskToHistory)
+
+        ## Archive task ----
+
+        observe({
+            shinyWidgets::ask_confirmation(
+                inputId = ns("confirm_archive_task"),
+                title = "Archivar tarea",
+                text = paste0(
+                    "Se archivará tarea. ",
+                    "No será posible modificar la información posteriormente. ",
+                    "Podrá consultar la información en analítica."
+                ),
+                type = "warning", 
+                btn_labels = c("Cancelar", "Confirmar"),
+                btn_colors = c("#6e7d88", "#ff5964")
+            )
+        }) |>
+            bindEvent(input$taskToArchive)
+
+        observe({
+            tryCatch(expr = {
+                if(isTRUE(input$confirm_archive_task)) {
+                    app_data$task_archive(input$taskToArchive)
+                    
+                    rv$tasks_modified <- rv$tasks_modified + 1L
+                    
+                    showNotification(
+                        session = session,
+                        ui =  "Tarea archivada",
+                        duration = 3,
+                        type = "message"
+                    )
+                }
+            }, error = \(e) alert_error(session, e))
+            
+        }) |> 
+            bindEvent(input$confirm_archive_task)
+
+        # Reports ----
+
+        ## Delete report ----
+
+        observe({
+            shinyWidgets::ask_confirmation(
+                inputId = ns("confirm_delete_report"),
+                title = "Eliminar reporte", 
+                text = paste0(
+                    "Se eliminará también cualquier progreso asociado. ",
+                    "No se podrá recuperar la información."
+                ),
+                type = "warning", 
+                btn_labels = c("Cancelar", "Confirmar"),
+                btn_colors = c("#6e7d88", "#ff5964")
+            )
+        }) |>
+            bindEvent(input$reportToDelete)
+
+        observe({
+            tryCatch(expr = {
+                if(isTRUE(input$confirm_delete_report)) {
+                    app_data$report_delete(input$reportToDelete)
+                    
+                    rv$reports_modified <- rv$reports_modified + 1L
+                    
+                    showNotification(
+                        session = session,
+                        ui =  "Reporte eliminado",
+                        duration = 3,
+                        type = "message"
+                    )
+                }
+            }, error = \(e) alert_error(session, e))
+            
+        }) |> 
+            bindEvent(input$confirm_delete_report)
+
+        ## Archive report ----
+
+        observe({
+            shinyWidgets::ask_confirmation(
+                inputId = ns("confirm_archive_report"),
+                title = "Archivar reporte",
+                text = paste0(
+                    "Se archivará reporte. ",
+                    "No será posible modificar la información posteriormente. ",
+                    "Podrá consultar la información en analítica."
+                ),
+                type = "warning", 
+                btn_labels = c("Cancelar", "Confirmar"),
+                btn_colors = c("#6e7d88", "#ff5964")
+            )
+        }) |>
+            bindEvent(input$reportToArchive)
+
+        observe({
+            tryCatch(expr = {
+                if(isTRUE(input$confirm_archive_report)) {
+                    app_data$report_archive(input$reportToArchive)
+                    
+                    rv$reports_modified <- rv$reports_modified + 1L
+                    
+                    showNotification(
+                        session = session,
+                        ui =  "Reporte archivado",
+                        duration = 3,
+                        type = "message"
+                    )
+                }
+            }, error = \(e) alert_error(session, e))
+            
+        }) |> 
+            bindEvent(input$confirm_archive_report)
         
         # Outputs ----
         
@@ -296,12 +445,18 @@ mod_board_server <- function(id, AppData, controlbar) {
         })
         
         output$terminado <- renderUI({
-            task_box_by_status(tasks(), "Terminado", ns, controlbar$is_admin())
+            tagList(
+                task_box_by_status(tasks(), "Terminado", ns, controlbar$is_admin())
+            )
+        })
+        
+        output$reports <- renderUI({
+                reports() |> purrr::map(~report_box(.x, ns))
         })
         
         
         output$table_history <- reactable::renderReactable({
-            AppData$task_get_history(rv$task_to_history$task_id) |> 
+            app_data$task_get_history(rv$task_to_history$task_id) |> 
                 purrr::pmap(list) |> 
                 purrr::map_dfr(~data.frame(
                     "Fecha" = format(.x$time_reported, "%d/%m/%Y %H:%M:%S"),
@@ -330,11 +485,11 @@ mod_board_server <- function(id, AppData, controlbar) {
 # mod_board_server("board_1")
 
 mod_board_apptest <- function(email = Sys.getenv("REPORTES_EMAIL")) {
-    AppData <- AppData$new(email)
+    app_data <- AppData$new(email)
     id = ids::random_id()
     quick_bs4dash(
         modUI = mod_board_ui(id = id),
-        modServer = mod_board_server(id = id, AppData, controlbar = fake_config(AppData))
+        modServer = mod_board_server(id = id, app_data, controlbar = fake_config(app_data))
     )
 }
 

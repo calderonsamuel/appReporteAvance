@@ -74,3 +74,19 @@ btn_user_edit <- mk_btn(color = "warning", label = icon("user-edit"))
 
 #' @rdname buttons
 btn_editar <- mk_btn(color = "warning", label = "Editar") 
+
+btn_custom <- function(inputId, label, icon = NULL, width = NULL, ...) {
+    value <- shiny::restoreInput(id = inputId, default = NULL)
+    tags$button(
+        id = inputId, 
+        type = "button",
+        class = "btn action-button", 
+        style = htmltools::css(width = htmltools::validateCssUnit(width)), 
+        `data-val` = value,
+        list(
+            icon,
+            label
+        ),
+        ...
+    )
+}

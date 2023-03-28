@@ -12,15 +12,11 @@ mod_group_users_ui <- function(id) {
     
     tagList(
         h5("Gestión de usuarios"),
-        tags$button(
-            id = ns("add"), 
-            type = "button",
-            class = "btn btn-success btn-sm mb-2 action-button", 
-            `data-val` = shiny::restoreInput(ns("add"), NULL),
-            list(
-                fontawesome::fa("fas fa-user-plus"),
-                "Agregar"
-            )
+        btn_custom(
+            inputId = ns("add"),
+            label = "Agregar",
+            icon = fontawesome::fa("fas fa-user-plus"),
+            class = "btn-success btn-sm mb-2"
         ),
         uiOutput(ns("users"))
     )
@@ -29,7 +25,7 @@ mod_group_users_ui <- function(id) {
 #' group_users Server Functions
 #'
 #' @noRd
-mod_group_users_server <- function(id, AppData, controlbar) {
+mod_group_users_server <- function(id, app_data, controlbar) {
     moduleServer(id, function(input, output, session) {
         ns <- session$ns
         
@@ -39,7 +35,7 @@ mod_group_users_server <- function(id, AppData, controlbar) {
             user_edited = 0L
         )
         
-        group_selected <- reactive(AppData$group_users[[controlbar$group_selected()]]) |> 
+        group_selected <- reactive(app_data$group_users[[controlbar$group_selected()]]) |> 
             bindEvent(
                 rv$user_added,
                 rv$user_deleted,
@@ -52,7 +48,7 @@ mod_group_users_server <- function(id, AppData, controlbar) {
         )
         
         org_users <- reactive({
-            org_users_list <- AppData$org_users[[controlbar$org_selected()]]
+            org_users_list <- app_data$org_users[[controlbar$org_selected()]]
             current_group_users_ids <- purrr::map_chr(group_selected(), "user_id")
             
             remaining_users <- org_users_list |> 
@@ -138,7 +134,7 @@ mod_group_users_server <- function(id, AppData, controlbar) {
             tryCatch({
                 color_selected <- reportes_bs_colors()[reportes_bs_colors() == input$color] |> names()
                 
-                AppData$group_user_add(
+                app_data$group_user_add(
                     group_id = controlbar$group_selected(),
                     user_id = input$user,
                     user_color = color_selected,
@@ -175,7 +171,7 @@ mod_group_users_server <- function(id, AppData, controlbar) {
         observe({
             tryCatch({
                 if(isTRUE(input$confirm_delete)) {
-                    AppData$group_user_delete(
+                    app_data$group_user_delete(
                         group_id = controlbar$group_selected(),
                         user_id = input$userToDelete
                     )
@@ -201,11 +197,12 @@ mod_group_users_server <- function(id, AppData, controlbar) {
                 
                 fluidRow(
                     col_6(
-                        textInput(
+                        textInputPro(
                             inputId = ns("user_editing"), 
                             label = "Selecciona usuario", 
                             value = paste(user_selected$name, user_selected$last_name),
-                            width = "100%"
+                            width = "100%",
+                            readonly = TRUE
                         )
                     ),
                     col_2(
@@ -242,7 +239,7 @@ mod_group_users_server <- function(id, AppData, controlbar) {
                 user_selected <- group_selected()[[input$userToEdit]]
                 color_selected <- reportes_bs_colors()[reportes_bs_colors() == input$color_editing] |> names()
                 
-                AppData$group_user_edit(
+                app_data$group_user_edit(
                     group_id = controlbar$group_selected(),
                     user_id = input$userToEdit,
                     user_color = color_selected,
@@ -274,12 +271,12 @@ mod_group_users_server <- function(id, AppData, controlbar) {
 
 mod_group_users_apptest <- function(id = "test") {
     
-    AppData <- AppData$new()
-    controlbar <- fake_controlbar(AppData)
+    app_data <- AppData$new()
+    controlbar <- fake_controlbar(app_data)
     
     quick_bs4dash(
         modUI = mod_group_users_ui(id),
-        modServer = mod_group_users_server(id, AppData, controlbar)
+        modServer = mod_group_users_server(id, app_data, controlbar)
     )
 }
 

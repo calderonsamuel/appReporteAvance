@@ -3,7 +3,6 @@
 #' @param input,output,session Internal parameters for {shiny}.
 #'     DO NOT REMOVE.
 #' @import shiny
-#' @importFrom reportesAPI AppData
 #' @noRd
 app_server <- function(input, output, session) {
     # Your application server logic
@@ -24,18 +23,18 @@ app_server <- function(input, output, session) {
             # email = TRUE,
             google = TRUE)$launch()
     
-    myAppData <- reactive(AppData$new(f$get_signed_in()$response$email)) |> bindEvent(f$req_sign_in())
+    myapp_data <- reactive(AppData$new(f$get_signed_in()$response$email)) |> bindEvent(f$req_sign_in())
 
   output$my_ui <- renderUI({
       # f$req_sign_in() # https://firebase.google.com/docs/reference/rest/auth#section-sign-in-with-oauth-credential
       
-      mod_secure_ui("secure_1", myAppData())
+      mod_secure_ui("secure_1", myapp_data())
   }) |>
       bindEvent(f$req_sign_in())
   
   observe({
       shinyWidgets::closeSweetAlert(session)
-      mod_secure_server("secure_1", myAppData())
+      mod_secure_server("secure_1", myapp_data())
   }) |>
       bindEvent(f$req_sign_in())
   

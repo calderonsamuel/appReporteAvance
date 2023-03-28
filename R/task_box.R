@@ -19,8 +19,13 @@ task_box <- function(task, ns = NULL, is_group_admin = FALSE) {
         tags$p(task$task_description),
         task_assignee_div(task),
         tags$div(
-            tags$span(fontawesome::fa("far fa-clock"), format(task$time_due, "%H:%M:%S")),
+            tags$span(fontawesome::fa("far fa-clock"), format(task$time_due, "%H:%M")),
             tags$span(fontawesome::fa("fas fa-bullseye"), glue::glue("{task$output_current}/{task$output_goal} {task$output_unit}"), style = "float: right;")
+        ),
+        tags$p(
+            class = "text-muted small mb-0",
+            format(task$time_creation, "Creado el %d %b a las %H:%M:%S", tz = "America/Lima"),
+            paste0("por ", task$assigned_by_dn)
         )
     )
     
@@ -46,6 +51,14 @@ task_dropdown <- function(ns, value, status, is_group_admin) {
         value = value,
         label = "Editar",
         icon = fontawesome::fa("fas fa-pen-to-square"),
+        class = "dropdown-item"
+    )
+    
+    item_archivar <- multiBtnInput(
+        inputId = ns_safe("taskToArchive", ns), 
+        value = value,
+        label = "Archivar",
+        icon = fontawesome::fa("fas fa-box-archive"),
         class = "dropdown-item"
     )
     
@@ -88,7 +101,7 @@ task_dropdown <- function(ns, value, status, is_group_admin) {
             )
         } else {
             tagList(
-                item_historia
+                item_historia, item_archivar
             )
         }
 
@@ -107,18 +120,7 @@ task_status_from_time_due <- function(time_due) {
 }
 
 task_assignee_div <- function(task) {
-    if (task$assignee == task$assigned_by) {
-        tags$div(
-            tags$span(fontawesome::fa("far fa-user"), fontawesome::fa("far fa-thumbs-up"), glue::glue("{task$assignee_name} {task$assignee_last_name}"))
-        )
-    } else {
-        tagList(
-            tags$div(
-                tags$span(fontawesome::fa("far fa-user"), glue::glue("{task$assignee_name} {task$assignee_last_name}"))
-            ),
-            tags$div(
-                tags$span(fontawesome::fa("far fa-thumbs-up"), glue::glue("{task$assigned_by_name} {task$assigned_by_last_name}"))
-            )
-        )
-    }
+    tags$div(
+        tags$span(fontawesome::fa("far fa-user"), task$assignee_dn)
+    )
 }

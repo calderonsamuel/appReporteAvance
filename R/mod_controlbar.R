@@ -7,7 +7,7 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-mod_controlbar_ui <- function(id, AppData) {
+mod_controlbar_ui <- function(id, app_data) {
     ns <- NS(id)
     
     menu <- bs4Dash::controlbarMenu(
@@ -15,12 +15,17 @@ mod_controlbar_ui <- function(id, AppData) {
         bs4Dash::controlbarItem(
             title = fontawesome::fa("people-roof"),
             id = ns("section-group-selection"),
-            mod_group_selection_ui(ns("group_selection_1"), AppData)
+            mod_group_selection_ui(ns("group_selection_1"), app_data)
         ),
         bs4Dash::controlbarItem(
             title = fontawesome::fa("user-pen"),
             id = ns("section-group-users"),
             mod_group_users_ui(ns("group_users_1"))
+        ),
+        bs4Dash::controlbarItem(
+            title = fontawesome::fa("diagram-project"),
+            id = ns("section-processes"),
+            mod_processes_ui(ns("processes_1"))
         ),
         bs4Dash::controlbarItem(
             title = fontawesome::fa("temperature-low"),
@@ -40,16 +45,17 @@ mod_controlbar_ui <- function(id, AppData) {
 #' controlbar Server Functions
 #'
 #' @noRd
-mod_controlbar_server <- function(id, AppData) {
+mod_controlbar_server <- function(id, app_data) {
     moduleServer(id, function(input, output, session) {
         ns <- session$ns
         
-        group_selection <- mod_group_selection_server("group_selection_1", AppData)
-        users_admin <- mod_group_users_server("group_users_1", AppData, group_selection)
-        units_admin <- mod_group_units_server("group_units_1", AppData, group_selection)
+        group_selection <- mod_group_selection_server("group_selection_1", app_data)
+        users_admin <- mod_group_users_server("group_users_1", app_data, group_selection)
+        processes_admin <- mod_processes_server("processes_1", app_data, group_selection)
+        units_admin <- mod_group_units_server("group_units_1", app_data, processes_admin$processes)
         
         group_info <- reactive({
-            AppData$groups[[group_selection$group_selected()]]
+            app_data$groups[[group_selection$group_selected()]]
         }) |> 
             bindEvent(
                 group_selection$group_selected()
@@ -74,7 +80,8 @@ mod_controlbar_server <- function(id, AppData) {
             org_selected = group_selection$org_selected,
             group_selected = group_selection$group_selected,
             group_colors_modified = reactive(users_admin$group_colors_modified),
-            is_admin = is_admin
+            is_admin = is_admin,
+            processes = processes_admin$processes
         )
         
     })
@@ -87,43 +94,43 @@ mod_controlbar_server <- function(id, AppData) {
 # mod_controlbar_server("controlbar_1")
 
 mod_controlbar_apptest <- function(user = Sys.getenv("REPORTES_EMAIL")) {
-    AppData <- AppData$new(user)
+    app_data <- AppData$new(user)
     
     quick_bs4dash(
         controlbar = bs4Dash::dashboardControlbar(
             id = "controbar",
-            mod_controlbar_ui("test", AppData)
+            mod_controlbar_ui("test", app_data)
         ), 
-        modServer = mod_controlbar_server("test", AppData)
+        modServer = mod_controlbar_server("test", app_data)
     )
 }
 
-get_org_choices <- function(AppData) {
-    ids <- AppData$orgs |> purrr::map_chr("org_id")
-    titles <- AppData$orgs |> purrr::map_chr("org_title")
+get_org_choices <- function(app_data) {
+    ids <- app_data$orgs |> purrr::map_chr("org_id")
+    titles <- app_data$orgs |> purrr::map_chr("org_title")
     setNames(ids, titles)
 }
 
-get_group_choices <- function(AppData, org_id) {
-    groups <- AppData$groups |> 
+get_group_choices <- function(app_data, org_id) {
+    groups <- app_data$groups |> 
         purrr::keep(~.x$org_id == org_id)
     ids <- groups |> purrr::map_chr("group_id")
     titles <- groups |> purrr::map_chr("group_title")
     setNames(ids, titles)
 }
 
-get_user_choices <- function(AppData, group_id) {
-    is_admin <- AppData$groups[[group_id]]$group_role == "admin"
+get_user_choices <- function(app_data, group_id) {
+    is_admin <- app_data$groups[[group_id]]$group_role == "admin"
     if (is_admin) {
-        users <- AppData$group_users[[group_id]]
+        users <- app_data$group_users[[group_id]]
         ids <- users |> purrr::map_chr("user_id")
         titles <- users |> purrr::map_chr(~paste(.x$name, .x$last_name))
         setNames(ids, titles)
     } else {
-        setNames(object = AppData$user$user_id, 
-                 nm = paste(AppData$user$name, AppData$user$last_name))
+        setNames(object = app_data$user$user_id, 
+                 nm = paste(app_data$user$name, app_data$user$last_name))
     }
     
 }
 
-verify_group_admin <- function(AppData, group_id) AppData$groups[[group_id]]$group_role == "admin"
+verify_group_admin <- function(app_data, group_id) app_data$groups[[group_id]]$group_role == "admin"
