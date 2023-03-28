@@ -25,6 +25,7 @@ mod_controlbar_ui <- function(id, app_data) {
         bs4Dash::controlbarItem(
             title = fontawesome::fa("temperature-low"),
             id = ns("section-group-units"),
+            mod_processes_ui(ns("processes_1")),
             mod_group_units_ui(ns("group_units_1"))
         ) 
     )
@@ -46,6 +47,7 @@ mod_controlbar_server <- function(id, app_data) {
         
         group_selection <- mod_group_selection_server("group_selection_1", app_data)
         users_admin <- mod_group_users_server("group_users_1", app_data, group_selection)
+        processes_admin <- mod_processes_server("processes_1", app_data)
         units_admin <- mod_group_units_server("group_units_1", app_data, group_selection)
         
         group_info <- reactive({
