@@ -10,8 +10,10 @@ URL: https://github.com/calderonsamuel/appReporteAvance
 BugReports: https://github.com/calderonsamuel/appReporteAvance/issues
 Imports: 
     bs4Dash,
+    cli,
     colourpicker,
     config (>= 0.3.1),
+    DBI,
     firebase (>= 1.0.1.9000),
     fontawesome,
     fresh,
@@ -21,13 +23,16 @@ Imports:
     ids,
     lubridate,
     purrr,
+    R6,
     RColorBrewer,
     reactable,
+    rlang,
+    RMariaDB,
     sass,
     shiny (>= 1.7.1),
     shinyjs,
     shinyWidgets (>= 0.7.0),
-    stringr
+    tibble
 Suggests: 
     spelling,
     testthat (>= 3.0.0)

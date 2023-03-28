@@ -12,7 +12,7 @@ Get App data
 R6 class that allows to get the information needed for an User session of the app.
 }
 \section{Super classes}{
-\code{\link[appReporteAvance:DBManager]{appReporteAvance::DBManager}} -> \code{\link[appReporteAvance:User]{appReporteAvance::User}} -> \code{\link[appReporteAvance:Organisation]{appReporteAvance::Organisation}} -> \code{\link[appReporteAvance:Group]{appReporteAvance::Group}} -> \code{\link[appReporteAvance:Task]{appReporteAvance::Task}} -> \code{AppData}
+\code{\link[appReporteAvance:DBManager]{appReporteAvance::DBManager}} -> \code{\link[appReporteAvance:User]{appReporteAvance::User}} -> \code{\link[appReporteAvance:Organisation]{appReporteAvance::Organisation}} -> \code{\link[appReporteAvance:Group]{appReporteAvance::Group}} -> \code{appReporteAvance::Process} -> \code{\link[appReporteAvance:Task]{appReporteAvance::Task}} -> \code{AppData}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -50,6 +50,14 @@ R6 class that allows to get the information needed for an User session of the ap
 <li><span class="pkg-link" data-pkg="appReporteAvance" data-topic="Group" data-id="group_user_add"><a href='../../appReporteAvance/html/Group.html#method-Group-group_user_add'><code>appReporteAvance::Group$group_user_add()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="appReporteAvance" data-topic="Group" data-id="group_user_delete"><a href='../../appReporteAvance/html/Group.html#method-Group-group_user_delete'><code>appReporteAvance::Group$group_user_delete()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="appReporteAvance" data-topic="Group" data-id="group_user_edit"><a href='../../appReporteAvance/html/Group.html#method-Group-group_user_edit'><code>appReporteAvance::Group$group_user_edit()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="appReporteAvance" data-topic="Process" data-id="fetch_processes"><a href='../../appReporteAvance/html/Process.html#method-Process-fetch_processes'><code>appReporteAvance::Process$fetch_processes()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="appReporteAvance" data-topic="Process" data-id="fetch_units"><a href='../../appReporteAvance/html/Process.html#method-Process-fetch_units'><code>appReporteAvance::Process$fetch_units()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="appReporteAvance" data-topic="Process" data-id="process_add"><a href='../../appReporteAvance/html/Process.html#method-Process-process_add'><code>appReporteAvance::Process$process_add()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="appReporteAvance" data-topic="Process" data-id="process_delete"><a href='../../appReporteAvance/html/Process.html#method-Process-process_delete'><code>appReporteAvance::Process$process_delete()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="appReporteAvance" data-topic="Process" data-id="process_edit"><a href='../../appReporteAvance/html/Process.html#method-Process-process_edit'><code>appReporteAvance::Process$process_edit()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="appReporteAvance" data-topic="Process" data-id="unit_add"><a href='../../appReporteAvance/html/Process.html#method-Process-unit_add'><code>appReporteAvance::Process$unit_add()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="appReporteAvance" data-topic="Process" data-id="unit_delete"><a href='../../appReporteAvance/html/Process.html#method-Process-unit_delete'><code>appReporteAvance::Process$unit_delete()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="appReporteAvance" data-topic="Process" data-id="unit_edit"><a href='../../appReporteAvance/html/Process.html#method-Process-unit_edit'><code>appReporteAvance::Process$unit_edit()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="appReporteAvance" data-topic="Task" data-id="progress_add"><a href='../../appReporteAvance/html/Task.html#method-Task-progress_add'><code>appReporteAvance::Task$progress_add()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="appReporteAvance" data-topic="Task" data-id="report_add"><a href='../../appReporteAvance/html/Task.html#method-Task-report_add'><code>appReporteAvance::Task$report_add()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="appReporteAvance" data-topic="Task" data-id="report_archive"><a href='../../appReporteAvance/html/Task.html#method-Task-report_archive'><code>appReporteAvance::Task$report_archive()</code></a></span></li>
