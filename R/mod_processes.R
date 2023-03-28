@@ -47,6 +47,8 @@ mod_processes_server <- function(id, app_data){
       })
     })
 
+    # Add ----
+
     observe({
       showModal(modalDialog(
         title = "Nuevo proceso",
@@ -87,6 +89,90 @@ mod_processes_server <- function(id, app_data){
       }, error = \(e) alert_error(session, e))
     }) |>
     bindEvent(input$save)
+
+    # Delete ----
+
+    observe({
+      tryCatch({
+        shinyWidgets::ask_confirmation(
+          inputId = ns("confirm_delete"),
+          title = "Eliminar proceso",
+          text = "El equipo ya no tendrá acceso al proceso y sus unidades de medida",
+          type = "warning",
+          btn_labels = c("Cancelar", "Confirmar"),
+          btn_colors = c("#6e7d88", "#ff5964")
+        )
+      }, error = \(e) alert_error(session, e))
+    }) |>
+      bindEvent(input$processToDelete)
+
+    observe({
+      tryCatch({
+        if(isTRUE(input$confirm_delete)) {
+          app_data$process_delete(
+              process_id = input$processToDelete
+          )
+          
+          rv$processes_need_refresh <- rv$processes_need_refresh + 1L
+          
+          alert_info(session, "Proceso eliminado")
+        }
+          
+      }, error = \(e) alert_error(session, e))
+    }) |> 
+      bindEvent(input$confirm_delete)
+
+    # Edit ----
+
+    observe({
+
+      process_to_edit <- processes() |>
+        purrr::keep(~.x$process_id == input$processToEdit)  |>
+        purrr::pluck(1)
+
+      showModal(modalDialog(
+        title = "Editar proceso",
+        size = "l",
+
+        textInputPro(
+          inputId = ns("title"),
+          label = "Nombre de proceso",
+          value = process_to_edit$title,
+          maxlength = 250,
+          maxlengthCounter = TRUE
+        ),
+        textAreaInputPro(
+          inputId = ns("description"),
+          label = "Descripción",
+          value = process_to_edit$description,
+          maxlength = 500,
+          maxlengthCounter = TRUE
+        ),
+
+        footer = tagList(
+          modalButton("Cancelar"),
+          btn_guardar(ns("save_edition"))
+        )
+      ))
+    }) |>
+      bindEvent(input$processToEdit)
+
+    observe({
+      tryCatch({
+        app_data$process_edit(
+          process_id = input$processToEdit,
+          title = input$title,
+          description = input$description
+        )
+
+        showNotification("Proceso editado", duration = 3, session = session)
+        removeModal(session)
+        rv$processes_need_refresh <- rv$processes_need_refresh + 1L
+
+      }, error = \(e) alert_error(session, e))
+    }) |>
+    bindEvent(input$save_edition)
+    
 
   })
 }
