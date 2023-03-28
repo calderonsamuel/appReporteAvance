@@ -23,9 +23,13 @@ mod_controlbar_ui <- function(id, app_data) {
             mod_group_users_ui(ns("group_users_1"))
         ),
         bs4Dash::controlbarItem(
+            title = fontawesome::fa("diagram-project"),
+            id = ns("section-processes"),
+            mod_processes_ui(ns("processes_1"))
+        ),
+        bs4Dash::controlbarItem(
             title = fontawesome::fa("temperature-low"),
             id = ns("section-group-units"),
-            mod_processes_ui(ns("processes_1")),
             mod_group_units_ui(ns("group_units_1"))
         ) 
     )
