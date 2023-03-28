@@ -12,7 +12,7 @@ mod_processes_ui <- function(id){
   tagList(
     h5("Gestión de procesos"),
       btn_custom(
-        inputId = ns("add_process"),
+        inputId = ns("add"),
         label = "Agregar",
         icon = fontawesome::fa("fas fa-plus"),
         class = "btn-success btn-sm mb-2"
@@ -47,7 +47,46 @@ mod_processes_server <- function(id, app_data){
       })
     })
 
+    observe({
+      showModal(modalDialog(
+        title = "Nuevo proceso",
+        size = "l",
 
+        textInputPro(
+          inputId = ns("title"),
+          label = "Nombre de proceso",
+          maxlength = 250,
+          maxlengthCounter = TRUE
+        ),
+        textAreaInputPro(
+          inputId = ns("description"),
+          label = "Descripción",
+          maxlength = 500,
+          maxlengthCounter = TRUE
+        ),
+
+        footer = tagList(
+          modalButton("Cancelar"),
+          btn_guardar(ns("save"))
+        )
+      ))
+    }) |>
+      bindEvent(input$add)
+
+    observe({
+      tryCatch({
+        app_data$process_add(
+          title = input$title,
+          description = input$description
+        )
+
+        showNotification("Proceso añadido", duration = 3, session = session)
+        removeModal(session)
+        rv$processes_need_refresh <- rv$processes_need_refresh + 1L
+
+      }, error = \(e) alert_error(session, e))
+    }) |>
+    bindEvent(input$save)
 
   })
 }
