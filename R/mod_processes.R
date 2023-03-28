@@ -24,7 +24,7 @@ mod_processes_ui <- function(id){
 #' processes Server Functions
 #'
 #' @noRd 
-mod_processes_server <- function(id, app_data){
+mod_processes_server <- function(id, app_data, group_selection){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
@@ -35,7 +35,7 @@ mod_processes_server <- function(id, app_data){
     processes <- reactive({
       app_data$fetch_processes()
     }) |>
-      bindEvent(rv$processes_need_refresh)
+      bindEvent(rv$processes_need_refresh, group_selection$group_selected())
 
     output$processes <- renderUI({
       lapply(processes(), \(x) {
@@ -173,6 +173,8 @@ mod_processes_server <- function(id, app_data){
     }) |>
     bindEvent(input$save_edition)
     
+    # output ----
+    list(processes = processes)
 
   })
 }

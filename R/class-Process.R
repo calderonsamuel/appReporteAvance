@@ -70,7 +70,6 @@ Process <- R6::R6Class(
             st <- glue::glue_sql(
                 "INSERT INTO units
                 SET
-                    group_id = {self$group_selected},
                     process_id = {process_id},
                     unit_id = {unit_id},
                     unit_title = {unit_title},
