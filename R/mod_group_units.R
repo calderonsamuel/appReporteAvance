@@ -45,35 +45,13 @@ mod_group_units_server <- function(id, app_data, group_selection) {
             )
         
         output$units <- renderUI({
-            group_units() |> 
-                lapply(\(x) {
-                    div(
-                        class = "row p-1 mx-0 mb-2 mw-100",
-                        style = "background-color: #FFFFFF33; border-radius: 5px;",
-                        div(
-                            class = "col-xs-auto d-flex align-items-center",
-                            span(
-                                fontawesome::fa(x$icon),
-                            )
-                        ),
-                        div(
-                            class = "col d-flex align-items-center mx-2",
-                            `data-toggle`= "tooltip",
-                            `data-placement`= "top",
-                            title = paste0("Descripción: ", x$unit_description),
-                            x$unit_title,
-                            badge_unit_type(x$type)
-                        ),
-                        div(
-                            class = "col-xs-auto d-flex align-items-center",
-                            admin_toolbar(
-                                editInputId = ns("unitToEdit"),
-                                deleteInputId = ns("unitToDelete"),
-                                value = x$unit_id
-                            )
-                        )
-                    )
-                })
+            lapply(group_units(), \(x) {
+                unit_display(
+                    item = x,
+                    editInputId = ns("unitToEdit"),
+                    deleteInputId = ns("unitToDelete")
+                )
+            })
         })
         
         observe({
@@ -256,5 +234,34 @@ badge_unit_type <- function(type) {
         class = "badge px-1 bg-info mx-2",
         class = bg_class,
         type_translate # content
+    )
+}
+
+unit_display <- function(item, editInputId, deleteInputId) {
+    div(
+        class = "row p-1 mx-0 mb-2 mw-100",
+        style = "background-color: #FFFFFF33; border-radius: 5px;",
+        div(
+            class = "col-xs-auto d-flex align-items-center pl-2",
+            span(
+                fontawesome::fa(item$icon),
+            )
+        ),
+        div(
+            class = "col d-flex align-items-center mx-2",
+            `data-toggle`= "tooltip",
+            `data-placement`= "top",
+            title = paste0("Descripción: ", item$unit_description),
+            item$unit_title,
+            badge_unit_type(item$type)
+        ),
+        div(
+            class = "col-xs-auto d-flex align-items-center",
+            admin_toolbar(
+                editInputId = editInputId,
+                deleteInputId = deleteInputId,
+                value = item$unit_id
+            )
+        )
     )
 }
