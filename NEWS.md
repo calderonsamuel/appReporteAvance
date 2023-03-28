@@ -1,3 +1,44 @@
+# appReporteAvance 0.4.0
+
+## Procesos
+
+La plataforma ahora incorpora una lógica de procesos. Debe entenderse que los equipos tienen procesos y los procesos tienen unidades de medida. Las unidades de medida pueden ser de tarea o de reporte. 
+
+Esto implica que ahora al momento de añadir una tarea o reporte, debe seleccionarse un proceso para acceder a la lista de unidades de medida disponibles.
+
+El panel de control se actualizó para incluir la gestión de procesos y sus unidades de medida. Para gestionar procesos se requiere ser responsable de equipo.
+
+## Reportes
+
+Los reportes son una nueva manera de informar acerca del progreso en las actividades. Mientras que las tareas suelen corresponder a actividades cotidianas o intermedias, los reportes deben entenderse como el resultado de un proceso. Como son de resultado, se añaden desde el panel de "Terminadas".
+
+En un solo reporte se pueden informar acerca de progreso en múltiples unidades de medida.
+
+## Estado 'Archivado' para tareas
+
+Previamente, se mostraban todas las tareas no terminadas + las que se hayan terminado en los últimos 15 días. Esto significaba que implícitamente existía un estado 'Archivado' que no podía ser controlado por el usuario. 
+
+Se decidió incorporar explícitamente el estado 'Archivado'. Ahora, la única manera de que no aparezcan las tareas terminadas (y reportes) es archivarlas manualmente.
+
+## Abandono de {reportesAPI}
+
+Se decide dejar de desarrollar el paquete `{reportesAPI}` de manera independiente porque dificultaba las tareas de desarrollo al tener que dividir la lógica de la administración de la data y su uso en la plataforma como proyectos independientes.
+
+Esto no significa que la idea detrás de eso estuviera equivocada. Por el contrario, es fundamental que en el futuro se retome. Sin embargo, debe hacerse cuando realmente se intente administrar los datos desde una REST API, que no había sido el caso hasta ahora.
+
+Todo el código desarrollado para ese paquete se ha migrado a este repositorio, donde se seguirá manteniendo administrando la base de datos desde clases `R6`.
+
+## Otras pequeñas mejoras
+
+- Ahora todos los campos de texto (por ejemplo al añadirle título a una tarea) muestran el límite máximo de caracteres.
+- Se añadió un selector de íconos para las unidades de medida. Puede utilizarse al momento de añadir una nueva unidad de medida o al editarla.
+
+## Bug fixes
+
+- Se corrigió un error que no permitía obtener la vista de historial para tareas recién creadas.
+- El campo de texto que contenía el nombre del miembro del equipo seleccionado para editarse daba la idea de que era posible cambiarle el nombre. Se corrigió para seguir viendo el nombre pero que quede claro que no se puede cambiar.
+
+
 # appReporteAvance 0.3.8
 
 - Remueve un botón que se mostraba y que no cumplía ninguna función.
