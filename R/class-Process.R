@@ -5,6 +5,28 @@ Process <- R6::R6Class(
         initialize = function(email) {
             super$initialize(email)
         },
+        fetch_processes = function() {
+            st <- glue::glue_sql(
+                "SELECT * 
+                FROM processes
+                WHERE group_id = {self$group_selected}",
+                .con = private$con
+            )
+
+            DBI::dbGetQuery(private$con, st) |>
+                purrr::pmap(list)
+        },
+        fetch_units = function(process_id) {
+            st <- glue::glue_sql(
+                "SELECT * 
+                FROM units
+                WHERE process_id = {process_id}",
+                .con = private$con
+            )
+
+            DBI::dbGetQuery(private$con, st) |>
+                purrr::pmap(list)
+        },
         process_add = function(title, description = NA) {
             id <- ids::random_id()
             st <- glue::glue_sql(
