@@ -162,7 +162,9 @@ mod_group_units_server <- function(id, app_data, processes) {
         ## Edition ----
         observe({
             
-            unit_selected <- group_units()[[input$unitToEdit]]
+            unit_selected <- group_units() |>
+                purrr::keep(~.x$unit_id == input$unitToEdit) |>
+                purrr::pluck(1)
             
             showModal(modalDialog(
                 title = "Editar unidad de medida",
