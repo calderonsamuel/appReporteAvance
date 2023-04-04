@@ -181,7 +181,6 @@ Process <- R6::R6Class(
         #' This function deletes a measurement unit identified by its ID from the database using an SQL query executed through the glue and DBI libraries.
         #' 
         #' @param unit_id integer with the ID of the unit to delete
-        #' @export
         unit_delete = function(unit_id) {
             st <- glue::glue_sql(
                 "DELETE FROM units
