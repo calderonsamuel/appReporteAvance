@@ -130,6 +130,7 @@ mod_board_server <- function(id, app_data, controlbar) {
         }) |>
             bindEvent(
                 report_gets_added(),
+                controlbar$group_selected(),
                 rv$reports_modified
             )
         
