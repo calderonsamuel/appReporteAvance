@@ -130,6 +130,7 @@ mod_board_server <- function(id, app_data, controlbar) {
         }) |>
             bindEvent(
                 report_gets_added(),
+                controlbar$group_selected(),
                 rv$reports_modified
             )
         
@@ -458,13 +459,14 @@ mod_board_server <- function(id, app_data, controlbar) {
         output$table_history <- reactable::renderReactable({
             app_data$task_get_history(rv$task_to_history$task_id) |> 
                 purrr::pmap(list) |> 
-                purrr::map_dfr(~data.frame(
+                purrr::map(~tibble::tibble(
                     "Fecha" = format(.x$time_reported, "%d/%m/%Y %H:%M:%S"),
                     "Por" = .x$user_names,
                     "Estado" = .x$status,
                     "Progreso" = .x$output_progress,
                     "Detalle" = .x$details
                 )) |> 
+                purrr::reduce(rbind) |>
                 reactable::reactable()
         })
         

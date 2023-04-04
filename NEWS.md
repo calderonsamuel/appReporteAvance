@@ -1,3 +1,12 @@
+# appReporteAvance 0.4.1
+
+## Bug fixes
+
+- Arregla un bug que permitía que usuarios no responsables de equipo puedan archivar tareas terminadas y en revisión. Fixes #137
+- Vista de historial ya no muestra mensaje de error. Fixes #133
+- Se corrige bug que no permitía editar unidades de medida. Fixes #136
+- Corrige un bug evitaba cargar los reportes al cambiar de grupo. Fixes #135
+
 # appReporteAvance 0.4.0
 
 ## Procesos

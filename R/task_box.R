@@ -99,9 +99,13 @@ task_dropdown <- function(ns, value, status, is_group_admin) {
             tagList(
                 item_revisar, item_historia
             )
-        } else {
+        } else if (status == "Terminado" && is_group_admin) {
             tagList(
                 item_historia, item_archivar
+            )
+        } else {
+            tagList(
+                item_historia
             )
         }
 
