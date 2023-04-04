@@ -12,7 +12,7 @@ Get App data
 R6 class that allows to get the information needed for an User session of the app.
 }
 \section{Super classes}{
-\code{\link[appReporteAvance:DBManager]{appReporteAvance::DBManager}} -> \code{\link[appReporteAvance:User]{appReporteAvance::User}} -> \code{\link[appReporteAvance:Organisation]{appReporteAvance::Organisation}} -> \code{\link[appReporteAvance:Group]{appReporteAvance::Group}} -> \code{appReporteAvance::Process} -> \code{\link[appReporteAvance:Task]{appReporteAvance::Task}} -> \code{AppData}
+\code{\link[appReporteAvance:DBManager]{appReporteAvance::DBManager}} -> \code{\link[appReporteAvance:User]{appReporteAvance::User}} -> \code{\link[appReporteAvance:Organisation]{appReporteAvance::Organisation}} -> \code{\link[appReporteAvance:Group]{appReporteAvance::Group}} -> \code{\link[appReporteAvance:Process]{appReporteAvance::Process}} -> \code{\link[appReporteAvance:Task]{appReporteAvance::Task}} -> \code{AppData}
 }
 \section{Methods}{
 \subsection{Public methods}{
