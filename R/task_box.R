@@ -11,7 +11,7 @@ task_box <- function(task, ns = NULL, is_group_admin = FALSE) {
         headerBorder = FALSE,
         # background = task$user_color,
         label = bs4Dash::boxLabel(
-            text = format(task$time_due, "%d %b"), 
+            text = format(task$time_due, "%d %b", tz = "America/Lima"), 
             status = task_status_from_time_due(task$time_due),
             tooltip = task$output_unit
         ),
@@ -19,7 +19,7 @@ task_box <- function(task, ns = NULL, is_group_admin = FALSE) {
         tags$p(task$task_description),
         task_assignee_div(task),
         tags$div(
-            tags$span(fontawesome::fa("far fa-clock"), format(task$time_due, "%H:%M")),
+            tags$span(fontawesome::fa("far fa-clock"), format(task$time_due, "%H:%M", tz = "America/Lima")),
             tags$span(fontawesome::fa("fas fa-bullseye"), glue::glue("{task$output_current}/{task$output_goal} {task$output_unit}"), style = "float: right;")
         ),
         tags$p(
