@@ -92,23 +92,10 @@ mod_task_add_server <- function(id, app_data, controlbar){
                 ), width = 9)
             ),
             fluidRow(
-                col_6(shinyWidgets::airDatepickerInput(
+                col_6(timeDuePicker(
                     inputId = ns("time_due"),
                     label = "Plazo máximo",
-                    value = computeMinTimeDue(tzone = "America/Lima") + lubridate::weeks(1), 
-                    timepicker = TRUE,
-                    dateFormat = "dd/MM/yyyy", 
-                    language = "es",
-                    minDate = computeMinDateDue(tzone = "America/Lima"),
-                    maxDate = computeMinDateDue(tzone = "America/Lima") + lubridate::weeks(4),
-                    todayButton = TRUE,
-                    firstDay = 0,
-                    addon = 'none',
-                    timepickerOpts = shinyWidgets::timepickerOptions(
-                        minutesStep = 15,
-                        minHours = 8,
-                        maxHours = 18
-                    )
+                    value = computeMinTimeDue(tzone = "America/Lima") + lubridate::weeks(1)
                 )),
                 col_6(selectInput(
                     inputId = ns("user_id"),
@@ -131,7 +118,7 @@ mod_task_add_server <- function(id, app_data, controlbar){
                 task_title = input$title,
                 task_description = input$description,
                 assignee = input$user_id,
-                time_due = lubridate::with_tz(input$time_due, "America/Lima"),
+                time_due = lubridate::with_tz(input$time_due, "UTC"),
                 output_unit = input$output_unit,
                 output_goal = input$output_goal
             )
@@ -167,3 +154,25 @@ mod_task_add_server <- function(id, app_data, controlbar){
     
 ## To be copied in the server
 # mod_task_add_server("task_add_1")
+
+# convertir esto en una funcion wrapper, debe tomar id y valor
+timeDuePicker <- function(inputId, label, value) {
+    shinyWidgets::airDatepickerInput(
+        inputId = inputId,
+        label = label,
+        value = value, 
+        timepicker = TRUE,
+        dateFormat = "dd/MM/yyyy", 
+        language = "es",
+        minDate = computeMinDateDue(tzone = "America/Lima"),
+        maxDate = computeMinDateDue(tzone = "America/Lima") + lubridate::period(6, "months"),
+        todayButton = TRUE,
+        firstDay = 0,
+        addon = 'none',
+        timepickerOpts = shinyWidgets::timepickerOptions(
+            minutesStep = 15,
+            minHours = 8,
+            maxHours = 18
+        )
+    )
+}
