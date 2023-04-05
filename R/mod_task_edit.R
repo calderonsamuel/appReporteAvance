@@ -21,6 +21,8 @@ mod_task_edit_server <- function(id, app_data, rv){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
+    # Edit metadata ----
+
     observe({
       showModal(modalDialog(
           
@@ -40,6 +42,12 @@ mod_task_edit_server <- function(id, app_data, rv){
           maxlength = 500,
           maxlengthCounter = TRUE
         ),
+
+        timeDuePicker(
+          inputId = ns("time_due"),
+          label = "Plazo máximo",
+          value = lubridate::with_tz(rv$task_to_edit$time_due, "America/Lima")
+        ),
         
         footer = tagList(
           modalButton("Cancelar"),
@@ -53,16 +61,26 @@ mod_task_edit_server <- function(id, app_data, rv){
     observe({
         tryCatch(expr = {
             app_data$task_edit_metadata(
+              task_id = rv$task_to_edit$task_id,
+              task_title = input$edit_title,
+              task_description = input$edit_description
+            )
+
+            if (input$time_due != rv$task_to_edit$time_due) {
+              app_data$task_edit_time_due(
                 task_id = rv$task_to_edit$task_id,
-                task_title = input$edit_title,
-                task_description = input$edit_description)
-            
+                time_due = lubridate::with_tz(input$time_due, "UTC")
+              )
+            }
             
             removeModal(session)
             
             rv$task_has_been_edited <- rv$task_has_been_edited + 1L
             
-        }, error = \(e) alert_error(session, e))
+        }, error = \(e) {
+          alert_error(session, e)
+          cli::cli_inform(e)
+        })
         
     }) |> 
         bindEvent(input$save_edition)
