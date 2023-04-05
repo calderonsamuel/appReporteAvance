@@ -167,21 +167,3 @@ mod_task_add_server <- function(id, app_data, controlbar){
     
 ## To be copied in the server
 # mod_task_add_server("task_add_1")
-
-output_unit_choices <- function() {
-    list(ADMINISTRATIVO = c("Informe", "Proyecto de informe", "Proyecto de Memorando", 
-                            "Proyecto de Oficio", "Ayuda memoria", "PPT", "Entregable", "Correo"
-    ), DESTRUCCIÓN = c("Informe", "Proyecto de hoja de recomendación", 
-                       "Proyecto de plan de operaciones", "Proyecto de oficio para destrucción (VOI)", 
-                       "Anexo por tipo de droga", "Relación de droga para destrucción", 
-                       "kg de droga destruida, por tipo de droga", "kg de droga destruida, por tipo de droga", 
-                       "Proyecto de Informe de destrucción para VOI", "Informe final de destrucción"
-    ), INTERNAMIENTO = c("Pericias revisadas", "Pericias corregidas", 
-                         "Consolidado de Relación de drogas", "Relación de drogas revisadas", 
-                         "Relación de drogas corregidas", "Hoja de trabajo para internamiento", 
-                         "Proyecto de informe de internamiento", "Kg de droga internada, por tipo de droga", 
-                         "Muestras programadas para recepción",
-                         "Muestras observadas en recepción",
-                         "Muestras observadas en almacenamiento",
-                         "Bolsas almacenadas"))
-}
