@@ -56,6 +56,11 @@ Task <- R6::R6Class(
                 .con = private$con
             )
 
+            details <- glue::glue(
+                "Tarea creada con plazo máximo {plazo}",
+                plazo = format(time_due, "%d/%m/%Y %H:%M:%S", tz = "America/Lima")
+            )
+
             progress_st <- glue::glue_sql(
                 "INSERT INTO progress
                 SET
@@ -63,7 +68,7 @@ Task <- R6::R6Class(
                     reported_by = {self$user$user_id},
                     output_progress = 0,
                     status = 'Pendiente',
-                    details = 'Tarea creada'
+                    details = {details}
                 ",
                 .con = private$con
             )
@@ -98,6 +103,63 @@ Task <- R6::R6Class(
             }
         },
 
+        #' @description Edit a task metadata
+        task_edit_metadata = function(task_id,
+                                      task_title, 
+                                      task_description) {
+
+            statement <-
+                "UPDATE tasks
+                SET
+                    task_title = {task_title},
+                    task_description = {task_description}
+                WHERE
+                    task_id = {task_id}"
+
+            super$db_execute_statement(statement, .envir = rlang::current_env())
+
+            if (interactive()) {
+                cli::cli_h2("Task edited")
+                cli::cli_alert_warning("task_id: {task_id}")
+            }
+        },
+
+        #' @description Edit a task's time due
+        task_edit_time_due = function(task_id, time_due) {
+            st_task <- glue::glue_sql(
+                "UPDATE tasks
+                SET time_due = {time_due}
+                WHERE task_id = {task_id}",
+                .con = private$con
+            )
+
+            details <- paste0(
+                "Plazo máximo cambiado a ",
+                format(time_due, "%d/%m/%Y %H:%M:%S", tz = "America/Lima")
+            )
+
+            st_progress <- glue::glue_sql(
+                "INSERT INTO progress(task_id, reported_by, output_progress, status, details)
+                SELECT 
+                    task_id,
+                    {self$user$user_id} AS reported_by,
+                    output_progress,
+                    status,
+                    {details} AS details
+                FROM progress
+                WHERE task_id = {task_id}
+                ORDER BY time_reported DESC
+                LIMIT 1
+                ",
+                .con = private$con
+            )
+
+            DBI::dbBegin(private$con)
+            DBI::dbExecute(private$con, st_task)
+            DBI::dbExecute(private$con, st_progress)
+            DBI::dbCommit(private$con)
+        },
+
         #' @description Report progress on an assigned task
         task_report_progress = function(task_id,
                                         status_current,
@@ -123,27 +185,6 @@ Task <- R6::R6Class(
                               output_progress = output_current,
                               status = status_current,
                               details = details)
-        },
-
-        #' @description Edit a task metadata
-        task_edit_metadata = function(task_id,
-                                      task_title, 
-                                      task_description) {
-
-            statement <-
-                "UPDATE tasks
-                SET
-                    task_title = {task_title},
-                    task_description = {task_description}
-                WHERE
-                    task_id = {task_id}"
-
-            super$db_execute_statement(statement, .envir = rlang::current_env())
-
-            if (interactive()) {
-                cli::cli_h2("Task edited")
-                cli::cli_alert_warning("task_id: {task_id}")
-            }
         },
 
         #' @description Archive a task
