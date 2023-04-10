@@ -169,6 +169,7 @@ Task <- R6::R6Class(
             if (interactive()) {
                 cli::cli_h2("Task edited")
                 cli::cli_alert_warning("task_id: {task_id}")
+                cli::cli_alert_info("time_due: {time_due}")
             }
         },
 

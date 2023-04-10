@@ -58,13 +58,16 @@ mod_task_edit_server <- function(id, app_data, rv){
       ))
     }) |> bindEvent(rv$task_to_edit)
 
-
+    observe({
+        cli::cli_alert_info("Task edit time due: {input$time_due}")
+    }) |>
+        bindEvent(input$time_due)
 
     observe({
         tryCatch(expr = {
             title_modified <- input$edit_title != rv$task_to_edit$task_title
             description_modified <- input$edit_description != rv$task_to_edit$task_description
-            time_due_modified <- input$time_due != rv$task_to_edit$time_due
+            time_due_modified <- lubridate::with_tz(input$time_due, "UTC") != lubridate::with_tz(rv$task_to_edit$time_due, "UTC")
 
             if (!any(title_modified, description_modified, time_due_modified)) {
               return(showNotification("Sin modificación en tarea", session = session))

@@ -107,6 +107,11 @@ mod_task_add_server <- function(id, app_data, controlbar){
             )
         ))
     }) |> bindEvent(input$add)
+
+    observe({
+        cli::cli_alert_info("Task add time due: {input$time_due}")
+    }) |>
+        bindEvent(input$time_due)
     
     observe({
         tryCatch(expr = {
@@ -163,7 +168,7 @@ timeDuePicker <- function(inputId, label, value, width = NULL) {
         language = "es",
         minDate = computeMinDateDue(tzone = "America/Lima"),
         maxDate = computeMinDateDue(tzone = "America/Lima") + lubridate::period(6, "months"),
-        todayButton = TRUE,
+        todayButton = TRUE, 
         firstDay = 0,
         addon = 'none',
         timepickerOpts = shinyWidgets::timepickerOptions(
