@@ -1,3 +1,14 @@
+# appReporteAvance 0.4.2
+
+## Bug fixes
+
+- Ahora es posible cambiar fecha limite de tareas. Fixes #134
+- Vista de historial ya no muestra una fecha y hora incorrecta. Fixes #149
+- Ahora se usa todo el espacio disponible en modal de edición de tarea. Fixes #148
+- Ahora se usa todo el espacio disponible en el Modal de nuevo proceso. Fixes #146
+- Ahora la vista de unidades de medida está dividida según corresponda a tarea y reportes. Fixes #147
+- Ya no es obligatorio especificar metas de unidad de medida en gestión de tareas. Fixes #145
+
 # appReporteAvance 0.4.1
 
 ## Bug fixes
