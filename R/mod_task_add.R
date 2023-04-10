@@ -68,20 +68,15 @@ mod_task_add_server <- function(id, app_data, controlbar){
                 maxlength = 500,
                 maxlengthCounter = TRUE
             ),
-
-            selectInput(
-                inputId = ns("process"),
-                label = "Proceso",
-                choices = processes_choices()
-            ),
             
             fluidRow(
-                col_3(numericInput(
-                    inputId = ns("output_goal"),
-                    label = "Meta",
-                    value = 1
+                col_6(selectInput(
+                    inputId = ns("process"),
+                    label = "Proceso",
+                    choices = processes_choices(),
+                    width = "100%"
                 )),
-                column(shinyWidgets::pickerInput(
+                col_6(shinyWidgets::pickerInput(
                     inputId = ns("output_unit"), 
                     label = "Unidad de medida",
                     width = "100%",
@@ -89,30 +84,19 @@ mod_task_add_server <- function(id, app_data, controlbar){
                     options = shinyWidgets::pickerOptions(
                         liveSearch = TRUE
                     )
-                ), width = 9)
+                ))
             ),
             fluidRow(
-                col_6(shinyWidgets::airDatepickerInput(
+                col_6(timeDuePicker(
                     inputId = ns("time_due"),
                     label = "Plazo máximo",
-                    value = computeMinTimeDue(tzone = "America/Lima") + lubridate::weeks(1), 
-                    timepicker = TRUE,
-                    dateFormat = "dd/MM/yyyy", 
-                    language = "es",
-                    minDate = computeMinDateDue(tzone = "America/Lima"),
-                    maxDate = computeMinDateDue(tzone = "America/Lima") + lubridate::weeks(4),
-                    todayButton = TRUE,
-                    firstDay = 0,
-                    addon = 'none',
-                    timepickerOpts = shinyWidgets::timepickerOptions(
-                        minutesStep = 15,
-                        minHours = 8,
-                        maxHours = 18
-                    )
+                    width = "100%",
+                    value = computeMinTimeDue(tzone = "America/Lima") + lubridate::weeks(1)
                 )),
                 col_6(selectInput(
                     inputId = ns("user_id"),
                     label = "Encargado",
+                    width = "100%",
                     choices = user_choices()
                 ))
             ),
@@ -131,9 +115,8 @@ mod_task_add_server <- function(id, app_data, controlbar){
                 task_title = input$title,
                 task_description = input$description,
                 assignee = input$user_id,
-                time_due = lubridate::with_tz(input$time_due, "America/Lima"),
-                output_unit = input$output_unit,
-                output_goal = input$output_goal
+                time_due = lubridate::with_tz(input$time_due, "UTC"),
+                output_unit = input$output_unit
             )
             
             removeModal(session)
@@ -168,20 +151,25 @@ mod_task_add_server <- function(id, app_data, controlbar){
 ## To be copied in the server
 # mod_task_add_server("task_add_1")
 
-output_unit_choices <- function() {
-    list(ADMINISTRATIVO = c("Informe", "Proyecto de informe", "Proyecto de Memorando", 
-                            "Proyecto de Oficio", "Ayuda memoria", "PPT", "Entregable", "Correo"
-    ), DESTRUCCIÓN = c("Informe", "Proyecto de hoja de recomendación", 
-                       "Proyecto de plan de operaciones", "Proyecto de oficio para destrucción (VOI)", 
-                       "Anexo por tipo de droga", "Relación de droga para destrucción", 
-                       "kg de droga destruida, por tipo de droga", "kg de droga destruida, por tipo de droga", 
-                       "Proyecto de Informe de destrucción para VOI", "Informe final de destrucción"
-    ), INTERNAMIENTO = c("Pericias revisadas", "Pericias corregidas", 
-                         "Consolidado de Relación de drogas", "Relación de drogas revisadas", 
-                         "Relación de drogas corregidas", "Hoja de trabajo para internamiento", 
-                         "Proyecto de informe de internamiento", "Kg de droga internada, por tipo de droga", 
-                         "Muestras programadas para recepción",
-                         "Muestras observadas en recepción",
-                         "Muestras observadas en almacenamiento",
-                         "Bolsas almacenadas"))
+# convertir esto en una funcion wrapper, debe tomar id y valor
+timeDuePicker <- function(inputId, label, value, width = NULL) {
+    shinyWidgets::airDatepickerInput(
+        inputId = inputId,
+        label = label,
+        value = value, 
+        width = width,
+        timepicker = TRUE,
+        dateFormat = "dd/MM/yyyy", 
+        language = "es",
+        minDate = computeMinDateDue(tzone = "America/Lima"),
+        maxDate = computeMinDateDue(tzone = "America/Lima") + lubridate::period(6, "months"),
+        todayButton = TRUE,
+        firstDay = 0,
+        addon = 'none',
+        timepickerOpts = shinyWidgets::timepickerOptions(
+            minutesStep = 15,
+            minHours = 8,
+            maxHours = 18
+        )
+    )
 }

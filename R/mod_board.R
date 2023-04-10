@@ -201,14 +201,6 @@ mod_board_server <- function(id, app_data, controlbar) {
                     choices = task_get_status_choices(rv$task_to_report$status_current),
                     width = "100%"
                 ),
-                numericInput(
-                    inputId = ns("report_output_current"), 
-                    label = paste0("Avance actual - ", rv$task_to_report$output_unit),
-                    value = rv$task_to_report$output_current,
-                    min = rv$task_to_report$output_current,
-                    max = rv$task_to_report$output_goal,
-                    width = "100%"
-                ),
                 textAreaInputPro(
                     inputId = ns("report_details"), 
                     label = "Detalles",
@@ -229,7 +221,6 @@ mod_board_server <- function(id, app_data, controlbar) {
                 app_data$task_report_progress(
                     task_id = rv$task_to_report$task_id,
                     status_current = input$report_status_current,
-                    output_current = input$report_output_current,
                     details = input$report_details)
                 
                 
@@ -246,49 +237,9 @@ mod_board_server <- function(id, app_data, controlbar) {
         
         observe({
             rv$task_to_edit <- tasks()[[input$taskToEdit]]
-            
-            showModal(modalDialog(
-                
-                h1("Editar tarea"),
-                
-                textInputPro(
-                    inputId = ns("edit_title"),
-                    label = "Título de tarea",
-                    value = rv$task_to_edit$task_title,
-                    maxlength = 250,
-                    maxlengthCounter = TRUE
-                ),
-                textAreaInputPro(
-                    inputId = ns("edit_description"),
-                    label = "Descripción de tarea",
-                    value = rv$task_to_edit$task_description,
-                    maxlength = 500,
-                    maxlengthCounter = TRUE
-                ),
-                
-                footer = tagList(
-                    modalButton("Cancelar"),
-                    btn_guardar(ns("save_edition"))
-                )
-            ))
         }) |> bindEvent(input$taskToEdit)
-        
-        observe({
-            tryCatch(expr = {
-                app_data$task_edit_metadata(
-                    task_id = rv$task_to_edit$task_id,
-                    task_title = input$edit_title,
-                    task_description = input$edit_description)
-                
-                
-                removeModal(session)
-                
-                rv$task_has_been_edited <- rv$task_has_been_edited + 1L
-                
-            }, error = \(e) alert_error(session, e))
-            
-        }) |> 
-            bindEvent(input$save_edition)
+
+        mod_task_edit_server("task_edit_1", app_data, rv)
         
         ## See history ----
         
@@ -460,10 +411,9 @@ mod_board_server <- function(id, app_data, controlbar) {
             app_data$task_get_history(rv$task_to_history$task_id) |> 
                 purrr::pmap(list) |> 
                 purrr::map(~tibble::tibble(
-                    "Fecha" = format(.x$time_reported, "%d/%m/%Y %H:%M:%S"),
+                    "Fecha" = format(.x$time_reported, "%d/%m/%Y %H:%M:%S", tz = "America/Lima"),
                     "Por" = .x$user_names,
                     "Estado" = .x$status,
-                    "Progreso" = .x$output_progress,
                     "Detalle" = .x$details
                 )) |> 
                 purrr::reduce(rbind) |>
