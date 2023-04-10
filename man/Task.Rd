@@ -29,8 +29,8 @@ R6 class that allows to get the Group information.
 \item \href{#method-Task-new}{\code{Task$new()}}
 \item \href{#method-Task-task_add}{\code{Task$task_add()}}
 \item \href{#method-Task-task_delete}{\code{Task$task_delete()}}
+\item \href{#method-Task-task_edit}{\code{Task$task_edit()}}
 \item \href{#method-Task-task_report_progress}{\code{Task$task_report_progress()}}
-\item \href{#method-Task-task_edit_metadata}{\code{Task$task_edit_metadata()}}
 \item \href{#method-Task-task_archive}{\code{Task$task_archive()}}
 \item \href{#method-Task-progress_add}{\code{Task$progress_add()}}
 \item \href{#method-Task-task_get_history}{\code{Task$task_get_history()}}
@@ -109,8 +109,7 @@ Add a new task for an User and report it as initial progress.
   task_description,
   assignee,
   time_due,
-  output_unit,
-  output_goal
+  output_unit
 )}\if{html}{\out{</div>}}
 }
 
@@ -128,8 +127,6 @@ Add a new task for an User and report it as initial progress.
 \item{\code{time_due}}{Deadline for the task completion. Datetime}
 
 \item{\code{output_unit}}{Unit of measurement of the task output}
-
-\item{\code{output_goal}}{Number on which which the output will be measured}
 }
 \if{html}{\out{</div>}}
 }
@@ -152,35 +149,17 @@ Delete an user task
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Task-task_report_progress"></a>}}
-\if{latex}{\out{\hypertarget{method-Task-task_report_progress}{}}}
-\subsection{Method \code{task_report_progress()}}{
-Report progress on an assigned task
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Task$task_report_progress(task_id, status_current, output_current, details)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{task_id}}{The id of the task on which the statement will be executed}
-
-\item{\code{status_current}}{Current status of the specified task}
-
-\item{\code{output_current}}{Current output of the specified task}
-
-\item{\code{details}}{Explanation of the progress made}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Task-task_edit_metadata"></a>}}
-\if{latex}{\out{\hypertarget{method-Task-task_edit_metadata}{}}}
-\subsection{Method \code{task_edit_metadata()}}{
+\if{html}{\out{<a id="method-Task-task_edit"></a>}}
+\if{latex}{\out{\hypertarget{method-Task-task_edit}{}}}
+\subsection{Method \code{task_edit()}}{
 Edit a task metadata
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Task$task_edit_metadata(task_id, task_title, task_description)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Task$task_edit(
+  task_id,
+  task_title = NULL,
+  task_description = NULL,
+  time_due = NULL
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -191,6 +170,29 @@ Edit a task metadata
 \item{\code{task_title}}{Title for the task}
 
 \item{\code{task_description}}{Long description of the task}
+
+\item{\code{time_due}}{Deadline for the task completion. Datetime}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Task-task_report_progress"></a>}}
+\if{latex}{\out{\hypertarget{method-Task-task_report_progress}{}}}
+\subsection{Method \code{task_report_progress()}}{
+Report progress on an assigned task
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Task$task_report_progress(task_id, status_current, details)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{task_id}}{The id of the task on which the statement will be executed}
+
+\item{\code{status_current}}{Current status of the specified task}
+
+\item{\code{details}}{Explanation of the progress made}
 }
 \if{html}{\out{</div>}}
 }
@@ -218,15 +220,13 @@ Archive a task
 \subsection{Method \code{progress_add()}}{
 Insert progress info on some task
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Task$progress_add(task_id, output_progress, status, details)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Task$progress_add(task_id, status, details)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{task_id}}{The id of the task on which the statement will be executed}
-
-\item{\code{output_progress}}{Quantity of the progress being reported. Is measured in the unit specified in the creation of the task}
 
 \item{\code{status}}{The status of the task once the new progress is added}
 

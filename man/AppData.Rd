@@ -65,7 +65,7 @@ R6 class that allows to get the information needed for an User session of the ap
 <li><span class="pkg-link" data-pkg="appReporteAvance" data-topic="Task" data-id="task_add"><a href='../../appReporteAvance/html/Task.html#method-Task-task_add'><code>appReporteAvance::Task$task_add()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="appReporteAvance" data-topic="Task" data-id="task_archive"><a href='../../appReporteAvance/html/Task.html#method-Task-task_archive'><code>appReporteAvance::Task$task_archive()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="appReporteAvance" data-topic="Task" data-id="task_delete"><a href='../../appReporteAvance/html/Task.html#method-Task-task_delete'><code>appReporteAvance::Task$task_delete()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="appReporteAvance" data-topic="Task" data-id="task_edit_metadata"><a href='../../appReporteAvance/html/Task.html#method-Task-task_edit_metadata'><code>appReporteAvance::Task$task_edit_metadata()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="appReporteAvance" data-topic="Task" data-id="task_edit"><a href='../../appReporteAvance/html/Task.html#method-Task-task_edit'><code>appReporteAvance::Task$task_edit()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="appReporteAvance" data-topic="Task" data-id="task_get_history"><a href='../../appReporteAvance/html/Task.html#method-Task-task_get_history'><code>appReporteAvance::Task$task_get_history()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="appReporteAvance" data-topic="Task" data-id="task_report_progress"><a href='../../appReporteAvance/html/Task.html#method-Task-task_report_progress'><code>appReporteAvance::Task$task_report_progress()</code></a></span></li>
 </ul>
