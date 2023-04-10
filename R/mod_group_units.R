@@ -65,13 +65,28 @@ mod_group_units_server <- function(id, app_data, processes) {
         })
         
         output$units <- renderUI({
-            lapply(group_units(), \(x) {
-                unit_display(
-                    item = x,
-                    editInputId = ns("unitToEdit"),
-                    deleteInputId = ns("unitToDelete")
-                )
-            })
+            units_tasks <- group_units() |> purrr::keep(~.x$type == "task")
+            units_report <- group_units() |> purrr::keep(~.x$type == "report")
+
+            tagList(
+                tags$h6("Unidades de medida de tarea"),
+                lapply(units_tasks, \(x) {
+                    unit_display(
+                        item = x,
+                        editInputId = ns("unitToEdit"),
+                        deleteInputId = ns("unitToDelete")
+                    )
+                }),
+                tags$h6("Unidades de medida de reporte"),
+                lapply(units_report, \(x) {
+                    unit_display(
+                        item = x,
+                        editInputId = ns("unitToEdit"),
+                        deleteInputId = ns("unitToDelete")
+                    )
+                })
+            )
+
         })
         
         observe({
@@ -242,23 +257,6 @@ mod_group_units_apptest <- function(id = "test") {
     )
 }
 
-badge_unit_type <- function(type) {
-    bg_class <- switch (type,
-        task = "bg-info",
-        report = "bg-lime"
-    )
-    
-    type_translate <- switch (type,
-        task = "Tarea",
-        report = "Reporte"
-    )
-    
-    span(
-        class = "badge px-1 bg-info mx-2",
-        class = bg_class,
-        type_translate # content
-    )
-}
 
 unit_display <- function(item, editInputId, deleteInputId) {
     div(
@@ -275,8 +273,7 @@ unit_display <- function(item, editInputId, deleteInputId) {
             `data-toggle`= "tooltip",
             `data-placement`= "top",
             title = paste0("Descripción: ", item$unit_description),
-            item$unit_title,
-            badge_unit_type(item$type)
+            item$unit_title
         ),
         div(
             class = "col-xs-auto d-flex align-items-center",

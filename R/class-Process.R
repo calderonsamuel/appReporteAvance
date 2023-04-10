@@ -45,7 +45,8 @@ Process <- R6::R6Class(
             st <- glue::glue_sql(
                 "SELECT * 
                 FROM units
-                WHERE process_id = {process_id}",
+                WHERE process_id = {process_id}
+                ORDER BY time_last_modified DESC",
                 .con = private$con
             )
 
