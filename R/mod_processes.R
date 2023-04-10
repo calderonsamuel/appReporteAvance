@@ -52,19 +52,20 @@ mod_processes_server <- function(id, app_data, group_selection){
     observe({
       showModal(modalDialog(
         title = "Nuevo proceso",
-        size = "l",
 
         textInputPro(
           inputId = ns("title"),
           label = "Nombre de proceso",
           maxlength = 250,
-          maxlengthCounter = TRUE
+          maxlengthCounter = TRUE,
+          width = "100%"
         ),
         textAreaInputPro(
           inputId = ns("description"),
           label = "Descripción",
           maxlength = 500,
-          maxlengthCounter = TRUE
+          maxlengthCounter = TRUE,
+          width = "100%"
         ),
 
         footer = tagList(
