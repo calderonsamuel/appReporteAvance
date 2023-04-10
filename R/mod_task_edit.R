@@ -60,22 +60,26 @@ mod_task_edit_server <- function(id, app_data, rv){
 
     observe({
         tryCatch(expr = {
-            app_data$task_edit_metadata(
-              task_id = rv$task_to_edit$task_id,
-              task_title = input$edit_title,
-              task_description = input$edit_description
-            )
+            title_modified <- input$edit_title != rv$task_to_edit$task_title
+            description_modified <- input$edit_description != rv$task_to_edit$task_description
+            time_due_modified <- input$time_due != rv$task_to_edit$time_due
 
-            if (input$time_due != rv$task_to_edit$time_due) {
-              app_data$task_edit_time_due(
-                task_id = rv$task_to_edit$task_id,
-                time_due = lubridate::with_tz(input$time_due, "UTC")
-              )
+            if (!any(title_modified, description_modified, time_due_modified)) {
+              return(showNotification("Sin modificación en tarea", session = session))
             }
+
+            app_data$task_edit(
+              task_id = rv$task_to_edit$task_id,
+              task_title = if (title_modified) input$edit_title else NULL,
+              task_description = if (description_modified) input$edit_description else NULL,
+              time_due = if (time_due_modified) lubridate::with_tz(input$time_due, "UTC")
+            )
             
             removeModal(session)
             
             rv$task_has_been_edited <- rv$task_has_been_edited + 1L
+
+            showNotification("Tarea modificada", session = session)
             
         }, error = \(e) {
           alert_error(session, e)
