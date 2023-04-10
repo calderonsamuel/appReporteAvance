@@ -420,7 +420,7 @@ mod_board_server <- function(id, app_data, controlbar) {
             app_data$task_get_history(rv$task_to_history$task_id) |> 
                 purrr::pmap(list) |> 
                 purrr::map(~tibble::tibble(
-                    "Fecha" = format(.x$time_reported, "%d/%m/%Y %H:%M:%S"),
+                    "Fecha" = format(.x$time_reported, "%d/%m/%Y %H:%M:%S", tz = "America/Lima"),
                     "Por" = .x$user_names,
                     "Estado" = .x$status,
                     "Progreso" = .x$output_progress,
