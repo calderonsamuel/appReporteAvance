@@ -68,15 +68,15 @@ mod_task_add_server <- function(id, app_data, controlbar){
                 maxlength = 500,
                 maxlengthCounter = TRUE
             ),
-
-            selectInput(
-                inputId = ns("process"),
-                label = "Proceso",
-                choices = processes_choices()
-            ),
             
             fluidRow(
-                column(shinyWidgets::pickerInput(
+                col_6(selectInput(
+                    inputId = ns("process"),
+                    label = "Proceso",
+                    choices = processes_choices(),
+                    width = "100%"
+                )),
+                col_6(shinyWidgets::pickerInput(
                     inputId = ns("output_unit"), 
                     label = "Unidad de medida",
                     width = "100%",
@@ -84,17 +84,19 @@ mod_task_add_server <- function(id, app_data, controlbar){
                     options = shinyWidgets::pickerOptions(
                         liveSearch = TRUE
                     )
-                ), width = 9)
+                ))
             ),
             fluidRow(
                 col_6(timeDuePicker(
                     inputId = ns("time_due"),
                     label = "Plazo máximo",
+                    width = "100%",
                     value = computeMinTimeDue(tzone = "America/Lima") + lubridate::weeks(1)
                 )),
                 col_6(selectInput(
                     inputId = ns("user_id"),
                     label = "Encargado",
+                    width = "100%",
                     choices = user_choices()
                 ))
             ),
@@ -150,11 +152,12 @@ mod_task_add_server <- function(id, app_data, controlbar){
 # mod_task_add_server("task_add_1")
 
 # convertir esto en una funcion wrapper, debe tomar id y valor
-timeDuePicker <- function(inputId, label, value) {
+timeDuePicker <- function(inputId, label, value, width = NULL) {
     shinyWidgets::airDatepickerInput(
         inputId = inputId,
         label = label,
         value = value, 
+        width = width,
         timepicker = TRUE,
         dateFormat = "dd/MM/yyyy", 
         language = "es",
