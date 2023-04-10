@@ -135,7 +135,7 @@ Task <- R6::R6Class(
             details <- list(
                 `Título` = task_title,
                 `Descripción` = task_description,
-                `Plazo máximo` = time_due %||% format(time_due, "%d/%m/%Y %H:%M:%S", tz = "America/Lima")
+                `Plazo máximo` = if (!is.null(time_due)) format(time_due, "%d/%m/%Y %H:%M:%S", tz = "America/Lima") else NULL
             ) |>
                 purrr::compact() |>
                 purrr::imap_chr(\(x, i) {
