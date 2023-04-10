@@ -33,14 +33,16 @@ mod_task_edit_server <- function(id, app_data, rv){
           label = "Título de tarea",
           value = rv$task_to_edit$task_title,
           maxlength = 250,
-          maxlengthCounter = TRUE
+          maxlengthCounter = TRUE,
+          width = "100%"
         ),
         textAreaInputPro(
           inputId = ns("edit_description"),
           label = "Descripción de tarea",
           value = rv$task_to_edit$task_description,
           maxlength = 500,
-          maxlengthCounter = TRUE
+          maxlengthCounter = TRUE,
+          width = "100%"
         ),
 
         timeDuePicker(
