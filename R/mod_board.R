@@ -246,49 +246,9 @@ mod_board_server <- function(id, app_data, controlbar) {
         
         observe({
             rv$task_to_edit <- tasks()[[input$taskToEdit]]
-            
-            showModal(modalDialog(
-                
-                h1("Editar tarea"),
-                
-                textInputPro(
-                    inputId = ns("edit_title"),
-                    label = "Título de tarea",
-                    value = rv$task_to_edit$task_title,
-                    maxlength = 250,
-                    maxlengthCounter = TRUE
-                ),
-                textAreaInputPro(
-                    inputId = ns("edit_description"),
-                    label = "Descripción de tarea",
-                    value = rv$task_to_edit$task_description,
-                    maxlength = 500,
-                    maxlengthCounter = TRUE
-                ),
-                
-                footer = tagList(
-                    modalButton("Cancelar"),
-                    btn_guardar(ns("save_edition"))
-                )
-            ))
         }) |> bindEvent(input$taskToEdit)
-        
-        observe({
-            tryCatch(expr = {
-                app_data$task_edit_metadata(
-                    task_id = rv$task_to_edit$task_id,
-                    task_title = input$edit_title,
-                    task_description = input$edit_description)
-                
-                
-                removeModal(session)
-                
-                rv$task_has_been_edited <- rv$task_has_been_edited + 1L
-                
-            }, error = \(e) alert_error(session, e))
-            
-        }) |> 
-            bindEvent(input$save_edition)
+
+        mod_task_edit_server("task_edit_1", app_data, rv)
         
         ## See history ----
         
