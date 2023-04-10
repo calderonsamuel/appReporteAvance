@@ -35,7 +35,7 @@ Task <- R6::R6Class(
         #' @description Add a new task for an User and report it as initial progress.
         task_add = function(group_id,
                             task_title, task_description, assignee, time_due,
-                            output_unit, output_goal) {
+                            output_unit) {
 
             task_id <- ids::random_id()
 
@@ -50,7 +50,7 @@ Task <- R6::R6Class(
                     assignee = {assignee},
                     time_due = {time_due},
                     output_unit = {output_unit},
-                    output_goal = {output_goal},
+                    output_goal = {1L},
                     output_current = 0,
                     status_current = 'Pendiente'
                 ",
@@ -175,14 +175,12 @@ Task <- R6::R6Class(
         #' @description Report progress on an assigned task
         task_report_progress = function(task_id,
                                         status_current,
-                                        output_current,
                                         details) {
 
             statement <-
                 "UPDATE tasks
                 SET
-                    status_current = {status_current},
-                    output_current = {output_current}
+                    status_current = {status_current}
                 WHERE
                     task_id = {task_id}"
 
@@ -194,7 +192,6 @@ Task <- R6::R6Class(
             }
 
             self$progress_add(task_id,
-                              output_progress = output_current,
                               status = status_current,
                               details = details)
         },
@@ -230,9 +227,10 @@ Task <- R6::R6Class(
         
         #' @description Insert progress info on some task
         progress_add = function(task_id,
-                                output_progress, 
                                 status, 
                                 details) {
+
+            output_progress <- if (status %in% c("Terminado", "Archivado")) 1L else 0L
 
             statement <-
                 "INSERT INTO progress

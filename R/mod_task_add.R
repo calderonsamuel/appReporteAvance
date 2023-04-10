@@ -76,11 +76,6 @@ mod_task_add_server <- function(id, app_data, controlbar){
             ),
             
             fluidRow(
-                col_3(numericInput(
-                    inputId = ns("output_goal"),
-                    label = "Meta",
-                    value = 1
-                )),
                 column(shinyWidgets::pickerInput(
                     inputId = ns("output_unit"), 
                     label = "Unidad de medida",
@@ -119,8 +114,7 @@ mod_task_add_server <- function(id, app_data, controlbar){
                 task_description = input$description,
                 assignee = input$user_id,
                 time_due = lubridate::with_tz(input$time_due, "UTC"),
-                output_unit = input$output_unit,
-                output_goal = input$output_goal
+                output_unit = input$output_unit
             )
             
             removeModal(session)
