@@ -109,18 +109,22 @@ mod_task_add_server <- function(id, app_data, controlbar){
     }) |> bindEvent(input$add)
 
     observe({
-        cli::cli_alert_info("Task add time due: {input$time_due}")
+        time_due_registered <- input$time_due |> lubridate::force_tz("America/Lima") |> lubridate::with_tz("UTC")
+        tz <- lubridate::tz(time_due_registered)
+        cli::cli_alert_info("Task add time due: {time_due_registered} with tz {tz}")
     }) |>
         bindEvent(input$time_due)
     
     observe({
         tryCatch(expr = {
+            time_due_in_UTC <- input$time_due |> lubridate::force_tz("America/Lima") |> lubridate::with_tz("UTC")
+
             app_data$task_add(
                 group_id = controlbar$group_selected(),
                 task_title = input$title,
                 task_description = input$description,
                 assignee = input$user_id,
-                time_due = lubridate::with_tz(input$time_due, "UTC"),
+                time_due = time_due_in_UTC,
                 output_unit = input$output_unit
             )
             
@@ -158,6 +162,15 @@ mod_task_add_server <- function(id, app_data, controlbar){
 
 # convertir esto en una funcion wrapper, debe tomar id y valor
 timeDuePicker <- function(inputId, label, value, width = NULL) {
+    # dateInput(
+    #     inputId = inputId,
+    #     label = label,
+    #     value = value,
+    #     min = computeMinDateDue(tzone = "America/Lima"),
+    #     max = computeMinDateDue(tzone = "America/Lima") + lubridate::period(6, "months"),
+    #     format = "dd/MM/yyyy",
+    #     language = "es"
+    # )
     shinyWidgets::airDatepickerInput(
         inputId = inputId,
         label = label,
