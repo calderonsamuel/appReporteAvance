@@ -59,15 +59,12 @@ mod_task_edit_server <- function(id, app_data, rv){
     }) |> bindEvent(rv$task_to_edit)
 
     observe({
-        time_due_registered <- input$time_due |> lubridate::force_tz("America/Lima") |> lubridate::with_tz("UTC")
-        tz <- lubridate::tz(time_due_registered)
-        cli::cli_alert_info("Task edit time due: {time_due_registered} with tz {tz}")
-    }) |>
-        bindEvent(input$time_due)
-
-    observe({
         tryCatch(expr = {
-            time_due_in_UTC <- input$time_due |> lubridate::force_tz("America/Lima") |> lubridate::with_tz("UTC")
+            # timeDuePicker() receives `value` in tz: America/Lima. 
+            # So its input value should be treated like it has the same timezone
+            time_due_in_UTC <- input$time_due |> 
+                lubridate::force_tz("America/Lima") |> 
+                lubridate::with_tz("UTC")
 
             title_modified <- input$edit_title != rv$task_to_edit$task_title
             description_modified <- input$edit_description != rv$task_to_edit$task_description
