@@ -1,4 +1,12 @@
-# appReporteAvance (development version)
+# appReporteAvance 0.4.3
+
+## Bug fixes
+
+- Ya no existe discrepancia entre 1) la hora que el usuario escoge como plazo máximo en creación o edición de tarea, y 2) la hora que muestra el aplicativo una vez creada o editada una tarea.
+
+## Otros
+
+- Se incorpora un dockerfile para testeo local. Esto permite testear en un entorno muy similar al que se tiene en shinyapps.io.
 
 # appReporteAvance 0.4.2
 
