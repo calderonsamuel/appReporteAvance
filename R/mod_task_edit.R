@@ -59,15 +59,19 @@ mod_task_edit_server <- function(id, app_data, rv){
     }) |> bindEvent(rv$task_to_edit)
 
     observe({
-        cli::cli_alert_info("Task edit time due: {input$time_due}")
+        time_due_registered <- input$time_due |> lubridate::force_tz("America/Lima") |> lubridate::with_tz("UTC")
+        tz <- lubridate::tz(time_due_registered)
+        cli::cli_alert_info("Task edit time due: {time_due_registered} with tz {tz}")
     }) |>
         bindEvent(input$time_due)
 
     observe({
         tryCatch(expr = {
+            time_due_in_UTC <- input$time_due |> lubridate::force_tz("America/Lima") |> lubridate::with_tz("UTC")
+
             title_modified <- input$edit_title != rv$task_to_edit$task_title
             description_modified <- input$edit_description != rv$task_to_edit$task_description
-            time_due_modified <- lubridate::with_tz(input$time_due, "UTC") != lubridate::with_tz(rv$task_to_edit$time_due, "UTC")
+            time_due_modified <- time_due_in_UTC != lubridate::with_tz(rv$task_to_edit$time_due, "UTC")
 
             if (!any(title_modified, description_modified, time_due_modified)) {
               return(showNotification("Sin modificación en tarea", session = session))
@@ -77,7 +81,7 @@ mod_task_edit_server <- function(id, app_data, rv){
               task_id = rv$task_to_edit$task_id,
               task_title = if (title_modified) input$edit_title else NULL,
               task_description = if (description_modified) input$edit_description else NULL,
-              time_due = if (time_due_modified) lubridate::with_tz(input$time_due, "UTC")
+              time_due = if (time_due_modified) time_due_in_UTC else NULL
             )
             
             removeModal(session)
