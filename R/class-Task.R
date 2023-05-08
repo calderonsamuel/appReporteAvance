@@ -330,7 +330,7 @@ Task <- R6::R6Class(
             
             st_reports <- glue::glue_sql(
                 "
-                SELECT report_id, time_reported
+                SELECT *
                 FROM reports 
                 WHERE 
                     group_id = {self$group_selected} AND
@@ -338,7 +338,10 @@ Task <- R6::R6Class(
                 .con = private$con
             )
             statement <- glue::glue_sql(
-                "SELECT * 
+                "SELECT 
+                    lhs.report_title,
+                    rhs.output_unit, 
+                    rhs.output_progress
                 FROM ({st_reports}) AS lhs
                 LEFT JOIN report_quantities rhs ON
                     lhs.report_id = rhs.report_id
