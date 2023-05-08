@@ -23,7 +23,8 @@ mod_board_ui <- function(id) {
                 dropdownMenu = bs4Dash::boxDropdown(
                     icon = fontawesome::fa("fas fa-ellipsis"),
                     mod_task_add_ui(ns("task_add_1")), # this is a dropdown-item
-                    mod_report_add_ui(ns("report_add_1"))
+                    mod_report_add_ui(ns("report_add_1")),
+                    mod_data_download_ui(ns("data_download_1"))
                 ),
                 uiOutput(ns("pendientes"))
             ),
@@ -108,6 +109,10 @@ mod_board_server <- function(id, app_data, controlbar) {
             id = "report_add_1",
             app_data =  app_data,
             controlbar = controlbar
+        )
+        
+        data_download <- mod_data_download_server(
+            id = "data_download_1"
         )
         
         # Reactives ----
