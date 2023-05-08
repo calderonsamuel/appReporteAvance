@@ -14,6 +14,7 @@ Imports:
     colourpicker,
     config (>= 0.3.1),
     DBI,
+    dplyr,
     firebase (>= 1.0.1.9000),
     fontawesome,
     fresh,
@@ -33,7 +34,9 @@ Imports:
     shinyjs,
     shinyWidgets (>= 0.7.0),
     stringr,
-    tibble
+    tibble,
+    tidyr,
+    writexl
 Suggests: 
     spelling,
     testthat (>= 3.0.0)

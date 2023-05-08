@@ -37,6 +37,7 @@ R6 class that allows to get the Group information.
 \item \href{#method-Task-report_add}{\code{Task$report_add()}}
 \item \href{#method-Task-report_delete}{\code{Task$report_delete()}}
 \item \href{#method-Task-report_archive}{\code{Task$report_archive()}}
+\item \href{#method-Task-fetch_reports_to_download}{\code{Task$fetch_reports_to_download()}}
 \item \href{#method-Task-clone}{\code{Task$clone()}}
 }
 }
@@ -308,6 +309,15 @@ Archive a report and its contributions.
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Task-fetch_reports_to_download"></a>}}
+\if{latex}{\out{\hypertarget{method-Task-fetch_reports_to_download}{}}}
+\subsection{Method \code{fetch_reports_to_download()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Task$fetch_reports_to_download(start_date, end_date)}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Task-clone"></a>}}
