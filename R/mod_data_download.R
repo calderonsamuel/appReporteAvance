@@ -48,6 +48,18 @@ mod_data_download_server <- function(id, app_data) {
                         separator = " a "
                     ),
                     
+                    checkboxInput(
+                        inputId = ns("separate_by_report"),
+                        label = "¿Desglosar por reporte individual?", 
+                        value = TRUE
+                    ),
+                    
+                    checkboxInput(
+                        inputId = ns("include_totals"),
+                        label = "¿Incluir totales?",
+                        value = TRUE
+                    ),
+                    
                     data_download_tasks(ns("vars_tasks")),
                     data_download_reports(ns("vars_reports")),
                     
@@ -75,11 +87,10 @@ mod_data_download_server <- function(id, app_data) {
                     start_date = input$date_range[1],
                     end_date = input$date_range[2]
                 ) |> 
-                    dplyr::group_by(output_unit) |> 
-                    dplyr::summarise(
-                        `Reportado` = sum(output_progress)
-                    ) |> 
-                    dplyr::rename(`Unidad de medida` = output_unit)
+                    data_download_handle_reports_data(
+                        input$include_totals, 
+                        input$separate_by_report
+                    )
                 
                 metadata <- tibble::tribble(
                     ~Campo, ~Valor,
@@ -151,4 +162,42 @@ data_download_reports <- function(inputId) {
         ),
         disabled = TRUE
     )
+}
+
+data_download_handle_reports_data <- function(reports_data, use_totals = TRUE, separate_by_report = TRUE) {
+    processed <- reports_data |> 
+        dplyr::group_by(output_unit, report_title) |> 
+        dplyr::summarise(
+            sum_output = sum(output_progress, na.rm = TRUE)
+        ) |> 
+        dplyr::ungroup() |> 
+        tidyr::pivot_wider(
+            names_from = report_title,
+            values_from = sum_output, 
+            values_fill = 0
+        ) |> 
+        dplyr::rowwise() |> 
+        dplyr::mutate(
+            `Total Reportado` = sum(dplyr::c_across(-output_unit))
+        ) |> 
+        dplyr::rename(`Unidad de medida` = output_unit) |> 
+        dplyr::ungroup()
+    
+    if (use_totals) {
+        col_totals <- processed |> 
+            dplyr::summarise(
+                dplyr::across(dplyr::where(is.numeric), sum),
+                dplyr::across(dplyr::where( \(x) !is.numeric(x)), \(x) "Total de columna")
+            )
+        
+        processed <- processed |> 
+            dplyr::bind_rows(col_totals)
+    }
+    
+    if (!separate_by_report) {
+        processed <- processed |> 
+            dplyr::select(`Unidad de medida`, `Total Reportado`)
+    }
+    
+    processed
 }
