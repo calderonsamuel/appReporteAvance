@@ -8,7 +8,7 @@ task_box <- function(task, ns = NULL, is_group_admin = FALSE) {
         title = task$task_title,
         width = 12,
         collapsed = TRUE,
-        headerBorder = FALSE,
+        headerBorder = FALSE, 
         # background = task$user_color,
         label = bs4Dash::boxLabel(
             text = format(task$time_due, "%d %b", tz = "America/Lima"), 
@@ -22,6 +22,7 @@ task_box <- function(task, ns = NULL, is_group_admin = FALSE) {
             tags$span(fontawesome::fa("far fa-clock"), format(task$time_due, "%H:%M", tz = "America/Lima")),
             tags$span(fontawesome::fa("fas fa-bullseye"), glue::glue("{task$output_current}/{task$output_goal} {task$output_unit}"), style = "float: right;")
         ),
+        footer = 
         tags$p(
             class = "text-muted small mb-0",
             format(task$time_creation, "Creado el %d %b a las %H:%M:%S", tz = "America/Lima"),
