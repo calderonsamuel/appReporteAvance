@@ -90,3 +90,23 @@ btn_custom <- function(inputId, label, icon = NULL, width = NULL, ...) {
         ...
     )
 }
+
+btn_download_custom <- function(outputId,
+                                   label = "Download",
+                                   class = "btn-default",
+                                   ...,
+                                   icon = fontawesome::fa("download")) {
+    tags$a(
+        id = outputId,
+        class = "btn shiny-download-link",
+        class = class,
+        href = "",
+        target = "_blank",
+        download = NA,
+        list(
+            icon, label
+        ),
+        ...
+    )
+}
+
