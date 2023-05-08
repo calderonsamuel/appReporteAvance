@@ -22,7 +22,7 @@ mod_data_download_ui <- function(id) {
 #' data_download Server Functions
 #'
 #' @noRd
-mod_data_download_server <- function(id) {
+mod_data_download_server <- function(id, app_data) {
     moduleServer(id, function(input, output, session) {
         ns <- session$ns
         
@@ -70,7 +70,16 @@ mod_data_download_server <- function(id) {
             },
             content = function(file) {
                 tasks <- iris[sample(seq_len(nrow(iris)), 3),]
-                reports <- iris[sample(seq_len(nrow(iris)), 3),]
+                
+                reports <- app_data$fetch_reports_to_download(
+                    start_date = input$date_range[1],
+                    end_date = input$date_range[2]
+                ) |> 
+                    dplyr::group_by(output_unit) |> 
+                    dplyr::summarise(
+                        `Reportado` = sum(output_progress)
+                    ) |> 
+                    dplyr::rename(`Unidad de medida` = output_unit)
                 
                 metadata <- tibble::tribble(
                     ~Campo, ~Valor,

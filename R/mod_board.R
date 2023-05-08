@@ -112,7 +112,8 @@ mod_board_server <- function(id, app_data, controlbar) {
         )
         
         data_download <- mod_data_download_server(
-            id = "data_download_1"
+            id = "data_download_1",
+            app_data = app_data
         )
         
         # Reactives ----

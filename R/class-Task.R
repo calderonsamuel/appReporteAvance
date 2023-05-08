@@ -324,6 +324,29 @@ Task <- R6::R6Class(
             )
             
             DBI::dbExecute(private$con, statement)
+        },
+        
+        fetch_reports_to_download = function(start_date, end_date) {
+            
+            st_reports <- glue::glue_sql(
+                "
+                SELECT report_id, time_reported
+                FROM reports 
+                WHERE 
+                    group_id = {self$group_selected} AND
+                    time_reported BETWEEN {start_date} AND DATE_ADD({end_date}, INTERVAL 1 DAY)",
+                .con = private$con
+            )
+            statement <- glue::glue_sql(
+                "SELECT * 
+                FROM ({st_reports}) AS lhs
+                LEFT JOIN report_quantities rhs ON
+                    lhs.report_id = rhs.report_id
+                ",
+                .con = private$con
+            )
+            
+            DBI::dbGetQuery(private$con, statement)
         }
     ),
     private = list(
