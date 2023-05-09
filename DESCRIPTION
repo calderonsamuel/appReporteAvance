@@ -23,6 +23,7 @@ Imports:
     htmltools,
     ids,
     lubridate,
+    pkgload,
     purrr,
     R6,
     RColorBrewer,
