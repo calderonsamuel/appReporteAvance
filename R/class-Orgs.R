@@ -16,6 +16,29 @@ Organisation <- R6::R6Class(
         initialize = function(email) {
             super$initialize(email)
         },
+        
+        #' @description Get the public data from the organisations the user is a member of
+        fetch_orgs = function() {
+            query <-
+                "SELECT
+                    lhs.org_id, lhs.org_role,
+                    rhs.org_title, rhs.org_description,
+                    rhs.time_creation, rhs.time_last_modified
+                FROM (
+                    SELECT org_id, org_role
+                    FROM org_users
+                    WHERE user_id = {self$user$user_id}
+                ) lhs
+                LEFT JOIN organisations rhs ON
+                    lhs.org_id = rhs.org_id"
+            
+            db_data <- super$db_get_query(query)
+            
+            
+            db_data |>
+                purrr::pmap(list)
+        },
+        
         #' @description Initialize an organisation for a new user
         org_initialize = function() {
             org_id <- self$org_add("Organización sin nombre", "")
