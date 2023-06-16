@@ -28,6 +28,10 @@ mod_data_download_server <- function(id, app_data) {
         
         observe({
             tryCatch({
+                
+                group_info <- app_data$groups[[app_data$group_selected]]
+                if (group_info$group_role != "admin") stop("Descarga solo válida para responsables de equipo", call. = FALSE)
+                
                 showModal(modalDialog(
                     title = "Descargar datos",
                     size = "l",
