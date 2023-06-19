@@ -39,6 +39,31 @@ Organisation <- R6::R6Class(
                 purrr::pmap(list)
         },
         
+        fetch_org_users = function(org_id) {
+            st <- glue_sql(
+                "SELECT 
+                    lhs.user_id, lhs.org_role, 
+                    lhs.time_creation, lhs.time_last_modified,
+                    rhs.name, rhs.last_name
+                FROM (
+                    SELECT 
+                        user_id, org_role, 
+                        time_creation, time_last_modified
+                    FROM org_users
+                    WHERE org_id = {org_id}
+                ) lhs
+                LEFT JOIN users rhs ON
+                    lhs.user_id = rhs.user_id
+                ",
+                .con = private$con
+            )
+            
+            DBI::dbGetQuery(private$con, st) |> 
+                purrr::pmap(list)
+            
+            
+        },
+        
         #' @description Initialize an organisation for a new user
         org_initialize = function() {
             org_id <- self$org_add("Organización sin nombre", "")
