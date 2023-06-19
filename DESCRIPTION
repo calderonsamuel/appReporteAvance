@@ -10,6 +10,8 @@ URL: https://github.com/calderonsamuel/appReporteAvance
 BugReports: https://github.com/calderonsamuel/appReporteAvance/issues
 Imports: 
     bs4Dash,
+    bsicons,
+    bslib,
     cli,
     colourpicker,
     config (>= 0.3.1),
@@ -23,11 +25,12 @@ Imports:
     htmltools,
     ids,
     lubridate,
-    pkgload,
+    methods,
     purrr,
     R6,
     RColorBrewer,
     reactable,
+    readr,
     rlang,
     RMariaDB,
     sass,

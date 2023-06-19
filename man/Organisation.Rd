@@ -27,6 +27,7 @@ R6 class that allows to get the Organisation information.
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-Organisation-new}{\code{Organisation$new()}}
+\item \href{#method-Organisation-fetch_orgs}{\code{Organisation$fetch_orgs()}}
 \item \href{#method-Organisation-org_initialize}{\code{Organisation$org_initialize()}}
 \item \href{#method-Organisation-org_add}{\code{Organisation$org_add()}}
 \item \href{#method-Organisation-org_delete}{\code{Organisation$org_delete()}}
@@ -66,6 +67,16 @@ Start an Organisation based on an user email
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Organisation-fetch_orgs"></a>}}
+\if{latex}{\out{\hypertarget{method-Organisation-fetch_orgs}{}}}
+\subsection{Method \code{fetch_orgs()}}{
+Get the public data from the organisations the user is a member of
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Organisation$fetch_orgs()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Organisation-org_initialize"></a>}}
