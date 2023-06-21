@@ -76,7 +76,10 @@ input_icon_picker <- function(inputId, label,
 #' @return a character vector with the names of the available icons.
 #'
 reportes_icon_names <- function() {
-  fontawesome::fa_metadata()$icon_names_full_fas
+  all_icons <- fontawesome::fa_metadata()$icon_names_full_fas
+  new_order <- union("fas fa-file", all_icons)
+  
+  new_order
 }
 
 #' Icon Picker Dependency

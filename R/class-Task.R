@@ -21,6 +21,8 @@
 #' @param report_title The title of the report
 #' @param units Units of the report. Must have the same size as quantities.
 #' @param quantities Quantities of the report. Must have the same size as units.
+#' @param start_date Starting date of the report
+#' @param end_date Ending date of the report
 #' @importFrom cli cli_alert_success cli_h2
 #' @importFrom purrr pmap keep map reduce
 #' @importFrom rlang %||%
@@ -326,6 +328,7 @@ Task <- R6::R6Class(
             DBI::dbExecute(private$con, statement)
         },
         
+        #' @description Get data for reporting
         fetch_reports_to_download = function(start_date, end_date) {
             
             st_reports <- glue::glue_sql(

@@ -18,7 +18,7 @@ mod_secure_ui <- function(id, app_data){
       header = bs4Dash::dashboardHeader(
           title = "Reporte", 
           rightUi = tags$li(class = "nav-item dropdown", 
-            tags$a("Ver manual", class = "nav-link", href="https://manualreportes.productosdedatos.com", target="_blank")
+            tags$a("Ver manual", class = "nav-link", href="https://calderonsamuel.github.io/manual_de_reportes/", target="_blank")
           ),
           controlbarIcon = fontawesome::fa("fas fa-gear")
       ),

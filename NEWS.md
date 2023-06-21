@@ -1,4 +1,7 @@
-# appReporteAvance (development version)
+# appReporteAvance 0.4.4
+
+- Se arregló un enlace roto al manual de usuario
+- Ahora se impide que usuarios no responsables de equipo accedan a opciones de descarga
 
 # appReporteAvance 0.4.3
 

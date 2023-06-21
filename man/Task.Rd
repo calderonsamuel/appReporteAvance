@@ -50,6 +50,7 @@ R6 class that allows to get the Group information.
 <li><span class="pkg-link" data-pkg="appReporteAvance" data-topic="User" data-id="user_add"><a href='../../appReporteAvance/html/User.html#method-User-user_add'><code>appReporteAvance::User$user_add()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="appReporteAvance" data-topic="User" data-id="user_delete"><a href='../../appReporteAvance/html/User.html#method-User-user_delete'><code>appReporteAvance::User$user_delete()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="appReporteAvance" data-topic="User" data-id="user_edit_names"><a href='../../appReporteAvance/html/User.html#method-User-user_edit_names'><code>appReporteAvance::User$user_edit_names()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="appReporteAvance" data-topic="Organisation" data-id="fetch_orgs"><a href='../../appReporteAvance/html/Organisation.html#method-Organisation-fetch_orgs'><code>appReporteAvance::Organisation$fetch_orgs()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="appReporteAvance" data-topic="Organisation" data-id="org_add"><a href='../../appReporteAvance/html/Organisation.html#method-Organisation-org_add'><code>appReporteAvance::Organisation$org_add()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="appReporteAvance" data-topic="Organisation" data-id="org_delete"><a href='../../appReporteAvance/html/Organisation.html#method-Organisation-org_delete'><code>appReporteAvance::Organisation$org_delete()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="appReporteAvance" data-topic="Organisation" data-id="org_edit"><a href='../../appReporteAvance/html/Organisation.html#method-Organisation-org_edit'><code>appReporteAvance::Organisation$org_edit()</code></a></span></li>
@@ -314,10 +315,20 @@ Archive a report and its contributions.
 \if{html}{\out{<a id="method-Task-fetch_reports_to_download"></a>}}
 \if{latex}{\out{\hypertarget{method-Task-fetch_reports_to_download}{}}}
 \subsection{Method \code{fetch_reports_to_download()}}{
+Get data for reporting
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Task$fetch_reports_to_download(start_date, end_date)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{start_date}}{Starting date of the report}
+
+\item{\code{end_date}}{Ending date of the report}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Task-clone"></a>}}

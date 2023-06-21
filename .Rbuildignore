@@ -12,3 +12,4 @@ $run_dev.*
 ^\.dockerignore$
 ^app\.R$
 ^rsconnect$
+dev/.*
