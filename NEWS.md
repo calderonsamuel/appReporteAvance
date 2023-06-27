@@ -1,3 +1,7 @@
+# appReporteAvance 0.4.5
+
+- Se incluyó infraestructura básica para el seguimiento con Google Analytics. close #173
+
 # appReporteAvance 0.4.4
 
 - Se arregló un enlace roto al manual de usuario
