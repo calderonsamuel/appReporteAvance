@@ -50,6 +50,7 @@ golem_add_external_resources <- function() {
     # for example, you can add shinyalert::useShinyalert()
     shinyWidgets::useSweetAlert(),
     firebase::useFirebase(),
-    shinyjs::useShinyjs()
+    shinyjs::useShinyjs(),
+    tags$script(async = NA, src="https://www.googletagmanager.com/gtag/js?id=G-7P45QNH8JV")
   )
 }
