@@ -143,7 +143,7 @@ mod_report_add_server <- function(id, app_data, controlbar) {
                         numericInput(
                             inputId = ns(.y),
                             label = NULL,
-                            value = input[[.y]] %||% 0L,
+                            value = isolate(input[[.y]] %||% 0L),
                             min = 0,
                             width = "100%"
                         )
