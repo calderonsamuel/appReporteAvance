@@ -1,3 +1,7 @@
+# appReporteAvance 0.4.6
+
+- Se arregló un bug que impedía añadir cantidades fluidamente en formulario de nuevo reporte.
+
 # appReporteAvance 0.4.5
 
 - Se incluyó infraestructura básica para el seguimiento con Google Analytics. close #173
