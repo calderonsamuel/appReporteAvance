@@ -1,6 +1,6 @@
 Package: appReporteAvance
 Title: Reporte de avances de oficina
-Version: 0.4.6
+Version: 0.4.6.9000
 Authors@R: 
     person("Samuel", "Calderon", , "samuel.calderon@uarm.pe", role = c("cre", "aut"))
 Description: Las personas de la oficina usan esta app para reportar el

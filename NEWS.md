@@ -1,3 +1,5 @@
+# appReporteAvance (development version)
+
 # appReporteAvance 0.4.6
 
 - Se arregló un bug que impedía añadir cantidades fluidamente en formulario de nuevo reporte.
