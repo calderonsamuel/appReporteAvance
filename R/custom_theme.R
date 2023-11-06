@@ -10,7 +10,8 @@ custom_theme <- function() {
             control_sidebar_width = "350px"
         ),
         theme_colors
-    )
+    ) |> 
+        suppressWarnings()
 }
 reportes_compute_colors <- function() {
     
