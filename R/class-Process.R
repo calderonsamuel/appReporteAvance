@@ -19,7 +19,7 @@ Process <- R6::R6Class(
         
         #' @description
         #' This function fetches all the processes that belong to a group using the group_selected property.
-        #' It uses the glue and DBI libraries to execute an SQL query on the database connection stored in the private$con property.
+        #' It uses the glue and DBI libraries to execute an SQL query on the database connection stored in the self$con property.
         #' The results are transformed using purrr::pmap(list). 
         #' 
         #' @return a list of processed retrieved from the database
@@ -28,15 +28,15 @@ Process <- R6::R6Class(
                 "SELECT * 
                 FROM processes
                 WHERE group_id = {self$group_selected}",
-                .con = private$con
+                .con = self$con
             )
 
-            DBI::dbGetQuery(private$con, st) |>
+            DBI::dbGetQuery(self$con, st) |>
                 purrr::pmap(list)
         },
         
         #' @description
-        #' This function fetches all the units that belong to a process identified by its ID using the glue and DBI libraries to execute an SQL query on the database connection stored in the private$con property.
+        #' This function fetches all the units that belong to a process identified by its ID using the glue and DBI libraries to execute an SQL query on the database connection stored in the self$con property.
         #' The results are transformed using purrr::pmap(list).
         #' 
         #' @param process_id integer with the ID of the process to retrieve units from
@@ -47,10 +47,10 @@ Process <- R6::R6Class(
                 FROM units
                 WHERE process_id = {process_id}
                 ORDER BY time_last_modified DESC",
-                .con = private$con
+                .con = self$con
             )
 
-            DBI::dbGetQuery(private$con, st) |>
+            DBI::dbGetQuery(self$con, st) |>
                 purrr::pmap(list)
         },
         
@@ -66,10 +66,10 @@ Process <- R6::R6Class(
             st <- glue::glue_sql(
                 "INSERT INTO processes(group_id, process_id, title, description, created_by)
                 VALUES ({self$group_selected}, {id}, {title}, {description}, {self$user$user_id})",
-                .con = private$con
+                .con = self$con
             )
             
-            DBI::dbExecute(private$con, st)
+            DBI::dbExecute(self$con, st)
             
             return(id)
         },
@@ -82,10 +82,10 @@ Process <- R6::R6Class(
             st <- glue::glue_sql(
                 "DELETE FROM processes
                 WHERE process_id = {process_id}",
-                .con = private$con
+                .con = self$con
             )
             
-            DBI::dbExecute(private$con, st)
+            DBI::dbExecute(self$con, st)
         },
         
         #' @description
@@ -102,10 +102,10 @@ Process <- R6::R6Class(
                     title = {title},
                     description = {description}
                 WHERE process_id = {process_id}",
-                .con = private$con
+                .con = self$con
             )
             
-            DBI::dbExecute(private$con, st)
+            DBI::dbExecute(self$con, st)
         },
 
         #' @description
@@ -136,10 +136,10 @@ Process <- R6::R6Class(
                     creator = {self$user$user_id},
                     last_modified_by = {self$user$user_id}
                 ",
-                .con = private$con
+                .con = self$con
             )
 
-            DBI::dbExecute(private$con, st)
+            DBI::dbExecute(self$con, st)
             
             if (interactive()) cli::cli_alert_info("Inserted unit '{unit_id}' into group '{self$group_selected}'")
             return(unit_id)
@@ -170,10 +170,10 @@ Process <- R6::R6Class(
                 WHERE
                     unit_id = {unit_id}
             ",
-            .con = private$con
+            .con = self$con
             )
 
-            DBI::dbExecute(private$con, st)
+            DBI::dbExecute(self$con, st)
             
             if (interactive()) cli::cli_alert_info("Edited unit '{unit_id}' from '{self$group_selected}'")
         },
@@ -186,10 +186,10 @@ Process <- R6::R6Class(
             st <- glue::glue_sql(
                 "DELETE FROM units
                 WHERE unit_id = {unit_id}",
-                .con = private$con
+                .con = self$con
             )
 
-            DBI::dbExecute(private$con, st)
+            DBI::dbExecute(self$con, st)
             
             if (interactive()) cli::cli_alert_info("Deleted unit '{unit_id}' from group '{self$group_selected}'")
         }

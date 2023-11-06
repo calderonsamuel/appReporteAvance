@@ -159,7 +159,7 @@ Group <- R6::R6Class(
                         user_id = {user_id} AND
                         group_id = {group_id}
                 ",
-                .con = private$con,
+                .con = self$con,
                 user_id = self$user$user_id,
                 group_id = self$group_selected
             )
@@ -172,15 +172,15 @@ Group <- R6::R6Class(
                         user_id = {user_id} AND
                         group_id != {group_id}
                 ",
-                .con = private$con,
+                .con = self$con,
                 user_id = self$user$user_id,
                 group_id = self$group_selected
             )
             
-            DBI::dbBegin(private$con)
-            DBI::dbExecute(private$con, statement_set_new_favorite)
-            DBI::dbExecute(private$con, statement_forget_old_favorite)
-            DBI::dbCommit(private$con)
+            DBI::dbBegin(self$con)
+            DBI::dbExecute(self$con, statement_set_new_favorite)
+            DBI::dbExecute(self$con, statement_forget_old_favorite)
+            DBI::dbCommit(self$con)
         },
         
         #' @description Add a measurement unit for a group
@@ -305,7 +305,7 @@ Group <- R6::R6Class(
                     value = glue::glue_sql(
                         "({group_id}, {unit_id}, {unit_title}, {unit_description}, 
                         {type}, {icon}, {creator}, {last_modified_by})",
-                        .con = private$con
+                        .con = self$con
                     )
                 )
             

@@ -15,9 +15,11 @@
 DBManager <- R6::R6Class(
     classname = "DBManager",
     public = list(
+        #' @field con The DB connection
+        con = NULL,
         #' @description Start the DB Manager
         initialize = function(use_tibble = TRUE) {
-            private$con <-  private$db_connect()
+            self$con <-  private$db_connect()
             private$use_tibble <- use_tibble
             
             if (interactive()) cli::cli_alert_info("Connected to DB")
@@ -25,34 +27,40 @@ DBManager <- R6::R6Class(
         #' @description Analog to  `DBI::dbExecute()`
         db_execute_statement = function(...) {
             dots <- list(...)
-            dots[[".con"]] <- private$con
+            dots[[".con"]] <- self$con
 
             statement <- do.call(what = glue::glue_sql, args = dots)
 
-            DBI::dbExecute(private$con, statement)
+            DBI::dbExecute(self$con, statement)
         },
         #' @description Analog to  `DBI::dbGetQuery()`
         db_get_query = function(...) {
+            private$db_safe_reconnect()
             dots <- list(...)
-            dots[[".con"]] <- private$con
+            dots[[".con"]] <- self$con
 
             query <- do.call(what = glue::glue_sql, args = dots)
 
-            data_returned <- DBI::dbGetQuery(private$con, query)
+            data_returned <- DBI::dbGetQuery(self$con, query)
 
             if (private$use_tibble) tibble::as_tibble(data_returned) else data_returned
         },
         #' @description Construct the query to be passed to `DBI::dbGetQuery()`. Useful for debugging and subquery construction.
         db_make_query = function(...) {
+            private$db_safe_reconnect()
             dots <- list(...)
-            dots[[".con"]] <- private$con
+            dots[[".con"]] <- self$con
 
             do.call(what = glue::glue_sql, args = dots)
         }
     ),
     private = list(
-        con = NULL,
         use_tibble = NULL,
+        db_safe_reconnect = function() {
+            if (!DBI::dbIsValid(self$con)) {
+                self$con <- private$db_connect()
+            }
+        },
         db_connect = function() {
             DBI::dbConnect(
                 drv = RMariaDB::MariaDB(),
@@ -64,7 +72,7 @@ DBManager <- R6::R6Class(
             )
         },
         finalize = function() {
-            DBI::dbDisconnect(private$con)
+            DBI::dbDisconnect(self$con)
             if (interactive()) cli::cli_alert_info("Ending DB connection")
         }
     )

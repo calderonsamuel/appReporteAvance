@@ -56,7 +56,7 @@ Task <- R6::R6Class(
                     output_current = 0,
                     status_current = 'Pendiente'
                 ",
-                .con = private$con
+                .con = self$con
             )
 
             details <- glue::glue(
@@ -73,13 +73,13 @@ Task <- R6::R6Class(
                     status = 'Pendiente',
                     details = {details}
                 ",
-                .con = private$con
+                .con = self$con
             )
 
-            DBI::dbBegin(private$con)
-            DBI::dbExecute(private$con, task_st)
-            DBI::dbExecute(private$con, progress_st)
-            DBI::dbCommit(private$con)
+            DBI::dbBegin(self$con)
+            DBI::dbExecute(self$con, task_st)
+            DBI::dbExecute(self$con, progress_st)
+            DBI::dbCommit(self$con)
             
             if (interactive()) {
                 cli::cli_h2("Task added")
@@ -120,7 +120,7 @@ Task <- R6::R6Class(
             ) |>
                 purrr::compact() |>
                 purrr::imap_chr(\(x, i) {
-                    glue::glue_sql("{`i`} = {x}", .con = private$con)
+                    glue::glue_sql("{`i`} = {x}", .con = self$con)
                 }) |>
                 glue::glue_sql_collapse(sep = ", ")
 
@@ -130,7 +130,7 @@ Task <- R6::R6Class(
                     {edit_values}
                 WHERE
                     task_id = {task_id}",
-                .con = private$con
+                .con = self$con
             )
 
             # This keeps non null values and creates a valid details text
@@ -160,13 +160,13 @@ Task <- R6::R6Class(
                 ORDER BY time_reported DESC
                 LIMIT 1
                 ",
-                .con = private$con
+                .con = self$con
             )
 
-            DBI::dbBegin(private$con)
-            DBI::dbExecute(private$con, st_task)
-            DBI::dbExecute(private$con, st_progress)
-            DBI::dbCommit(private$con)
+            DBI::dbBegin(self$con)
+            DBI::dbExecute(self$con, st_task)
+            DBI::dbExecute(self$con, st_progress)
+            DBI::dbCommit(self$con)
 
             if (interactive()) {
                 cli::cli_h2("Task edited")
@@ -207,7 +207,7 @@ Task <- R6::R6Class(
                     status_current = 'Archivado'
                 WHERE task_id = {task_id}
                 ",
-                .con = private$con
+                .con = self$con
             )
 
             progress_st  <- glue::glue_sql(
@@ -219,13 +219,13 @@ Task <- R6::R6Class(
                     status = 'Archivado',
                     details = 'Archivado manualmente'
                 ",
-                .con = private$con
+                .con = self$con
             )
 
-            DBI::dbBegin(private$con)
-            DBI::dbExecute(private$con, task_st)
-            DBI::dbExecute(private$con, progress_st)
-            DBI::dbCommit(private$con)
+            DBI::dbBegin(self$con)
+            DBI::dbExecute(self$con, task_st)
+            DBI::dbExecute(self$con, progress_st)
+            DBI::dbCommit(self$con)
         },
         
         #' @description Insert progress info on some task
@@ -278,7 +278,7 @@ Task <- R6::R6Class(
             
             report_id <- ids::random_id()
             
-            all_values <- glue::glue_sql("({report_id}, {units}, {quantities})", .con = private$con)
+            all_values <- glue::glue_sql("({report_id}, {units}, {quantities})", .con = self$con)
             
             report_insertion <- glue::glue_sql(
                 "
@@ -286,7 +286,7 @@ Task <- R6::R6Class(
                 VALUES
                     ({report_id}, {report_title}, {details}, {self$user$user_id}, {self$group_selected});
                 ",
-                .con = private$con
+                .con = self$con
             )
             
             quantities_insertion <- glue::glue_sql(
@@ -295,25 +295,25 @@ Task <- R6::R6Class(
                     VALUES
                         {all_values*};
                 ",
-                .con = private$con
+                .con = self$con
             )
             
-            DBI::dbBegin(private$con)
+            DBI::dbBegin(self$con)
             
-            DBI::dbExecute(conn = private$con, report_insertion)
-            DBI::dbExecute(conn = private$con, quantities_insertion)
+            DBI::dbExecute(conn = self$con, report_insertion)
+            DBI::dbExecute(conn = self$con, quantities_insertion)
             
-            DBI::dbCommit(private$con)
+            DBI::dbCommit(self$con)
         },
         #' @description Delete a report and its contributions from the database.
         report_delete = function(report_id) {
             statement <- glue::glue_sql(
                 "DELETE FROM reports
                 WHERE report_id IN ({report_id*})",
-                .con = private$con
+                .con = self$con
             )
             
-            DBI::dbExecute(private$con, statement)
+            DBI::dbExecute(self$con, statement)
         },
         #' @description Archive a report and its contributions.
         report_archive = function(report_id) {
@@ -322,10 +322,10 @@ Task <- R6::R6Class(
                 SET archived = 1
                 WHERE 
                     report_id IN ({report_id*})",
-                .con = private$con
+                .con = self$con
             )
             
-            DBI::dbExecute(private$con, statement)
+            DBI::dbExecute(self$con, statement)
         },
         
         #' @description Get data for reporting
@@ -338,7 +338,7 @@ Task <- R6::R6Class(
                 WHERE 
                     group_id = {self$group_selected} AND
                     time_reported BETWEEN {start_date} AND DATE_ADD({end_date}, INTERVAL 1 DAY)",
-                .con = private$con
+                .con = self$con
             )
             statement <- glue::glue_sql(
                 "SELECT 
@@ -349,10 +349,10 @@ Task <- R6::R6Class(
                 LEFT JOIN report_quantities rhs ON
                     lhs.report_id = rhs.report_id
                 ",
-                .con = private$con
+                .con = self$con
             )
             
-            DBI::dbGetQuery(private$con, statement)
+            DBI::dbGetQuery(self$con, statement)
         }
     ),
     private = list(
@@ -424,10 +424,10 @@ Task <- R6::R6Class(
                 LEFT JOIN report_quantities rhs ON
                     lhs.report_id = rhs.report_id
                 ",
-                .con = private$con
+                .con = self$con
             )
             
-            data <- DBI::dbGetQuery(private$con, statement)
+            data <- DBI::dbGetQuery(self$con, statement)
             
             data |> 
                 split(~report_id) |> 

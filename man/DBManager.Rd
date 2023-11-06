@@ -11,6 +11,13 @@ Clase R6 para manejar la base de datos
 \details{
 Una base de datos puede ejecutar y obtener querys
 }
+\section{Public fields}{
+\if{html}{\out{<div class="r6-fields">}}
+\describe{
+\item{\code{con}}{The DB connection}
+}
+\if{html}{\out{</div>}}
+}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{

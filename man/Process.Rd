@@ -80,7 +80,7 @@ It calls the initialize() method of the Group class to inherit its properties.
 \if{latex}{\out{\hypertarget{method-Process-fetch_processes}{}}}
 \subsection{Method \code{fetch_processes()}}{
 This function fetches all the processes that belong to a group using the group_selected property.
-It uses the glue and DBI libraries to execute an SQL query on the database connection stored in the private$con property.
+It uses the glue and DBI libraries to execute an SQL query on the database connection stored in the self$con property.
 The results are transformed using purrr::pmap(list).
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Process$fetch_processes()}\if{html}{\out{</div>}}
@@ -94,7 +94,7 @@ a list of processed retrieved from the database
 \if{html}{\out{<a id="method-Process-fetch_units"></a>}}
 \if{latex}{\out{\hypertarget{method-Process-fetch_units}{}}}
 \subsection{Method \code{fetch_units()}}{
-This function fetches all the units that belong to a process identified by its ID using the glue and DBI libraries to execute an SQL query on the database connection stored in the private$con property.
+This function fetches all the units that belong to a process identified by its ID using the glue and DBI libraries to execute an SQL query on the database connection stored in the self$con property.
 The results are transformed using purrr::pmap(list).
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Process$fetch_units(process_id)}\if{html}{\out{</div>}}
